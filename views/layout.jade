@@ -1,0 +1,27 @@
+!!! 5
+html
+
+  head
+    title WoUSO - New
+
+    link(rel='stylesheet', href='/' + theme + '/style.css')
+
+    script(type="text/javascript", src='/widgets/index.js')
+    script(src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js")
+
+
+  body
+    h1 WoUSO - New
+    #nav
+      ul#nav-ul
+        li
+          a(href='/') Home
+        li
+          a(href='/admin') Admin
+
+    #main
+      block sidebar
+      block content
+
+  - each mod in settings.modules
+    script(type="text/javascript", src='/' + mod + '/public/widgets/index.js')

@@ -1,0 +1,12 @@
+{
+	"modules": {
+		"qotd" : true
+	},
+	"themes": {
+		"red" : false,
+		"grey": true
+	},
+	"superuser": {
+		"admin": "marius"
+	}
+}

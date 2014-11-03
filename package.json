@@ -1,0 +1,19 @@
+{
+  "name": "wouso-new",
+  "version": "0.0.1",
+  "dependencies": {
+    "bcrypt-nodejs": "0.0.3",
+    "connect": "2.19.6",
+    "express": "^3.10.5",
+    "express-session": "^1.9.1",
+    "jade": "0.31.2",
+    "mongoose": "3.2.0",
+    "passport": "^0.2.1",
+    "passport-facebook": "^1.0.3",
+    "passport-local": "^1.0.0"
+  },
+  "engines": {
+    "node": "0.8.x",
+    "npm": "1.2.x"
+  }
+}

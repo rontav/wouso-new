@@ -1,0 +1,32 @@
+extends ../../../views/layout
+
+block content
+  h3 QotD Page
+
+  form(method='post', action='/qotd/add')
+    label Question
+    br
+    input.span5(name='question', type='text')
+    br
+    br
+    label Ans1
+    input.span5(name='answer', type='text')
+    input(name="valid", type="radio", value="0")
+    br
+    label Ans2
+    input.span5(name='answer', type='text')
+    input(name="valid", type="radio", value="1")
+    br
+    input.btn.btn-success(id='sub', type='submit', value='Save')
+    hr
+
+    each qotd in questions
+        br
+        br
+        = qotd.question
+        br
+        each right in qotd.answers.right
+            = "+ " + right
+        br
+        each wrong in qotd.answers.wrong
+            = "- " + wrong
