@@ -147,7 +147,6 @@ app.get('/connect/twitter',
     scope : 'email'
   }));
 
-// handle the callback after twitter has authorized the user
 app.get('/connect/twitter/callback',
     passport.authorize('twitter', {
         successRedirect : '/profile',
@@ -172,10 +171,34 @@ app.get('/connect/google',
     scope : 'email'
   }));
 
-app.get('/auth/google/callback',
-    passport.authenticate('google', {
+app.get('/connect/google/callback',
+    passport.authorize('google', {
+        successRedirect : '/profile',
+        failureRedirect : '/'
+    }));
+
+
+// GITHUB LOGIN
+app.get('/auth/github',
+  passport.authenticate('github', {
+    scope : 'email'
+  }));
+
+app.get('/auth/github/callback',
+    passport.authenticate('github', {
         successRedirect : '/profile',
         failureRedirect : '/login'
+    }));
+
+app.get('/connect/github',
+  passport.authorize('github', {
+    scope : 'email'
+  }));
+
+app.get('/connect/github/callback',
+    passport.authorize('github', {
+        successRedirect : '/profile',
+        failureRedirect : '/'
     }));
 
 
@@ -223,7 +246,6 @@ app.use(express.static(__dirname + '/themes'));
 
 // Base routes
 app.get('/', function (req, res, next) {
-  console.log(req.user)
   User.find().exec(function (err, users) {
     res.render('index', {
       modules: Object.keys(data.modules),

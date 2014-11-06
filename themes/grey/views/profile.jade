@@ -5,9 +5,18 @@ block content
 
   if (user && !user.facebook.id)
     a(href='/connect/facebook') Connect Facebook account
+    br
   if (user && !user.twitter.id)
     a(href='/connect/twitter') Connect Twitter account
+    br
   if (user && !user.google.id)
     a(href='/connect/google') Connect Google account
+    br
+  if (user && !user.github.id)
+    a(href='/connect/github') Connect GitHub account
+    br
 
   p= user
+
+  if (user)
+    a(href='/logout') Logout
