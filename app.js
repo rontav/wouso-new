@@ -104,6 +104,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 
+// FACEBOOK LOGIN
 app.get('/auth/facebook',
   passport.authenticate('facebook', {
     scope : 'email'
@@ -112,9 +113,72 @@ app.get('/auth/facebook',
 // handle the callback after facebook has authenticated the user
 app.get('/auth/facebook/callback',
     passport.authenticate('facebook', {
-        successRedirect : '/',
+        successRedirect : '/profile',
+        failureRedirect : '/login'
+    }));
+
+app.get('/connect/facebook',
+  passport.authorize('facebook', {
+    scope : 'email'
+  }));
+
+// handle the callback after twitter has authorized the user
+app.get('/connect/facebook/callback',
+    passport.authorize('facebook', {
+        successRedirect : '/profile',
         failureRedirect : '/'
     }));
+
+
+// TWITTER LOGIN
+app.get('/auth/twitter',
+  passport.authenticate('twitter', {
+    scope : 'email'
+  }));
+
+app.get('/auth/twitter/callback',
+    passport.authenticate('twitter', {
+        successRedirect : '/profile',
+        failureRedirect : '/login'
+    }));
+
+app.get('/connect/twitter',
+  passport.authorize('twitter', {
+    scope : 'email'
+  }));
+
+// handle the callback after twitter has authorized the user
+app.get('/connect/twitter/callback',
+    passport.authorize('twitter', {
+        successRedirect : '/profile',
+        failureRedirect : '/'
+    }));
+
+
+// GOOGLE LOGIN
+app.get('/auth/google',
+  passport.authenticate('google', {
+    scope : 'email'
+  }));
+
+app.get('/auth/google/callback',
+    passport.authenticate('google', {
+        successRedirect : '/profile',
+        failureRedirect : '/login'
+    }));
+
+app.get('/connect/google',
+  passport.authorize('google', {
+    scope : 'email'
+  }));
+
+app.get('/auth/google/callback',
+    passport.authenticate('google', {
+        successRedirect : '/profile',
+        failureRedirect : '/login'
+    }));
+
+
 
 // route for logging out
 app.get('/logout', function(req, res) {
@@ -159,6 +223,7 @@ app.use(express.static(__dirname + '/themes'));
 
 // Base routes
 app.get('/', function (req, res, next) {
+  console.log(req.user)
   User.find().exec(function (err, users) {
     res.render('index', {
       modules: Object.keys(data.modules),

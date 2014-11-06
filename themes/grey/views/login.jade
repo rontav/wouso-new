@@ -1,0 +1,11 @@
+extends ../../../views/layout
+
+block content
+  h3 Login Page
+
+  a(href='/auth/facebook') Facebook Login
+  a(href='/auth/twitter') Twitter Login
+  a(href='/auth/google') Google Login
+
+  - if (username)
+    h2 Logged in

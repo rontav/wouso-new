@@ -1,0 +1,13 @@
+extends ../../../views/layout
+
+block content
+  h3 Profile Page
+
+  if (user && !user.facebook.id)
+    a(href='/connect/facebook') Connect Facebook account
+  if (user && !user.twitter.id)
+    a(href='/connect/twitter') Connect Twitter account
+  if (user && !user.google.id)
+    a(href='/connect/google') Connect Google account
+
+  p= user

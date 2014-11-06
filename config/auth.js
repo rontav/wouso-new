@@ -7,15 +7,15 @@ module.exports = {
     },
 
     'twitterAuth' : {
-        'consumerKey'       : 'your-consumer-key-here',
-        'consumerSecret'    : 'your-client-secret-here',
-        'callbackURL'       : 'http://localhost:8080/auth/twitter/callback'
+        'consumerKey'       : 'JJIFjjLVYXbUpwEv4kffKYW9q',
+        'consumerSecret'    : 'C2wi4vFDPhowoY25fI1zYHzj9dL8uMDsNCqFlVwJlD9ibmNQyM',
+        'callbackURL'       : 'http://localhost:3000/auth/twitter/callback'
     },
 
     'googleAuth' : {
-        'clientID'      : 'your-secret-clientID-here',
-        'clientSecret'  : 'your-client-secret-here',
-        'callbackURL'   : 'http://localhost:8080/auth/google/callback'
+        'clientID'      : '749085539075-tihno91bjfqlm8950uocj6b5t1tf1asc.apps.googleusercontent.com',
+        'clientSecret'  : 'Adjo7Sz0zNe0974qPAWSXbvN',
+        'callbackURL'   : 'http://localhost:3000/auth/google/callback'
     }
 
 };
