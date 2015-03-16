@@ -10,6 +10,8 @@ module.exports = function (app) {
 
   app.post('/api/qotd/add', function (req, res, next) {
 
+    console.log(req.body)
+
     final_answers = {'right': [], 'wrong': []}
     for (i in req.body.answer)
       if (i == req.body.valid)

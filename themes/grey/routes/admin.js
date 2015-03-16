@@ -1,3 +1,5 @@
+var User = require('../../../config/models/user')
+
 module.exports = function (app) {
 
   app.get('/admin', function (req, res, next) {

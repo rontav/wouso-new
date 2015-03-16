@@ -16,7 +16,18 @@ block content
     a(href='/connect/github') Connect GitHub account
     br
 
-  p= user
+  - if (user.facebook.id)
+    b Facebook
+    p= user.facebook
+  - if (user.twitter.id)
+    b Twitter
+    p= user.twitter
+  - if (user.google.id)
+    b Google
+    p= user.google
+  - if (user.github.id)
+    b GitHub
+    p= user.github
 
   if (user)
     a(href='/logout') Logout
