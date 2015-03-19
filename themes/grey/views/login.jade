@@ -3,13 +3,25 @@ extends ../../../views/layout
 block content
   h3 Login Page
 
-  a(href='/auth/facebook') Facebook Login
-  br
-  a(href='/auth/twitter') Twitter Login
-  br
-  a(href='/auth/google') Google Login
-  br
-  a(href='/auth/github') GitHub Login
+  - if (!username)
+    form(action='/login', method='post')
+      label Email
+      input(name='email', type='text')
+      br
+      label Password
+      input(name='password', type='password')
+      p Need an <a href='/signup'> account </a> ?
+      br
+      button.btn.btn-warning(type='submit') Login
 
-  - if (username)
-    h2 Logged in
+    <br><br>
+    a(href='/auth/facebook') Facebook Login
+    br
+    a(href='/auth/twitter') Twitter Login
+    br
+    a(href='/auth/google') Google Login
+    br
+    a(href='/auth/github') GitHub Login
+
+  - else
+    h2 Already logged in

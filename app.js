@@ -116,6 +116,20 @@ app.use(passport.initialize())
 app.use(passport.session())
 
 
+// LOCAL SIGNUP
+app.post('/login',
+  passport.authenticate('local-login', {
+    successRedirect : '/profile', // redirect to the secure profile section
+    failureRedirect : '/login', // redirect back to the signup page if there is an error
+  }))
+
+app.post('/signup',
+  passport.authenticate('local-signup', {
+    successRedirect : '/profile', // redirect to the secure profile section
+    failureRedirect : '/signup', // redirect back to the signup page if there is an error
+    failureFlash : true // allow flash messages
+  }))
+
 // FACEBOOK LOGIN
 app.get('/auth/facebook',
   passport.authenticate('facebook', {
@@ -124,10 +138,10 @@ app.get('/auth/facebook',
 
 // handle the callback after facebook has authenticated the user
 app.get('/auth/facebook/callback',
-    passport.authenticate('facebook', {
-        successRedirect : '/profile',
-        failureRedirect : '/login'
-    }))
+  passport.authenticate('facebook', {
+      successRedirect : '/profile',
+      failureRedirect : '/login'
+  }))
 
 app.get('/connect/facebook',
   passport.authorize('facebook', {
@@ -136,10 +150,10 @@ app.get('/connect/facebook',
 
 // handle the callback after facebook has authorized the user
 app.get('/connect/facebook/callback',
-    passport.authorize('facebook', {
-        successRedirect : '/profile',
-        failureRedirect : '/'
-    }))
+  passport.authorize('facebook', {
+      successRedirect : '/profile',
+      failureRedirect : '/'
+  }))
 
 
 // TWITTER LOGIN
@@ -149,10 +163,10 @@ app.get('/auth/twitter',
   }))
 
 app.get('/auth/twitter/callback',
-    passport.authenticate('twitter', {
-        successRedirect : '/profile',
-        failureRedirect : '/login'
-    }))
+  passport.authenticate('twitter', {
+      successRedirect : '/profile',
+      failureRedirect : '/login'
+  }))
 
 app.get('/connect/twitter',
   passport.authorize('twitter', {
@@ -160,10 +174,10 @@ app.get('/connect/twitter',
   }))
 
 app.get('/connect/twitter/callback',
-    passport.authorize('twitter', {
-        successRedirect : '/profile',
-        failureRedirect : '/'
-    }))
+  passport.authorize('twitter', {
+      successRedirect : '/profile',
+      failureRedirect : '/'
+  }))
 
 
 // GOOGLE LOGIN
@@ -173,10 +187,10 @@ app.get('/auth/google',
   }))
 
 app.get('/auth/google/callback',
-    passport.authenticate('google', {
-        successRedirect : '/profile',
-        failureRedirect : '/login'
-    }))
+  passport.authenticate('google', {
+      successRedirect : '/profile',
+      failureRedirect : '/login'
+  }))
 
 app.get('/connect/google',
   passport.authorize('google', {
@@ -184,10 +198,10 @@ app.get('/connect/google',
   }))
 
 app.get('/connect/google/callback',
-    passport.authorize('google', {
-        successRedirect : '/profile',
-        failureRedirect : '/'
-    }))
+  passport.authorize('google', {
+      successRedirect : '/profile',
+      failureRedirect : '/'
+  }))
 
 
 // GITHUB LOGIN
@@ -197,10 +211,10 @@ app.get('/auth/github',
   }))
 
 app.get('/auth/github/callback',
-    passport.authenticate('github', {
-        successRedirect : '/profile',
-        failureRedirect : '/login'
-    }))
+  passport.authenticate('github', {
+      successRedirect : '/profile',
+      failureRedirect : '/login'
+  }))
 
 app.get('/connect/github',
   passport.authorize('github', {
@@ -208,26 +222,30 @@ app.get('/connect/github',
   }))
 
 app.get('/connect/github/callback',
-    passport.authorize('github', {
-        successRedirect : '/profile',
-        failureRedirect : '/'
-    }))
+  passport.authorize('github', {
+      successRedirect : '/profile',
+      failureRedirect : '/'
+  }))
 
+
+app.get('/signup', function(req, res) {
+  res.render('signup')
+})
 
 // route for logging out
 app.get('/logout', function(req, res) {
-    req.logout()
-    res.redirect('/')
+  req.logout()
+  res.redirect('/')
 })
 
 // route middleware to make sure a user is logged in
 function isLoggedIn(req, res, next) {
-    // if user is authenticated in the session, carry on
-    if (req.isAuthenticated())
-        return next()
+  // if user is authenticated in the session, carry on
+  if (req.isAuthenticated())
+      return next()
 
-    // if they aren't redirect them to the home page
-    res.redirect('/')
+  // if they aren't redirect them to the home page
+  res.redirect('/')
 }
 
 

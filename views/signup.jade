@@ -1,0 +1,18 @@
+extends layout
+
+block content
+  h3 Signup Page
+
+  form(action='/signup', method='post')
+    label Username
+    input(name='username', type='text')
+    br
+    label Email
+    input(name='email', type='text')
+    br
+    label Password
+    input(name='password', type='password')
+    br
+    button.btn.btn-warning(type='submit') Signup
+
+  p Already have an account? <a href='/login'> Login </a>
