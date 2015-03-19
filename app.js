@@ -4,6 +4,7 @@ var mongoose     = require('mongoose')
 var bodyParser   = require('body-parser')
 var cookieParser = require('cookie-parser')
 var exprSession  = require('express-session')
+var passport     = require('passport')
 var app = module.exports = express()
 
 // Read config file
@@ -33,27 +34,6 @@ pass = data.superuser[root]
 User.findOne({'local.username': root}).exec(function(err, him) {
   if (!him) new User({'local.username': root, 'password': pass}).save()
 })
-
-
-// Load enabled modules
-for (module in data.modules) {
-  if (data.modules[module]) {
-    // Build list of enabled modules
-    available_modules.push(module)
-    // Load module shema
-    require(module + '/model.js')
-    // Load module routes
-    require(module)(app)
-  }
-}
-
-// Load theme routes
-views_dir = './themes/' + used_theme + '/routes'
-var views = fs.readdirSync(views_dir);
-for (i in views) {
-  view = views_dir + '/' + views[i]
-  require(view)(app)
-}
 
 
 // PATCH to used multiple view directories in express 3.0
@@ -102,136 +82,36 @@ app.use(bodyParser.json())
 app.use(express.static(__dirname + '/public'))
 app.use(express.static(__dirname + '/modules'))
 app.use(express.static(__dirname + '/themes'))
-
-
-// Configuring Passport
-var passport = require('passport')
-require('./config/passport')(passport)
 app.use(passport.initialize())
 app.use(passport.session())
 
 
-// LOCAL SIGNUP
-app.post('/login',
-  passport.authenticate('local-login', {
-    successRedirect : '/profile', // redirect to the secure profile section
-    failureRedirect : '/login', // redirect back to the signup page if there is an error
-  }))
-
-app.post('/signup',
-  passport.authenticate('local-signup', {
-    successRedirect : '/profile', // redirect to the secure profile section
-    failureRedirect : '/signup', // redirect back to the signup page if there is an error
-    failureFlash : true // allow flash messages
-  }))
-
-// FACEBOOK LOGIN
-app.get('/auth/facebook',
-  passport.authenticate('facebook', {
-    scope : 'email'
-  }))
-
-// handle the callback after facebook has authenticated the user
-app.get('/auth/facebook/callback',
-  passport.authenticate('facebook', {
-      successRedirect : '/profile',
-      failureRedirect : '/login'
-  }))
-
-app.get('/connect/facebook',
-  passport.authorize('facebook', {
-    scope : 'email'
-  }))
-
-// handle the callback after facebook has authorized the user
-app.get('/connect/facebook/callback',
-  passport.authorize('facebook', {
-      successRedirect : '/profile',
-      failureRedirect : '/'
-  }))
+// Configuring Passport
+require('./config/passport')(passport)
+// Load authentication routes from external file
+require('./auth.js')(app, passport)
 
 
-// TWITTER LOGIN
-app.get('/auth/twitter',
-  passport.authenticate('twitter', {
-    scope : 'email'
-  }))
+// Load enabled modules
+for (module in data.modules) {
+  if (data.modules[module]) {
+    // Build list of enabled modules
+    available_modules.push(module)
+    // Load module shema
+    require(module + '/model.js')
+    // Load module routes
+    require(module)(app)
+  }
+}
 
-app.get('/auth/twitter/callback',
-  passport.authenticate('twitter', {
-      successRedirect : '/profile',
-      failureRedirect : '/login'
-  }))
+// Load theme routes
+views_dir = './themes/' + used_theme + '/routes'
+var views = fs.readdirSync(views_dir);
+for (i in views) {
+  view = views_dir + '/' + views[i]
+  require(view)(app)
+}
 
-app.get('/connect/twitter',
-  passport.authorize('twitter', {
-    scope : 'email'
-  }))
-
-app.get('/connect/twitter/callback',
-  passport.authorize('twitter', {
-      successRedirect : '/profile',
-      failureRedirect : '/'
-  }))
-
-
-// GOOGLE LOGIN
-app.get('/auth/google',
-  passport.authenticate('google', {
-    scope : 'email'
-  }))
-
-app.get('/auth/google/callback',
-  passport.authenticate('google', {
-      successRedirect : '/profile',
-      failureRedirect : '/login'
-  }))
-
-app.get('/connect/google',
-  passport.authorize('google', {
-    scope : 'email'
-  }))
-
-app.get('/connect/google/callback',
-  passport.authorize('google', {
-      successRedirect : '/profile',
-      failureRedirect : '/'
-  }))
-
-
-// GITHUB LOGIN
-app.get('/auth/github',
-  passport.authenticate('github', {
-    scope : 'email'
-  }))
-
-app.get('/auth/github/callback',
-  passport.authenticate('github', {
-      successRedirect : '/profile',
-      failureRedirect : '/login'
-  }))
-
-app.get('/connect/github',
-  passport.authorize('github', {
-    scope : 'email'
-  }))
-
-app.get('/connect/github/callback',
-  passport.authorize('github', {
-      successRedirect : '/profile',
-      failureRedirect : '/'
-  }))
-
-
-app.get('/signup', function(req, res) {
-  res.render('signup')
-})
-
-// route for logging out
-app.get('/logout', function(req, res) {
-  req.logout()
-  res.redirect('/')
-})
 
 // route middleware to make sure a user is logged in
 function isLoggedIn(req, res, next) {

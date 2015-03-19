@@ -232,7 +232,7 @@ module.exports = function(passport) {
 
             // check if the user is already logged in
             if (!req.user) {
-                User.findOne({'google.id' : profile.id}, function(err, user) {
+                User.findOne({'google.email' : profile.email}, function(err, user) {
                     if (err) return done(err)
 
                     if (user) {
