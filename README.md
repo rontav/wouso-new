@@ -11,8 +11,8 @@ de utilizare (nu doar la noi in facultate)
 ## TODO:
 * investigate LDAP login
 * add lang directory that stores strings in different languages
-* investigate better modularisation (wouso modules as npm packages ?)
 * move login page to theme directory
+* better handling of logging
 
 ## BUGS
 * login with a connected account returns another user (if you login with a

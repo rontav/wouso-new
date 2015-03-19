@@ -1,5 +1,4 @@
 module.exports = function (app) {
-
   var qotd = require('mongoose').model('Qotd')
 
   app.get('/api/qotd/list', function (req, res, next) {

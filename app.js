@@ -7,7 +7,7 @@ var exprSession  = require('express-session')
 var app = module.exports = express()
 
 // Read config file
-var data = (JSON.parse(fs.readFileSync("./config.json", "utf8")))
+var data = (JSON.parse(fs.readFileSync('./config.json', 'utf8')))
 
 // List of enabled and available modules
 var available_modules = []
@@ -17,7 +17,6 @@ var used_theme = null
 for (theme in data.themes) {
   if (data.themes[theme])
     used_theme = theme
-
 }
 
 // Connect to database
@@ -36,59 +35,55 @@ User.findOne({'local.username': root}).exec(function(err, him) {
 })
 
 
-// Include all mongo schemas
+// Load enabled modules
 for (module in data.modules) {
-  var schema_file = './modules/' + module + '/model.js'
-  if (data.modules[module] && fs.existsSync(schema_file)) {
+  if (data.modules[module]) {
+    // Build list of enabled modules
     available_modules.push(module)
-    require(schema_file)
+    // Load module shema
+    require(module + '/model.js')
+    // Load module routes
+    require(module)(app)
   }
 }
 
-// Override res.render to use views dir within called module
-// As described here: https://gist.github.com/mrlannigan/5051687
-app.use(function(req, res, next) {
-  var render = res.render
+// Load theme routes
+views_dir = './themes/' + used_theme + '/routes'
+var views = fs.readdirSync(views_dir);
+for (i in views) {
+  view = views_dir + '/' + views[i]
+  require(view)(app)
+}
 
-  res.render = function(view, options, fn) {
-    var self = this,
-      options = options || {},
-      req = this.req,
-      app = req.app,
-      defaultFn
 
-    if ('function' == typeof options) {
-      fn = options, options = {}
-    }
+// PATCH to used multiple view directories in express 3.0
+// URL: http://stackoverflow.com/questions/11315351/multiple-view-paths-on-node-js-express
+function enable_multiple_view_folders() {
+    // Monkey-patch express to accept multiple paths for looking up views.
+    // this path may change depending on your setup.
+    var View = require("./node_modules/express/lib/view"),
+        lookup_proxy = View.prototype.lookup;
 
-    defaultFn = function(err, str){
-      if (err) return req.next(err)
-      self.send(str)
-    }
-
-    if ('function' != typeof fn) {
-      fn = defaultFn
-    }
-
-    // Raise error to get the stacktrace and find from which module
-    // is res.render called. Use path of views in that module.
-    var stack = new Error().stack
-    var pattern = new RegExp(/.*\/themes\/(.*?)\/.*/);
-    var match = stack.match(pattern)
-    var view_path = view
-
-    if (match) view_path = __dirname + '/themes/' + match[1] + '/views/' + view
-
-    render.call(self, view_path, options, function(err, str) {
-      fn(err, str)
-    })
-  }
-  next()
-})
+    View.prototype.lookup = function(viewName) {
+        var context, match;
+        if (this.root instanceof Array) {
+            for (var i = 0; i < this.root.length; i++) {
+                context = {root: this.root[i]};
+                match = lookup_proxy.call(context, viewName);
+                if (match) {
+                    return match;
+                }
+            }
+            return null;
+        }
+        return lookup_proxy.call(this, viewName);
+    };
+}
+enable_multiple_view_folders();
 
 
 // Configure app
-app.set('views', __dirname + '/views')
+app.set('views', ['views', 'themes/' + used_theme + '/views'])
 app.set('view engine', 'jade')
 app.set('modules', available_modules)
 app.set('theme', used_theme)
@@ -258,28 +253,6 @@ app.get('/', function (req, res, next) {
     })
   })
 })
-
-
-// Import routes specified in config file
-for (module in data.modules) {
-  if (data.modules[module]) {
-
-    var routes_file = './modules/' + module + '/routes.js'
-
-    if (fs.existsSync(routes_file))
-      require(routes_file)(app)
-    else
-      console.log('Missing module files for: ' + module)
-  }
-}
-
-// Include theme routes
-views_dir = './themes/' + used_theme + '/routes'
-var views = fs.readdirSync(views_dir);
-for (i in views) {
-  view = views_dir + '/' + views[i]
-  require(view)(app)
-}
 
 
 app.use(app.router)
