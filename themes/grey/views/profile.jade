@@ -10,7 +10,7 @@ block content
     a(href='/connect/twitter') Connect Twitter account
     br
   if (user && !user.google.id)
-    a(href='/connect/google') Connect Google account
+    a(href='#', onclick='gapi.auth.signIn({callback: signInCallback})') Connect Google account
     br
   if (user && !user.github.id)
     a(href='/connect/github') Connect GitHub account

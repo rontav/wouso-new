@@ -79,9 +79,9 @@ app.use(bodyParser.urlencoded({
   extended: true
 }))
 app.use(bodyParser.json())
-app.use(express.static(__dirname + '/public'))
-app.use(express.static(__dirname + '/modules'))
-app.use(express.static(__dirname + '/themes'))
+app.use('/public',  express.static(__dirname + '/public'))
+app.use('/modules', express.static(__dirname + '/modules'))
+app.use('/themes',  express.static(__dirname + '/themes'))
 app.use(passport.initialize())
 app.use(passport.session())
 
@@ -144,6 +144,6 @@ app.use(function(req, res, next){
 
 
 // Launch server
-app.listen(process.env.PORT || 3000, function() {
-  console.log('Server listening on port 3000.')
+app.listen(process.env.PORT || 4000, function() {
+  console.log('Server listening on port 4000.')
 })

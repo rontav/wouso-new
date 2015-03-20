@@ -12,7 +12,7 @@
     "passport": "^0.2.1",
     "passport-facebook": "^1.0.3",
     "passport-github": "^0.1.5",
-    "passport-google": "^0.3.0",
+    "passport-google-plus": "^0.5.1",
     "passport-local": "^1.0.0",
     "passport-twitter": "^1.0.2"
   },

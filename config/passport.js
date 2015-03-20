@@ -2,7 +2,7 @@
 var LocalStrategy    = require('passport-local').Strategy
 var FacebookStrategy = require('passport-facebook').Strategy
 var TwitterStrategy  = require('passport-twitter').Strategy
-var GoogleStrategy   = require('passport-google').Strategy
+var GoogleStrategy   = require('passport-google-plus')
 var GitHubStrategy   = require('passport-github').Strategy
 
 // load up the user model
@@ -216,31 +216,24 @@ module.exports = function(passport) {
 
     // GOOGLE
     passport.use(new GoogleStrategy({
-        clientID        : configAuth.googleAuth.clientID,
-        clientSecret    : configAuth.googleAuth.clientSecret,
-        callbackURL     : configAuth.googleAuth.callbackURL,
-        returnURL       : configAuth.googleAuth.callbackURL,
-        passReqToCallback : true,
+        clientId          : configAuth.googleAuth.clientID,
+        clientSecret      : configAuth.googleAuth.clientSecret,
+        passReqToCallback : true
     },
 
-    function(req, token, refreshToken, profile, done) {
+    function(req, tokens, profile, done) {
         process.nextTick(function() {
-
-            // Build user full name
-            fullname = req.query['openid.ext1.value.firstname'] + ' '
-            fullname += req.query['openid.ext1.value.lastname']
-
-            // check if the user is already logged in
             if (!req.user) {
-                User.findOne({'google.email' : profile.email}, function(err, user) {
+                User.findOne({'google.id' : profile.id}, function(err, user) {
                     if (err) return done(err)
 
                     if (user) {
+                        // if there is a user id already but no token (user was linked at one point and then removed)
                         if (!user.google.token) {
-                            // HACK: use query data
-                            user.google.token = req.query['openid.sig']
-                            user.google.name  = fullname
-                            user.google.email = req.query['openid.ext1.value.email'] // pull the first email
+                            user.google.token = tokens.access_token
+                            user.google.name  = profile.displayName
+                            user.google.email = profile.email
+                            user.google.avatar = profile.image.url.split('?')[0]
 
                             user.save(function(err) {
                                 if (err) throw err
@@ -250,12 +243,14 @@ module.exports = function(passport) {
 
                         return done(null, user)
                     } else {
-                        var newUser          = new User()
+                        // if there is no user, create them
+                        var newUser                 = new User()
 
-                        newUser.google.id    = req.query['openid.sig']
-                        newUser.google.token = req.query['openid.sig']
-                        newUser.google.name  = fullname
-                        newUser.google.email = req.query['openid.ext1.value.email'] // pull the first email
+                        newUser.google.id    = profile.id
+                        newUser.google.token = tokens.access_token
+                        newUser.google.name  = profile.displayName
+                        newUser.google.email = profile.email
+                        newUser.google.avatar = profile.image.url.split('?')[0]
 
                         newUser.save(function(err) {
                             if (err) throw err
@@ -268,14 +263,14 @@ module.exports = function(passport) {
                 // user already exists and is logged in, we have to link accounts
                 var user = req.user
 
-                user.google.id = req.query['openid.sig']
-                user.google.token = token
-                user.google.name  = fullname
-                user.google.email = req.query['openid.ext1.value.email']
+                user.google.id = profile.id
+                user.google.token = tokens.access_token
+                user.google.name  = profile.displayName
+                user.google.email = profile.email
+                user.google.avatar = profile.image.url.split('?')[0]
 
                 user.save(function(err) {
-                    if (err)
-                        throw err
+                    if (err) throw err
                     return done(null, user)
                 })
             }

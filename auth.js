@@ -65,27 +65,11 @@ module.exports = function(app, passport) {
 
 
   // GOOGLE LOGIN
-  app.get('/auth/google',
-    passport.authenticate('google', {
-      scope : 'email'
-    }))
-
-  app.get('/auth/google/callback',
-    passport.authenticate('google', {
-        successRedirect : '/profile',
-        failureRedirect : '/login'
-    }))
-
-  app.get('/connect/google',
-    passport.authorize('google', {
-      scope : 'email'
-    }))
-
-  app.get('/connect/google/callback',
-    passport.authorize('google', {
-        successRedirect : '/profile',
-        failureRedirect : '/'
-    }))
+  app.post('/auth/google/callback',
+    passport.authenticate('google'), function(req, res) {
+    // Return user back to client
+    res.send('profile')
+  })
 
 
   // GITHUB LOGIN
