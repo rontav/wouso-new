@@ -1,4 +1,4 @@
-var User = require('../../../config/models/user')
+var User = require('../config/models/user')
 
 module.exports = function (app) {
 

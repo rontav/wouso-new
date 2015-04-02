@@ -63,7 +63,7 @@ enable_multiple_view_folders();
 
 
 // Configure app
-app.set('views', ['views', 'themes/' + used_theme + '/views'])
+app.set('views', ['views'])
 app.set('view engine', 'jade')
 app.set('modules', available_modules)
 app.set('theme', used_theme)
@@ -81,7 +81,6 @@ app.use(bodyParser.urlencoded({
 app.use(bodyParser.json())
 app.use('/public',  express.static(__dirname + '/public'))
 app.use('/modules', express.static(__dirname + '/modules'))
-app.use('/themes',  express.static(__dirname + '/themes'))
 app.use(passport.initialize())
 app.use(passport.session())
 
@@ -105,7 +104,7 @@ for (module in data.modules) {
 }
 
 // Load theme routes
-views_dir = './themes/' + used_theme + '/routes'
+views_dir = './routes'
 var views = fs.readdirSync(views_dir);
 for (i in views) {
   view = views_dir + '/' + views[i]

@@ -3,8 +3,8 @@
 		"qotd" : true
 	},
 	"themes": {
-		"red" : false,
-		"grey": true
+		"red"  : false,
+		"white": true
 	},
 	"superuser": {
 		"admin": "marius"
