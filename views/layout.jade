@@ -6,6 +6,14 @@ html
 
     link(rel='stylesheet', href='/public/css/' + theme + '.css')
 
+    // Foundation css + js
+    link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.1/css/normalize.css')
+    link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.1/css/foundation.css')
+    script(src='https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.1/js/vendor/modernizr.js')
+    script(src='https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.1/js/vendor/jquery.js')
+    script(src='https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.1/js/vendor/fastclick.js')
+    script(src='https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.1/js/foundation.min.js')
+
     script(src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js")
     script(type="text/javascript", src='/public/widgets/index.js')
 
@@ -18,17 +26,21 @@ html
 
 
   body
-    h1 WoUSO - New
-    #nav
-      ul#nav-ul
-        li
-          a(href='/') Home
-        li
-          a(href='/profile') Profile
-        li
-          a(href='/admin') Admin
-        li
-          a(href='/login') Login
+    nav.top-bar(data-topbar, role='navigation')
+      ul.title-area
+        li.name
+          h1
+            a(href='') wouso-new
+
+      section.top-bar-section
+        ul.right
+          li.active
+            a(href='/login') Login
+        ul.left
+          li
+            a(href='/profile') Profile
+          li
+            a(href='/admin') Admin
 
     #main
       block sidebar
