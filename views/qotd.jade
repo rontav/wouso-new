@@ -4,12 +4,13 @@ block content
   h3 QotD Page
 
   - if (ROLE < 4)
-    .qotd-answer-template
-      input(name='valid', type='hidden', value='false', hidden)
-      .large-11.columns
-        input(name='answer', type='text', id='answer')
-      .large-1.columns.inline
-        input(name='check', type='checkbox', for='answer')
+    .row.collapse.qotd-answer-template
+      input(name='valid', type='hidden', value='false', id='valid', hidden)
+      .small-10.columns
+        label
+          input(name='answer', type='text', id='answer')
+      .small-2.columns
+        a.button.postfix(href='javascript:void(0);', name='check') False
 
     form(method='post', action='/api/qotd/add')
       .qotd-question

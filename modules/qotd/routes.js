@@ -10,14 +10,16 @@ module.exports = function (app) {
 
   app.post('/api/qotd/add', function (req, res, next) {
 
-    console.log(req.body)
-
     final_answers = {'right': [], 'wrong': []}
     for (i in req.body.answer)
-      if (i == req.body.valid)
-        final_answers.right.push(req.body.answer[i])
-      else
-        final_answers.wrong.push(req.body.answer[i])
+      // Ignore empty answers
+      if (req.body.answer[i] != '') {
+        if (req.body.valid[i] == 'true')
+          final_answers.right.push(req.body.answer[i])
+        else
+          final_answers.wrong.push(req.body.answer[i])
+      }
+
 
     // Format received date
     formatted_date = util.format('%d.%d.%d',
