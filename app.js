@@ -62,6 +62,19 @@ function enable_multiple_view_folders() {
 enable_multiple_view_folders();
 
 
+// Transfer variables to view
+app.use(function(req, res, next) {
+  // Save selected role
+  if (req.query.role) {
+    res.locals.ROLE = req.query.role
+  }
+
+  res.locals.URL = req.url.split('?')[0]
+
+  next()
+})
+
+
 // Configure app
 app.set('views', ['views'])
 app.set('view engine', 'jade')
@@ -132,7 +145,6 @@ app.get('/', function (req, res, next) {
     })
   })
 })
-
 
 app.use(app.router)
 

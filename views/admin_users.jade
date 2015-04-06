@@ -4,4 +4,13 @@ block content
   h1 Users admin page
 
   - each user in users
-    p= user.user_name
+    p= user._id + ' #' + user.role
+
+    roles = {0: 'Root', 1: 'Admin', 2: 'Teacher', 3: 'Contributor', 4: 'Player'}
+    select.role-select(id=user._id)
+      - each role, i in roles
+        - if (user.role == i)
+          option(value=i, selected)= role
+        - else
+          option(value=i)= role
+    .spacer

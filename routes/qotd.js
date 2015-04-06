@@ -5,7 +5,8 @@ module.exports = function (app) {
   app.get('/qotd', function (req, res, next) {
     qotd.find().exec(function (err, all) {
       res.render('qotd', {
-        questions: all
+        'questions'  : all,
+        'user'       : req.user
       });
     })
   })

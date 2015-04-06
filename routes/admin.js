@@ -17,4 +17,12 @@ module.exports = function (app) {
       })
     })
   })
+
+  app.get('/api/user/:user', function(req, res) {
+    var conditions = {'_id': req.params.user}
+    var update = {$set: {'role': req.query.role}}
+    User.update(conditions, update, function (err, num) {
+      if (num) res.json({success: true});
+    })
+  })
 }
