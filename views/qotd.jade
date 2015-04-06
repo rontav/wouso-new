@@ -3,37 +3,43 @@ extends layout
 block content
   h3 QotD Page
 
-  p= user
-  p= ROLE
-  p= URL
+  - if (ROLE < 4)
+    .qotd-answer-template
+      input(name='valid', type='hidden', value='false', hidden)
+      .large-11.columns
+        input(name='answer', type='text', id='answer')
+      .large-1.columns.inline
+        input(name='check', type='checkbox', for='answer')
 
-  .qotd-answer-template
-      label Ans1
-      input.span5(name='answer', type='text')
-      input.span5(name='valid', type='text', value='false', hidden)
-      input(name='check', type='checkbox')
+    form(method='post', action='/api/qotd/add')
+      .qotd-question
+        .row
+          .large-12.columns
+            h2 Add question
+            label Question
+              input(name='question', type='text')
+        .row
+          .large-6.columns.left
+            label Answers
+              .qotd-answer-list
+          .large-6.columns.right
+            label Date (dd/mm/yy)
+              input(name='date', type='text', id='qotd-date')
+            #datepicker
 
-  form(method='post', action='/api/qotd/add')
-    .qotd-question
-        label Question
-        br
-        input.span5(name='question', type='text')
-        br
-        br
-    .qotd-answer-list
+      .spacer
+      .controls.row
+        .large-11.columns.left
+          input.button.small(name='add-qotd-answer', type='button', value='Add answer')
+        .large-1.columns.right
+          input.button.small(id='sub', type='submit', value='Save')
 
-    br
-    input.btn.btn-success(name='add-qotd-answer', type='button', value='Add answer')
-    input.btn.btn-success(id='sub', type='submit', value='Save')
-    hr
+    .spacer
+    .row
+      h2 List of questions
+      each qotd in questions
+        p= qotd
 
-    each qotd in questions
-        br
-        br
-        = qotd.question
-        br
-        each right in qotd.answers.right
-            = "+ " + right
-        br
-        each wrong in qotd.answers.wrong
-            = "- " + wrong
+
+  - if (ROLE == 4)
+    h2 Play game

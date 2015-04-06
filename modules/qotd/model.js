@@ -1,10 +1,13 @@
 var mongoose = require('mongoose')
-var Schema   = mongoose.Schema;
+var Schema   = mongoose.Schema
 
 var Qotd = new Schema({
-  question:   String,
-  answers:    {right: [String],
-               wrong: [String]}
-});
+  question   : String,
+  date       : Date,
+  answers    : {
+    right: [String],
+    wrong: [String]
+  }
+})
 
-mongoose.model('Qotd', Qotd);
+mongoose.model('Qotd', Qotd)

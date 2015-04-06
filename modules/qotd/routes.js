@@ -1,5 +1,6 @@
 module.exports = function (app) {
   var qotd = require('mongoose').model('Qotd')
+  var util = require('util')
 
   app.get('/api/qotd/list', function (req, res, next) {
     qotd.find().exec(function (err, all) {
@@ -18,9 +19,17 @@ module.exports = function (app) {
       else
         final_answers.wrong.push(req.body.answer[i])
 
+    // Format received date
+    formatted_date = util.format('%d.%d.%d',
+      req.body.date.split('/')[1],
+      req.body.date.split('/')[0],
+      req.body.date.split('/')[2]
+    )
+
     new qotd ({
-      question: req.body.question,
-      answers: final_answers
+      'question'  : req.body.question,
+      'answers'   : final_answers,
+      'date'      : new Date(formatted_date)
     }).save()
 
     res.redirect('/qotd');

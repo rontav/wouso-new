@@ -22,7 +22,7 @@ $(document).ready(function() {
     // Add another answer entry to a qotd, by cloning the template
     $('[name="add-qotd-answer"]').click(function() {
         $('.qotd-answer-template').first().clone()
-                         .addClass('qotd-answer')
+                         .addClass('qotd-answer row')
                          .removeClass('qotd-answer-template')
                          .appendTo('.qotd-answer-list')
                          .css('display', 'block')

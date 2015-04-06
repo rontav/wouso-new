@@ -14,6 +14,10 @@ html
     script(src='https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.1/js/vendor/fastclick.js')
     script(src='https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.1/js/foundation.min.js')
 
+    // Datepicker
+    link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.0/css/bootstrap-datepicker.css')
+    script(src='https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.0/js/bootstrap-datepicker.min.js')
+
     meta(name="google-signin-clientid", content="749085539075-tihno91bjfqlm8950uocj6b5t1tf1asc.apps.googleusercontent.com")
     meta(name="google-signin-scope", content="https://www.googleapis.com/auth/plus.profile.emails.read")
     meta(name="google-signin-requestvisibleactions", content="http://schema.org/AddAction")
@@ -54,22 +58,24 @@ html
                     a(href='#') Teacher
                   - if (ROLE == 3)
                     a(href='#') Contributor
+                  - if (ROLE == 4)
+                    a(href='#') Player
 
                   // Available roles
                   ul.dropdown
                     - if (user.role == 0)
                       li
                         a(href=URL + '?role=0') Root
-                    - if (user.role < 1)
+                    - if (user.role <= 1)
                       li
                         a(href=URL + '?role=1') Admin
-                    - if (user.role < 2)
+                    - if (user.role <= 2)
                       li
                         a(href=URL + '?role=2') Teacher
-                    - if (user.role < 3)
+                    - if (user.role <= 3)
                       li
                         a(href=URL + '?role=3') Contributor
-                    - if (user.role < 4)
+                    - if (user.role <= 4)
                       li
                         a(href=URL + '?role=4') Player
 
