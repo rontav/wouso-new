@@ -78,12 +78,6 @@ app.use(function(req, res, next) {
 })
 
 
-// Configure app
-app.set('views', ['views'])
-app.set('view engine', 'jade')
-app.set('modules', available_modules)
-app.set('theme', used_theme)
-
 app.use(exprSession({
   cookie: { maxAge: 1800000 }, //30 min
   secret: 'mySecretKey',
@@ -107,6 +101,9 @@ require('./config/passport')(passport)
 require('./auth.js')(app, passport)
 
 
+// Store available views
+views = ['views']
+
 // Load enabled modules
 for (module in data.modules) {
   if (data.modules[module]) {
@@ -116,26 +113,25 @@ for (module in data.modules) {
     require(module + '/model.js')
     // Load module routes
     require(module)(app)
+    // Load module views
+    views.push('node_modules/' + module)
   }
 }
 
-// Load theme routes
+
+// Set app settings
+app.set('views', views)
+app.set('view engine', 'jade')
+app.set('modules', available_modules)
+app.set('theme', used_theme)
+
+
+// Load main routes
 views_dir = './routes'
 var views = fs.readdirSync(views_dir);
 for (i in views) {
   view = views_dir + '/' + views[i]
   require(view)(app)
-}
-
-
-// route middleware to make sure a user is logged in
-function isLoggedIn(req, res, next) {
-  // if user is authenticated in the session, carry on
-  if (req.isAuthenticated())
-      return next()
-
-  // if they aren't redirect them to the home page
-  res.redirect('/')
 }
 
 

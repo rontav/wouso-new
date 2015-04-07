@@ -1,7 +1,10 @@
-// General
-$("#nav-ul").append('<li><a href="/qotd">Qotd</a></li>')
-
-// Specific
+// QotD datepicker
+$('#datepicker').datepicker({
+  inline: true,
+  todayHighlight: true
+}).on('changeDate', function(e) {
+  $('#qotd-date').val(e.format('dd/mm/yyyy'))
+})
 
 // Mark selected answers
 // This is done because we need a default behavior for checkboxes
