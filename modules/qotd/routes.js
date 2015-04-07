@@ -1,6 +1,16 @@
 module.exports = function (app) {
   var qotd = require('mongoose').model('Qotd')
+  var settings = require('mongoose').model('Settings')
   var util = require('util')
+
+
+  app.post('/api/qotd/settings', function (req, res, next) {
+    query = {'key': 'qotd-defaultNoOfAns'}
+    update = {$set: {'val': req.body.defaultNoOfAns}}
+    settings.update(query, update, {upsert: true}).exec()
+
+    res.redirect('/qotd')
+  })
 
   app.get('/api/qotd/list', function (req, res, next) {
     qotd.find().exec(function (err, all) {

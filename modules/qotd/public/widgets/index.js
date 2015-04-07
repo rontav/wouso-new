@@ -24,11 +24,19 @@ $(document).ready(function() {
     $('.qotd-answer-template').css('display', 'none')
 
     // Add another answer entry to a qotd, by cloning the template
-    $('[name="add-qotd-answer"]').click(function() {
+    $('[name="add-qotd-answer"]').click(addQotdOption)
+
+    // Add default number of options for new QotD
+    if (typeof noOfOptions != 'undefined') {
+        for (var i=0; i<noOfOptions; i++)
+            addQotdOption()
+    }
+
+    function addQotdOption() {
         $('.qotd-answer-template').first().clone()
                          .addClass('qotd-answer row')
                          .removeClass('qotd-answer-template')
                          .appendTo('.qotd-answer-list')
                          .css('display', 'block')
-    })
+    }
 })

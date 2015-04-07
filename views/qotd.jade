@@ -3,6 +3,19 @@ extends layout
 block content
   h3 QotD Page
 
+  - if (ROLE < 2)
+    .row
+      .large-12.columns
+        h2 Settings
+
+        form(method='post', action='/api/qotd/settings')
+          label Default number of answers per question
+            input(name='defaultNoOfAns', type='text', value=mysettings['qotd-defaultNoOfAns'])
+          input.button.small(type='submit', value='Save')
+
+    // Transfer number of fields through JS
+    script var noOfOptions = #{mysettings['qotd-defaultNoOfAns']}
+
   - if (ROLE < 4)
     .row.collapse.qotd-answer-template
       input(name='valid', type='hidden', value='false', id='valid', hidden)

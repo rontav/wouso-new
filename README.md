@@ -18,3 +18,9 @@ de utilizare (nu doar la noi in facultate)
 * login with a connected account returns another user (if you login with a
 local account, connect your github account, logout, login with github, you
 do not get the local account)
+
+##QOTD
+* move all qotd module files inside package
+* find a way to insert game into app
+* qotd new question form validation
+* qotd play game
