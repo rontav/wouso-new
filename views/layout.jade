@@ -92,7 +92,7 @@ html
       block sidebar
       block content
 
-  - each mod in settings.modules
-    script(type="text/javascript", src='/modules/' + mod + '/public/js/main.js')
+  block footer
+
   // Insert core js
   script(type="text/javascript", src='/public/js/main.js')

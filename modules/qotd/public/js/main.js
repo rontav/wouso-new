@@ -49,16 +49,21 @@ $(document).ready(function() {
       type: 'GET',
       success: function(response) {
         if (response) {
+          // Display question and store question id
           $('.qotd-play-question').text(response.question)
           $('.qotd-play-question')
             .append('<input name="question_id" type="hidden" value="' + response._id + '" hidden>')
 
-          response.answers.forEach(function(ans) {
-            $('.qotd-play-answers')
-              .append('<div class="qotd-play-answer"><input type="radio" \
-                name="ans" value="' + ans + '">' + ans + '</div>')
-          })
+          // Display answer options
+          if (response.answers) {
+            response.answers.forEach(function(ans) {
+              $('.qotd-play-answers')
+                .append('<div class="qotd-play-answer"><input type="radio" \
+                  name="ans" value="' + ans + '">' + ans + '</div>')
+            })
+          }
 
+          // Display answer or submit button
           if (response.answer) {
             $('.qotd-play-answers').append('<p>Answer: ' + response.answer + '</p>')
           } else {
