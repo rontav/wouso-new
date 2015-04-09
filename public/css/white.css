@@ -6,3 +6,7 @@ body {
 	height: 40px;
 	clear: both;
 }
+
+.activeClass{
+    background: #C2C2C2;
+}

@@ -41,7 +41,18 @@ module.exports = function (app) {
 
   app.get('/api/qotd/list', function (req, res, next) {
     qotd.find().exec(function (err, all) {
-      res.send(all);
+      res.send(all)
+    })
+  })
+
+
+  app.get('/api/qotd/list/dates', function (req, res, next) {
+    qotd.find().select({'date': 1, '_id': 0}).exec(function (err, dates) {
+      dates_list = []
+      dates.forEach(function(qotd) {
+        dates_list.push(qotd.date.toISOString())
+      })
+      res.send(dates_list)
     })
   })
 

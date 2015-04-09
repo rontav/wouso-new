@@ -22,3 +22,5 @@ de utilizare (nu doar la noi in facultate)
 * paginate qotd list
 * timezone option
 * add timer option
+* flag question after answer is shown
+* optimise day mark in datepicker for single month

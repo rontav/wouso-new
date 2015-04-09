@@ -1,10 +1,24 @@
-// QotD datepicker
-$('#datepicker').datepicker({
-  inline: true,
-  todayHighlight: true
-}).on('changeDate', function(e) {
-  $('#qotd-date').val(e.format('dd/mm/yyyy'))
+// Highlight days that have scheduled qotds in datepicker
+qotd_dates = []
+$.ajax({
+  url: '/api/qotd/list/dates',
+  type: 'GET',
+  success: function(qotd_dates) {
+
+    // QotD datepicker
+    $('#datepicker').datepicker({
+      inline: true,
+      beforeShowDay: function(date) {
+        formated_date = new Date(Date.parse(date)).toISOString()
+        if (qotd_dates.indexOf(formated_date) > -1)
+          return { classes: 'activeClass' }
+      }
+    }).on('changeDate', function(e) {
+      $('#qotd-date').val(e.format('dd/mm/yyyy'))
+    })
+  }
 })
+
 
 // Mark selected answers
 // This is done because we need a default behavior for checkboxes
