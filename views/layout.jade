@@ -43,14 +43,14 @@ html
               li.active
                 a(href='/logout') Logout
 
+              // Current role
+              - var ROLE = (locals.ROLE ? locals.ROLE : user.role)
+
               // Display roles only for non-players
               - if (user.role < 4)
                 li
                   a(href='#') ROLE:
                 li.has-dropdown
-                  // Current role
-                  - var ROLE = (locals.ROLE ? locals.ROLE : user.role)
-
                   - if (ROLE == 0)
                     a(href='#') Root
                   - if (ROLE == 1)

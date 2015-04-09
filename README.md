@@ -16,5 +16,11 @@ de utilizare (nu doar la noi in facultate)
 ## QOTD
 * find a way to insert game into nav
 * qotd new question form validation
+	* make sure we don't have the same answer twice
 * qotd play game
 * possibility to override module view and style
+* batch edit for questions
+* paginate qotd list
+* timezone option
+* add timer option
+* load qotd js just for qotd view

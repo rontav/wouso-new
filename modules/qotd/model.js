@@ -7,7 +7,10 @@ var Qotd = new Schema({
   answers    : {
     right: [String],
     wrong: [String]
-  }
+  },
+  viewers    : [String],
+  right_ppl  : [String],
+  wrong_ppl  : [String]
 })
 
 mongoose.model('Qotd', Qotd)

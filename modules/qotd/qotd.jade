@@ -56,4 +56,9 @@ block content
 
 
   - if (ROLE == 4)
-    h2 Play game
+    .row
+      .large-12.columns
+        h2 Play game
+        form.qotd-form(method='post', action='/api/qotd/play')
+          .qotd-play-question
+          .qotd-play-answers
