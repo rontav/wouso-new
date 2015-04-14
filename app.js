@@ -5,6 +5,7 @@ var bodyParser   = require('body-parser')
 var cookieParser = require('cookie-parser')
 var exprSession  = require('express-session')
 var passport     = require('passport')
+var i18n         = require('i18n-2')
 var app = module.exports = express()
 
 // Read config file
@@ -65,6 +66,18 @@ function enable_multiple_view_folders() {
 enable_multiple_view_folders();
 
 
+
+// Localization
+i18n.expressBind(app, {
+  // setup some locales
+  locales: ['ro', 'en'],
+  // set the default locale
+  defaultLocale: 'en',
+  // set the cookie name
+  directory: 'locales',
+  extension: '.json'
+})
+
 // Transfer variables to view
 app.use(function(req, res, next) {
   // Save selected role
@@ -73,6 +86,9 @@ app.use(function(req, res, next) {
   }
 
   res.locals.URL = req.url.split('?')[0]
+
+  // Set preferred locale
+  req.i18n.setLocale('en')
 
   next()
 })

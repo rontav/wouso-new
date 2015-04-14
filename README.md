@@ -7,6 +7,9 @@ de utilizare (nu doar la noi in facultate)
 * internationalizabil
 ** suport pentru mai multe limbi
 
+## Development
+* for locales development please reffer to the [documentation](https://github.com/jeresig/i18n-node-2)
+
 
 ## TODO:
 * investigate LDAP login
@@ -24,3 +27,4 @@ de utilizare (nu doar la noi in facultate)
 * add timer option
 * flag question after answer is shown
 * optimise day mark in datepicker for single month
+* use separate locales for qotd module
