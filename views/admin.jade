@@ -6,3 +6,27 @@ block sidebar
       a(href='/admin/users') Users
     li
       a(href='/admin/settings') Settings
+
+block content
+  - if (tab == 'users')
+    h1 Users admin page
+
+    - each user in users
+      p= user._id + ' #' + user.role
+
+      roles = {0: 'Root', 1: 'Admin', 2: 'Teacher', 3: 'Contributor', 4: 'Player'}
+      select.role-select(id=user._id)
+        - each role, i in roles
+          - if (user.role == i)
+            option(value=i, selected)= role
+          - else
+            option(value=i)= role
+      .spacer
+
+  - if (tab == 'settings')
+    h1 Settings page
+
+    h4 Login options
+    label(for='login-fb')
+      input.setting(type='checkbox', id='login-fb', checked=(mysettings['login-fb']==='true'))
+      | Allow Facebook login

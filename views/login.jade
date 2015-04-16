@@ -20,8 +20,9 @@ block content
 
       .large-5.columns
         h3 Feeling social ?
-        a(href='/auth/facebook') Facebook Login
-        br
+        - if (mysettings['login-fb'] === 'true')
+          a(href='/auth/facebook') Facebook Login
+          br
         a(href='/auth/twitter') Twitter Login
         br
         a(href='#', onclick='gapi.auth.signIn({callback: signInCallback})') Google Login

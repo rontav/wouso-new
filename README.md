@@ -15,6 +15,7 @@ de utilizare (nu doar la noi in facultate)
 * investigate LDAP login
 * add lang directory that stores strings in different languages
 * better handling of logging
+* merge login and connect endpoints
 
 ## QOTD
 * find a way to insert game into nav
@@ -28,3 +29,4 @@ de utilizare (nu doar la noi in facultate)
 * flag question after answer is shown
 * optimise day mark in datepicker for single month
 * use separate locales for qotd module
+* handle 'no question for today'

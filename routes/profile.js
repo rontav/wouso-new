@@ -1,9 +1,21 @@
+var Settings = require('../config/models/settings')
+
 module.exports = function (app) {
 
   app.get('/profile', function (req, res, next) {
-    res.render('profile', {
-      'user': req.user
-    })
+    Settings.find({'key': /login-.*/}).exec(gotSettings)
+
+    function gotSettings(err, all) {
+      mysettings = {}
+      all.forEach(function(set) {
+        mysettings[set.key] = set.val
+      })
+
+      res.render('profile', {
+        'user'       : req.user,
+        'mysettings' : mysettings
+      })
+    }
   })
 
 }

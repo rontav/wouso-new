@@ -3,7 +3,7 @@ extends layout
 block content
   h3 Profile Page
 
-  if (user && !user.facebook.id)
+  if (user && !user.facebook.id && mysettings['login-fb'] === 'true')
     a(href='/connect/facebook') Connect Facebook account
     br
   if (user && !user.twitter.id)
