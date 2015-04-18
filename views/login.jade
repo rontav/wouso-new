@@ -19,12 +19,16 @@ block content
           button.btn.btn-warning(type='submit') Login
 
       .large-5.columns
-        h3 Feeling social ?
-        - if (mysettings['login-fb'] === 'true')
-          a(href='/auth/facebook') Facebook Login
-          br
-        a(href='/auth/twitter') Twitter Login
-        br
-        a(href='#', onclick='gapi.auth.signIn({callback: signInCallback})') Google Login
-        br
-        a(href='/auth/github') GitHub Login
+        - if (mysettings['login-fb'] === 'true' || mysettings['login-tw'] === 'true' || mysettings['login-gp'] === 'true' || mysettings['login-gh'] === 'true')
+          h3 Feeling social ?
+          - if (mysettings['login-fb'] === 'true')
+            a(href='/auth/facebook') Facebook Login
+            br
+          - if (mysettings['login-tw'] === 'true')
+            a(href='/auth/twitter') Twitter Login
+            br
+          - if (mysettings['login-gp'] === 'true')
+            a(href='#', onclick='gapi.auth.signIn({callback: signInCallback})') Google Login
+            br
+          - if (mysettings['login-gh'] === 'true')
+            a(href='/auth/github') GitHub Login
