@@ -9,6 +9,11 @@ de utilizare (nu doar la noi in facultate)
 
 ## Development
 * for locales development please reffer to the [documentation](https://github.com/jeresig/i18n-node-2)
+* when developing modules, create a sym link to the module in /modules, so changes
+are reflected directly, without installing the module
+* a module can see all instaled modules, by checking
+
+	app.get('modules')
 
 
 ## TODO:
@@ -29,4 +34,3 @@ de utilizare (nu doar la noi in facultate)
 * flag question after answer is shown
 * optimise day mark in datepicker for single month
 * use separate locales for qotd module
-* handle 'no question for today'

@@ -80,8 +80,10 @@ $(document).ready(function() {
           // Display answer or submit button
           if (response.answer) {
             $('.qotd-play-answers').append('<p>Answer: ' + response.answer + '</p>')
-          } else {
+          } else if (response.question) {
             $('.qotd-form').append('<input class="button small" type="submit" value="Check">')
+          } else {
+            $('.qotd-play-question').append('<p>' + response + '</p>')
           }
         }
       }

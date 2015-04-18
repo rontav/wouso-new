@@ -67,6 +67,9 @@ module.exports = function (app) {
       if (!req.user)
         return res.send('Login')
 
+      if (!today.length)
+        return res.send('No question for today.')
+
       sent = false
       today.forEach(function (question) {
         // Convert result from mongoose object to JSON
