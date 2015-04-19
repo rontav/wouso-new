@@ -13,7 +13,8 @@ module.exports = function (app) {
 
       res.render('login', {
         'username'   : (req.user ? req.user : null),
-        'mysettings' : mysettings
+        'mysettings' : mysettings,
+        'error'      : req.flash('error')
       })
     }
   })

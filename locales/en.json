@@ -1,3 +1,16 @@
 {
-	"title": "WoUSO - new"
+	"title": "WoUSO - new",
+
+	"login-wrong-user": "User not registered",
+	"login-wrong-pass": "Wrong password",
+	"login-wrong-email": "This email is already in use.",
+	"login-level-disabled": "Oops! Login is disabled for your type of user.",
+	"login-local-disabled": "Oops! Local login is disabled.",
+	"login-signup-disabled": "Oops! Signup seems to be disabled.",
+	"login-fb-disabled": "Oops! Login is disabled for Facebook accounts.",
+	"login-tw-disabled": "Oops! Login is disabled for Twitter accounts.",
+	"login-gp-disabled": "Oops! Login is disabled for Google accounts.",
+	"login-gh-disabled": "Oops! Login is disabled for GitHub accounts.",
+
+	"settings-nologin": "There should be at least one login method enabled."
 }

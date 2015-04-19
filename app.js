@@ -6,6 +6,7 @@ var cookieParser = require('cookie-parser')
 var exprSession  = require('express-session')
 var passport     = require('passport')
 var i18n         = require('i18n-2')
+var flash        = require('connect-flash')
 var app = module.exports = express()
 
 // Read config file
@@ -104,6 +105,7 @@ app.use(cookieParser())
 app.use(bodyParser.urlencoded({
   extended: true
 }))
+app.use(flash())
 app.use(bodyParser.json())
 app.use('/public',  express.static(__dirname + '/public'))
 app.use('/modules', express.static(__dirname + '/modules'))

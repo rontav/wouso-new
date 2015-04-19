@@ -4,6 +4,7 @@ var TwitterStrategy  = require('passport-twitter').Strategy
 var GoogleStrategy   = require('passport-google-plus')
 var GitHubStrategy   = require('passport-github').Strategy
 
+
 // load up the user model
 var User = require('./models/user')
 
@@ -36,19 +37,31 @@ module.exports = function(passport) {
   }, function(req, email, password, done) {
     // find a user whose email is the same as the forms email
     // we are checking to see if the user trying to login already exists
-    User.findOne({'local.email': email}, function(err, user) {
-      if (err) return done(err)
+    Settings.find({'key': /login-.*/}, function(err, settings) {
+      if (err) return done(null, false, req.flash('error', err))
 
-      // if no user is found, return the message
-      if (!user)
-        return done(null, false, 'No user found.')
+      User.findOne({'local.email': email}, function(err, user) {
+        if (err) return done(null, false, req.flash('error', err))
 
-      // if the user is found but the password is wrong
-      if (!user.validPassword(password))
-        return done(null, false, 'Oops! Wrong password.')
+        // Check if user is returned
+        if (!user)
+          return done(null, false, req.flash('error', req.i18n.__('login-wrong-user')))
 
-      // all is well, return successful user
-      return done(null, user)
+        // Check if password is correct
+        if (!user.validPassword(password))
+          return done(null, false, req.flash('error', req.i18n.__('login-wrong-pass')))
+
+        // Check user privilege level
+        settings.forEach(function (set) {
+          if (set.key == 'login-level' && user && user.role > set.val)
+            return done(null, false, req.flash('error', req.i18n.__('login-level-disabled')))
+          if (set.key == 'login-local' && set.val == 'false')
+            return done(null, false, req.flash('error', req.i18n.__('login-local-disabled')))
+        })
+
+        // Return successful user
+        return done(null, user)
+      })
     })
   }))
 
@@ -61,30 +74,35 @@ module.exports = function(passport) {
 
   }, function(req, email, password, done) {
     process.nextTick(function() {
-      // find a user whose email is the same as the forms email
-      // we are checking to see if the user trying to login already exists
-      User.findOne({'local.email': email}, function(err, user) {
-        if (err) return done(err)
+      Settings.find({'key': /login-.*/}, function(err, settings) {
+        if (err) return done(null, false, req.flash('error', err))
 
-        // check to see if theres already a user with that email
-        if (user) {
-          return done(null, false, 'That email is already taken.')
-        } else {
-          // if there is no user with that email
-          // create the user
-          var newUser = new User()
+        User.findOne({'local.email': email}, function(err, user) {
+          if (err) return done(null, false, req.flash('error', err))
 
-          // set the user's local credentials
-          newUser.local.email    = email
-          newUser.local.password = newUser.generateHash(password)
-
-          // save the user
-          newUser.save(function(err) {
-            if (err) throw err
-            return done(null, newUser)
+          // Check if signup is enabled
+          settings.forEach(function (set) {
+            if (set.key == 'login-signup' && set.val == 'false')
+              return done(null, false, req.flash('error', req.i18n.__('login-signup-disabled')))
           })
-        }
 
+          // Check if there is another user with that email
+          if (user) {
+            return done(null, false, req.flash('error', req.i18n.__('login-wrong-email')))
+
+          // Create new user
+          } else {
+            var newUser = new User()
+            newUser.local.email    = email
+            newUser.local.password = newUser.generateHash(password)
+
+            newUser.save(function(err) {
+              if (err) throw err
+              return done(null, newUser)
+            })
+          }
+
+        })
       })
     })
   }))
@@ -99,61 +117,57 @@ module.exports = function(passport) {
 
   }, function(req, token, refreshToken, profile, done) {
     process.nextTick(function() {
-      Settings.findOne({'key': 'login-fb'}).exec(gotSettings)
+      Settings.find({'key': /login-.*/}, function (err, settings) {
+        if (err) return done(null, false, req.flash('error', err))
 
-      function gotSettings(err, login) {
-        // check if fb login is enabled
-        if (login.val === 'false') return done('Facebook login is disabled')
-        // check if the user is already logged in
-        if (!req.user) {
-          User.findOne({'facebook.id': profile.id}, function(err, user) {
-            if (err) return done(err)
+        User.findOne({'facebook.id': profile.id}, function(err, user) {
+          if (err) return done(null, false, req.flash('error', err))
 
-            if (user) {
-              if (!user.facebook.token) {
-                user.facebook.token = token
-                user.facebook.name  = profile.name.givenName + ' ' + profile.name.familyName
-                user.facebook.email = profile.emails[0].value
-
-                user.save(function(err) {
-                  if (err) throw err
-                  return done(null, user)
-                })
-              }
-
-              return done(null, user)
-
-            } else {
-              // Create user if needed
-              var newUser            = new User()
-
-              newUser.facebook.id    = profile.id
-              newUser.facebook.token = token
-              newUser.facebook.name  = profile.name.givenName + ' ' + profile.name.familyName
-              newUser.facebook.email = profile.emails[0].value
-
-              newUser.save(function(err) {
-                if (err) throw err
-                return done(null, newUser)
-              })
-            }
+          // Check user privilege and if login is enabled
+          settings.forEach(function (set) {
+            if (set.key == 'login-level' && user && user.role > set.val)
+              return done(null, false, req.flash('error', req.i18n.__('login-level-disabled')))
+            if (set.key == 'login-fb' && set.val == 'false')
+              return done(null, false, req.flash('error', req.i18n.__('login-fb-disabled')))
           })
 
-        } else {
-          // Link account if user already exists
-          var user            = req.user
+          // User is not logged in, but found in db
+          if (!req.user && user) {
+            user.facebook.token = token
+            user.facebook.name  = profile.name.givenName + ' ' + profile.name.familyName
+            user.facebook.email = profile.emails[0].value
 
-          user.facebook.id    = profile.id
-          user.facebook.token = token
-          user.facebook.name  = profile.name.givenName + ' ' + profile.name.familyName
-          user.facebook.email = profile.emails[0].value
+            user.save(function(err) { if (err) throw err })
 
-          user.save(function(err) {
-            if (err) throw err
-            return done(null, user)
-          })
-        }
-      }
+          // User is not logged in and not found in db
+          } else if (!req.user && !user) {
+            user                = new User()
+            user.facebook.id    = profile.id
+            user.facebook.token = token
+            user.facebook.name  = profile.name.givenName + ' ' + profile.name.familyName
+            user.facebook.email = profile.emails[0].value
+
+            user.save(function(err) { if (err) throw err })
+
+          // User is logged in and connected an account
+          } else {
+
+            // If that accound was already in db, remove it and add detailes to the new one
+            if (user) User.remove({'_id': user._id}).exec()
+
+            user                = req.user
+            user.facebook.id    = profile.id
+            user.facebook.token = token
+            user.facebook.name  = profile.name.givenName + ' ' + profile.name.familyName
+            user.facebook.email = profile.emails[0].value
+
+            user.save(function(err) { if (err) throw err })
+          }
+
+          // Return one happy user
+          return done(null, user)
+        })
+      })
     })
   }))
 
@@ -167,54 +181,57 @@ module.exports = function(passport) {
 
   }, function(req, token, tokenSecret, profile, done) {
     process.nextTick(function() {
-      // check if the user is already logged in
-      if (!req.user) {
+      Settings.find({'key': /login-.*/}, function (err, settings) {
+        if (err) return done(null, false, req.flash('error', err))
+
         User.findOne({'twitter.id': profile.id}, function(err, user) {
-          if (err) return done(err)
+          if (err) return done(null, false, req.flash('error', err))
 
-          if (user) {
-            if (!user.twitter.token) {
-              user.twitter.token       = token
-              user.twitter.username    = profile.username
-              user.twitter.displayName = profile.displayName
+          // Check user privilege and if login is enabled
+          settings.forEach(function (set) {
+            if (set.key == 'login-level' && user && user.role > set.val)
+              return done(null, false, req.flash('error', req.i18n.__('login-level-disabled')))
+            if (set.key == 'login-tw' && set.val == 'false')
+              return done(null, false, req.flash('error', req.i18n.__('login-tw-disabled')))
+          })
 
-              user.save(function(err) {
-                if (err) throw err
-                return done(null, user)
-              })
-            }
+          // User is not logged in, but found in db
+          if (!req.user && user) {
+            user.twitter.token       = token
+            user.twitter.username    = profile.username
+            user.twitter.displayName = profile.displayName
 
-            return done(null, user)
+            user.save(function(err) { if (err) throw err })
+
+          // User is not logged in and not found in db
+          } else if (!req.user && !user) {
+            user                     = new User()
+            user.twitter.id          = profile.id
+            user.twitter.token       = token
+            user.twitter.username    = profile.username
+            user.twitter.displayName = profile.displayName
+
+            user.save(function(err) { if (err) throw err })
+
+          // User is logged in and connected an account
           } else {
-            // Create user if needed
-            var newUser                 = new User()
 
-            newUser.twitter.id          = profile.id
-            newUser.twitter.token       = token
-            newUser.twitter.username    = profile.username
-            newUser.twitter.displayName = profile.displayName
+            // If that accound was already in db, remove it and add detailes to the new one
+            if (user) User.remove({'_id': user._id}).exec()
 
-            newUser.save(function(err) {
-              if (err) throw err
-              return done(null, newUser)
-            })
+            user                     = req.user
+            user.twitter.id          = profile.id
+            user.twitter.token       = token
+            user.twitter.username    = profile.username
+            user.twitter.displayName = profile.displayName
+
+            user.save(function(err) { if (err) throw err })
           }
-        })
 
-      } else {
-        // Link account if user already exists
-        var user = req.user
-
-        user.twitter.id          = profile.id
-        user.twitter.token       = token
-        user.twitter.username    = profile.username
-        user.twitter.displayName = profile.displayName
-
-        user.save(function(err) {
-          if (err) throw err
+          // Return one happy user
           return done(null, user)
         })
-      }
+      })
     })
   }))
 
@@ -227,56 +244,60 @@ module.exports = function(passport) {
 
   }, function(req, tokens, profile, done) {
     process.nextTick(function() {
-      if (!req.user) {
+      Settings.find({'key': /login-.*/}, function (err, settings) {
+        if (err) return done(null, false, req.flash('error', err))
+
         User.findOne({'google.id': profile.id}, function(err, user) {
-          if (err) return done(err)
+          if (err) return done(null, false, req.flash('error', err))
 
-          if (user) {
-            if (!user.google.token) {
-              user.google.token  = tokens.access_token
-              user.google.name   = profile.displayName
-              user.google.email  = profile.email
-              user.google.avatar = profile.image.url.split('?')[0]
+          // Check user privilege and if login is enabled
+          settings.forEach(function (set) {
+            if (set.key == 'login-level' && user && user.role > set.val)
+              return done(null, false, req.flash('error', req.i18n.__('login-level-disabled')))
+            if (set.key == 'login-gp' && set.val == 'false')
+              return done(null, false, req.flash('error', req.i18n.__('login-gp-disabled')))
+          })
 
-              user.save(function(err) {
-                if (err) throw err
-                return done(null, user)
-              })
-            }
+          // User is not logged in, but found in db
+          if (!req.user && user) {
+            user.google.token  = tokens.access_token
+            user.google.name   = profile.displayName
+            user.google.email  = profile.email
+            user.google.avatar = profile.image.url.split('?')[0]
 
-            return done(null, user)
+            user.save(function(err) { if (err) throw err })
+
+          // User is not logged in and not found in db
+          } else if (!req.user && !user) {
+            user               = new User()
+            user.google.id     = profile.id
+            user.google.token  = tokens.access_token
+            user.google.name   = profile.displayName
+            user.google.email  = profile.email
+            user.google.avatar = profile.image.url.split('?')[0]
+
+            user.save(function(err) { if (err) throw err })
+
+          // User is logged in and connected an account
           } else {
-            // Create user if needed
-            var newUser           = new User()
 
-            newUser.google.id     = profile.id
-            newUser.google.token  = tokens.access_token
-            newUser.google.name   = profile.displayName
-            newUser.google.email  = profile.email
-            newUser.google.avatar = profile.image.url.split('?')[0]
+            // If that accound was already in db, remove it and add detailes to the new one
+            if (user) User.remove({'_id': user._id}).exec()
 
-            newUser.save(function(err) {
-              if (err) throw err
-              return done(null, newUser)
-            })
+            user               = req.user
+            user.google.id     = profile.id
+            user.google.token  = tokens.access_token
+            user.google.name   = profile.displayName
+            user.google.email  = profile.email
+            user.google.avatar = profile.image.url.split('?')[0]
+
+            user.save(function(err) { if (err) throw err })
           }
-        })
 
-      } else {
-        // Link account if user already exists
-        var user           = req.user
-
-        user.google.id     = profile.id
-        user.google.token  = tokens.access_token
-        user.google.name   = profile.displayName
-        user.google.email  = profile.email
-        user.google.avatar = profile.image.url.split('?')[0]
-
-        user.save(function(err) {
-          if (err) throw err
+          // Return one happy user
           return done(null, user)
         })
-      }
+      })
     })
   }))
 
@@ -290,58 +311,61 @@ module.exports = function(passport) {
 
   }, function(req, token, refreshToken, profile, done) {
     process.nextTick(function() {
-      // check if the user is already logged in
-      if (!req.user) {
+      Settings.find({'key': /login-.*/}, function (err, settings) {
+        if (err) return done(null, false, req.flash('error', err))
+
         User.findOne({'github.id': profile.id}, function(err, user) {
-          if (err) return done(err)
+          if (err) return done(null, false, req.flash('error', err))
 
-          if (user) {
-            if (!user.github.token) {
-              user.github.id          = profile.id
-              user.github.token       = token
-              user.github.username    = profile.username
-              user.github.displayName = profile.displayName
-              user.github.email       = profile.emails[0].value
+          // Check user privilege and if login is enabled
+          settings.forEach(function (set) {
+            if (set.key == 'login-level' && user && user.role > set.val)
+              return done(null, false, req.flash('error', req.i18n.__('login-level-disabled')))
+            if (set.key == 'login-gh' && set.val == 'false')
+              return done(null, false, req.flash('error', req.i18n.__('login-gh-disabled')))
+          })
 
-              user.save(function(err) {
-                if (err) throw err
-                return done(null, user)
-              })
-            }
+          // User is not logged in, but found in db
+          if (!req.user && user) {
+            user.github.id          = profile.id
+            user.github.token       = token
+            user.github.username    = profile.username
+            user.github.displayName = profile.displayName
+            user.github.email       = profile.emails[0].value
 
-            return done(null, user)
+            user.save(function(err) { if (err) throw err })
+
+          // User is not logged in and not found in db
+          } else if (!req.user && !user) {
+            user                    = new User()
+            user.github.id          = profile.id
+            user.github.token       = token
+            user.github.username    = profile.username
+            user.github.displayName = profile.displayName
+            user.github.email       = profile.emails[0].value
+
+            newUser.save(function(err) { if (err) throw err })
+
+          // User is logged in and connected an account
           } else {
-            // Create user if needed
-            var newUser                = new User()
 
-            newUser.github.id          = profile.id
-            newUser.github.token       = token
-            newUser.github.username    = profile.username
-            newUser.github.displayName = profile.displayName
-            newUser.github.email       = profile.emails[0].value
+            // If that accound was already in db, remove it and add detailes to the new one
+            if (user) User.remove({'_id': user._id}).exec()
 
-            newUser.save(function(err) {
-              if (err) throw err
-              return done(null, newUser)
-            })
+            user                    = req.user
+            user.github.id          = profile.id
+            user.github.token       = token
+            user.github.username    = profile.username
+            user.github.displayName = profile.displayName
+            user.github.email       = profile.emails[0].value
+
+            user.save(function(err) { if (err) throw err })
           }
-        })
 
-      } else {
-        // Link account if user already exists
-        var user                = req.user
-
-        user.github.id          = profile.id
-        user.github.token       = token
-        user.github.username    = profile.username
-        user.github.displayName = profile.displayName
-        user.github.email       = profile.emails[0].value
-
-        user.save(function(err) {
-          if (err) throw err
+          // Return one happy user
           return done(null, user)
         })
-      }
+      })
     })
   }))
 

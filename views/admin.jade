@@ -8,13 +8,15 @@ block sidebar
       a(href='/admin/settings') Settings
 
 block content
+  roles = {0: 'Root', 1: 'Admin', 2: 'Teacher', 3: 'Contributor', 4: 'Player'}
+
   - if (tab == 'users')
     h1 Users admin page
 
     - each user in users
       p= user._id + ' #' + user.role
+      p= user.local
 
-      roles = {0: 'Root', 1: 'Admin', 2: 'Teacher', 3: 'Contributor', 4: 'Player'}
       select.role-select(id=user._id)
         - each role, i in roles
           - if (user.role == i)
@@ -24,21 +26,40 @@ block content
       .spacer
 
   - if (tab == 'settings')
-    h1 Settings page
+    .row
+      .large-12.columns
+        h1 Settings page
+      .large-12.columns
+        h4 Login options
+        small.login-message-nologin.error(style='display: none')= __('settings-nologin')
 
-    h4 Login options
-    label(for='login-fb')
-      input.setting(type='checkbox', id='login-fb', checked=(mysettings['login-fb']==='true'))
-      | Allow Facebook login
+    .row.login-options
+      .large-6.columns
+        label(for='login-level')
+        | Select the login level (higher privileges are allowed)
+        select.login-level-select(id='login-level')
+          - each role, i in roles
+            - if (mysettings['login-level'] == i)
+              option(value=i, selected)= role
+            - else
+              option(value=i)= role
 
-    label(for='login-tw')
-      input.setting(type='checkbox', id='login-tw', checked=(mysettings['login-tw']==='true'))
-      | Allow Twitter login
+        br
+        input.setting(type='checkbox', id='login-signup', checked=(mysettings['login-signup']==='true'))
+        | Allow User signup
 
-    label(for='login-gp')
-      input.setting(type='checkbox', id='login-gp', checked=(mysettings['login-gp']==='true'))
-      | Allow Google login
-
-    label(for='login-gh')
-      input.setting(type='checkbox', id='login-gh', checked=(mysettings['login-gh']==='true'))
-      | Allow GitHub login
+      .large-6.columns
+        input.setting(type='checkbox', id='login-local', checked=(mysettings['login-local']==='true'))
+        | Allow Local login
+        br
+        input.setting(type='checkbox', id='login-fb', checked=(mysettings['login-fb']==='true'))
+        | Allow Facebook login
+        br
+        input.setting(type='checkbox', id='login-tw', checked=(mysettings['login-tw']==='true'))
+        | Allow Twitter login
+        br
+        input.setting(type='checkbox', id='login-gp', checked=(mysettings['login-gp']==='true'))
+        | Allow Google login
+        br
+        input.setting(type='checkbox', id='login-gh', checked=(mysettings['login-gh']==='true'))
+        | Allow GitHub login

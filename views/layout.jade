@@ -4,8 +4,6 @@ html
   head
     title= __('title')
 
-    link(rel='stylesheet', href='/public/css/' + theme + '.css')
-
     // Foundation css + js
     link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.1/css/normalize.css')
     link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.1/css/foundation.css')
@@ -25,6 +23,9 @@ html
     meta(name="google-signin-cookiepolicy", content="single_host_origin")
     script(type="text/javascript", src="/public/js/google-login.js")
     script(src="https://apis.google.com/js/client:platform.js", async, defer)
+
+    // My css
+    link(rel='stylesheet', href='/public/css/' + theme + '.css')
 
 
   body

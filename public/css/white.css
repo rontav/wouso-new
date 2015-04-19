@@ -10,3 +10,7 @@ body {
 .activeClass{
     background: #C2C2C2;
 }
+
+input[type="checkbox"] {
+	margin: 8px 5px 0px 0px;
+}
