@@ -71,18 +71,24 @@ $(document).ready(function() {
           // Display answer options
           if (response.answers) {
             response.answers.forEach(function(ans) {
-              $('.qotd-play-answers')
-                .append('<div class="qotd-play-answer"><input type="radio" \
-                  name="ans" value="' + ans + '">' + ans + '</div>')
+              // Highlight right response
+              if (response.answer == ans) {
+                $('.qotd-play-answers').append('<div class="qotd-play-answer">\
+                  <input type="radio" name="ans" value="' + ans + '"><span\
+                  class="qotd-right-answer">' + ans + '</div>')
+              } else {
+                $('.qotd-play-answers').append('<div class="qotd-play-answer">\
+                  <input type="radio" name="ans" value="' + ans + '">' + ans + '</div>')
+              }
             })
           }
 
-          // Display answer or submit button
-          if (response.answer) {
-            $('.qotd-play-answers').append('<p>Answer: ' + response.answer + '</p>')
-          } else if (response.question) {
+          // Display submit button, if there is no answer
+          if (!response.answer) {
             $('.qotd-form').append('<input class="button small" type="submit" value="Check">')
-          } else {
+
+          // Display message if ther is no answer or question
+          } else if (!response.answer && !response.question) {
             $('.qotd-play-question').append('<p>' + response + '</p>')
           }
         }

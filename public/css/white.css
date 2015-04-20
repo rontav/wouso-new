@@ -14,3 +14,13 @@ body {
 input[type="checkbox"] {
 	margin: 8px 5px 0px 0px;
 }
+
+input[type="radio"] {
+	margin: 8px 5px 0px 0px;
+}
+
+.qotd-right-answer {
+	background-color: #8dc53e;
+	border-radius: 5px;
+	color: white;
+}
