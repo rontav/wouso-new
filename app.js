@@ -172,6 +172,8 @@ app.use(function(req, res, next){
 
 
 // Launch server
-app.listen(process.env.PORT || 4000, function() {
-  console.log('Server listening on port 4000.')
-})
+if (process.env.NODE_ENV != 'test') {
+  app.listen(process.env.PORT || 4000, function() {
+    console.log('Server listening on port 4000.')
+  })
+}

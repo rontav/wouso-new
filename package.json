@@ -10,13 +10,15 @@
     "express-session": "^1.9.1",
     "i18n-2": "^0.4.6",
     "jade": "0.31.2",
+    "mocha": "^2.2.4",
     "mongoose": "3.2.0",
     "passport": "^0.2.1",
     "passport-facebook": "^1.0.3",
     "passport-github": "^0.1.5",
     "passport-google-plus": "^0.5.1",
     "passport-local": "^1.0.0",
-    "passport-twitter": "^1.0.2"
+    "passport-twitter": "^1.0.2",
+    "zombie": "^2.5.1"
   },
   "engines": {
     "node": "0.8.x",

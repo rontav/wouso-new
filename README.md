@@ -11,6 +11,7 @@ de utilizare (nu doar la noi in facultate)
 * for locales development please reffer to the [documentation](https://github.com/jeresig/i18n-node-2)
 * when developing modules, create a sym link to the module in /modules, so changes
 are reflected directly, without installing the module
+* when developing test cases, reffer to the zombie [docs](http://zombie.js.org/#assertions)
 * a module can see all instaled modules, by checking
 
 	app.get('modules')
