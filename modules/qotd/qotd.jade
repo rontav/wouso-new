@@ -51,12 +51,9 @@ block content
     .spacer
     .row
       h2 List of questions
-      each qotd in questions
-        .large-11.columns= qotd.question
-        .large-1.columns.text-right
-          = ('0' + qotd.date.getDate()).slice(-2) + '/'
-          = ('0' + (qotd.date.getMonth()+1)).slice(-2) + '/'
-          = qotd.date.getFullYear()
+      .qotd-question-list
+      .qotd-question-pages.text-center
+      .spacer
 
 
   - if (ROLE == 4)

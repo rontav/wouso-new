@@ -29,7 +29,9 @@ are reflected directly, without installing the module
 	* make sure we don't have the same answer twice
 * possibility to override module view and style
 * batch edit for questions
-* paginate qotd list
+* add option for number of questions per page in list
+* show question options on click
+* add question tags
 * timezone option
 * add timer option
 * flag question after answer is shown

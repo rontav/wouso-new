@@ -49,13 +49,10 @@ $(document).ready(function() {
             addQotdOption()
     }
 
-    function addQotdOption() {
-        $('.qotd-answer-template').first().clone()
-                         .addClass('qotd-answer row')
-                         .removeClass('qotd-answer-template')
-                         .appendTo('.qotd-answer-list')
-                         .css('display', 'block')
-    }
+    // Get list of questions
+    curPage = 1
+    perPage = 10
+    listQotdQuestions(perPage, curPage)
 
     // Get today's question and display it
     $.ajax({
@@ -95,3 +92,52 @@ $(document).ready(function() {
       }
     })
 })
+
+
+// Print answer option
+function addQotdOption() {
+  $('.qotd-answer-template')
+    .first().clone()
+    .addClass('qotd-answer row')
+    .removeClass('qotd-answer-template')
+    .appendTo('.qotd-answer-list')
+    .css('display', 'block')
+}
+
+// Request and print QotD questions in list
+function listQotdQuestions(perPage, currentPage) {
+  nextPage = currentPage + 1
+
+  $.ajax({
+    url: '/api/qotd/list/' + perPage + '/' + currentPage,
+    type: 'GET',
+    success: function(response) {
+      if (response) { printQotd(response) }
+    }
+  })
+
+  function printQotd(response) {
+    // Empty current page
+    $('.qotd-question-list').empty()
+    $('.qotd-question-pages').empty()
+
+    // Add each questions
+    response.questions.forEach(function(q) {
+      qdate = new Date(q.date)
+      fullDate = ('0' + qdate.getDate()).slice(-2) + '/'
+      fullDate += ('0' + (qdate.getMonth()+1)).slice(-2) + '/'
+      fullDate += qdate.getFullYear()
+      $('.qotd-question-list').append('<div class="large-11 columns">' + q.question + '</div>\
+        <div class="large-1 columns text-right">' + fullDate + '</div>')
+    })
+
+    // Add page links
+    for (var i=1; i<=response.count/perPage+1; i++) {
+      if (i == currentPage) {
+        $('.qotd-question-pages').append('<b>' + i + ' </b>')
+      } else {
+        $('.qotd-question-pages').append('<a href="#" onclick="listQotdQuestions(perPage, nextPage)">' + i + ' </a>')
+      }
+    }
+  }
+}

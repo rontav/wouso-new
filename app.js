@@ -74,7 +74,7 @@ i18n.expressBind(app, {
   locales: ['ro', 'en'],
   // set the default locale
   defaultLocale: 'en',
-  // set the cookie name
+  // set location
   directory: 'locales',
   extension: '.json'
 })

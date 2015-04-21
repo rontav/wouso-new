@@ -39,10 +39,25 @@ module.exports = function (app) {
   })
 
 
-  app.get('/api/qotd/list', function (req, res, next) {
-    qotd.find().exec(function (err, all) {
-      res.send(all)
-    })
+  app.get('/api/qotd/list/:perPage/:page', function (req, res, next) {
+    _self = {}
+    show = req.params.perPage
+    skip = (req.params.page - 1) * show
+
+    qotd.find().skip(skip).limit(show).exec(gotQotd)
+
+    function gotQotd(err, all) {
+      _self.questions = all
+      // Get total number of questions
+      qotd.count({}).exec(gotQotdCount)
+    }
+
+    function gotQotdCount(err, count) {
+      response = {}
+      response.questions = _self.questions
+      response.count = count
+      res.send(response)
+    }
   })
 
 
