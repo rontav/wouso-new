@@ -1,6 +1,8 @@
 {
 	"title": "WoUSO - new",
 
+	"module-qotd": "QotD",
+
 	"login-wrong-user": "User not registered",
 	"login-wrong-pass": "Wrong password",
 	"login-wrong-email": "This email is already in use.",
