@@ -39,7 +39,6 @@ are reflected directly, without installing the module
 
 
 ## QOTD
-* save selected user role in session and persistent
 * qotd new question form validation
 	* make sure we don't have the same answer twice
 * possibility to override module view and style

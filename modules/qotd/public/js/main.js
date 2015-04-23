@@ -80,13 +80,13 @@ $(document).ready(function() {
             })
           }
 
-          // Display submit button, if there is no answer
-          if (!response.answer) {
-            $('.qotd-form').append('<input class="button small" type="submit" value="Check">')
-
           // Display message if ther is no answer or question
-          } else if (!response.answer && !response.question) {
+          if (!response.answer && !response.question) {
             $('.qotd-play-question').append('<p>' + response + '</p>')
+
+          // Display submit button, if there is no answer
+          } else if (!response.answer) {
+            $('.qotd-form').append('<input class="button small" type="submit" value="Check">')
           }
         }
       }

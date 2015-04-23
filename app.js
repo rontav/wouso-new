@@ -67,34 +67,6 @@ function enable_multiple_view_folders() {
 enable_multiple_view_folders();
 
 
-
-// Localization
-i18n.expressBind(app, {
-  // setup some locales
-  locales: ['ro', 'en'],
-  // set the default locale
-  defaultLocale: 'en',
-  // set location
-  directory: 'locales',
-  extension: '.json'
-})
-
-// Transfer variables to view
-app.use(function(req, res, next) {
-  // Save selected role
-  if (req.query.role) {
-    res.locals.ROLE = req.query.role
-  }
-
-  res.locals.URL = req.url.split('?')[0]
-
-  // Set preferred locale
-  req.i18n.setLocale('en')
-
-  next()
-})
-
-
 app.use(exprSession({
   cookie: { maxAge: 1800000 }, //30 min
   secret: 'mySecretKey',
@@ -111,6 +83,35 @@ app.use('/public',  express.static(__dirname + '/public'))
 app.use('/modules', express.static(__dirname + '/modules'))
 app.use(passport.initialize())
 app.use(passport.session())
+
+
+// Localization
+i18n.expressBind(app, {
+  // setup some locales
+  locales: ['ro', 'en'],
+  // set the default locale
+  defaultLocale: 'en',
+  // set location
+  directory: 'locales',
+  extension: '.json'
+})
+
+// Transfer variables to view
+app.use(function(req, res, next) {
+  // Save selected role to session
+  if (req.query.role) {
+    req.session.ROLE = req.query.role
+  }
+
+  // Transfer vars to view
+  res.locals.ROLE = req.session.ROLE
+  res.locals.URL = req.url.split('?')[0]
+
+  // Set preferred locale
+  req.i18n.setLocale('en')
+
+  next()
+})
 
 
 // Configuring Passport
