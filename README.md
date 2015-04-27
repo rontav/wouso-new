@@ -12,6 +12,9 @@ de utilizare (nu doar la noi in facultate)
 * when developing modules, create a sym link to the module in /modules, so changes
 are reflected directly, without installing the module
 * when developing test cases, reffer to the zombie [docs](http://zombie.js.org/#assertions)
+* when developing themes, you can overwrite the core CSS or any view, by creating
+a .jade file with the name of the file that you would like to overwrite, in the
+themes directory; you can also have a style.css file to add more styling
 * a module can see all instaled modules, by checking
 
 	app.get('modules')
@@ -41,7 +44,6 @@ are reflected directly, without installing the module
 ## QOTD
 * qotd new question form validation
 	* make sure we don't have the same answer twice
-* possibility to override module view and style
 * batch edit for questions
 * search questions
 	* filter by tag

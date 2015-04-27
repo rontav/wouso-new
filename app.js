@@ -81,6 +81,7 @@ app.use(flash())
 app.use(bodyParser.json())
 app.use('/public',  express.static(__dirname + '/public'))
 app.use('/modules', express.static(__dirname + '/modules'))
+app.use('/themes', express.static(__dirname + '/themes'))
 app.use(passport.initialize())
 app.use(passport.session())
 
@@ -121,7 +122,9 @@ require('./auth.js')(app, passport)
 
 
 // Store available views
-views = ['views']
+// Views in the themes directory have the highest priority and can overwrite
+// core or module views
+views = ['./themes/' + used_theme, 'views']
 
 // Load enabled modules
 for (module in data.modules) {

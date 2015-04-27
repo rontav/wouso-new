@@ -24,8 +24,10 @@ html
     script(type="text/javascript", src="/public/js/google-login.js")
     script(src="https://apis.google.com/js/client:platform.js", async, defer)
 
-    // My css
-    link(rel='stylesheet', href='/public/css/' + settings.theme + '.css')
+    // Load base css
+    link(rel='stylesheet', href='/public/css/style.css')
+    // Load theme css
+    link(rel='stylesheet', href='/themes/' + settings.theme + '/style.css')
 
 
   body
