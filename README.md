@@ -36,9 +36,12 @@ themes directory; you can also have a style.css file to add more styling
 * game simulator
 * stats page
 * user messages
-* push notifications
+* push [notifications](http://notifyjs.com/) with [socket.io](http://gonzalo123.com/2011/05/23/real-time-notifications-part-ii-now-with-node-js-and-socket-io/)
 	* notify users when a new qotd get's published
 	* notifications for new messages in inbox
+* make app restart itself. use [this](https://www.npmjs.com/package/forever)
+* add real-time user [analytics](http://coenraets.org/blog/2012/10/real-time-web-analytics-with-node-js-and-socket-io/)
+* move '/' route to own file
 
 
 ## QOTD

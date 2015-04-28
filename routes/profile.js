@@ -6,6 +6,8 @@ module.exports = function (app) {
     Settings.find({'key': /login-.*/}).exec(gotSettings)
 
     function gotSettings(err, all) {
+      if (err) return next(err)
+
       mysettings = {}
       all.forEach(function(set) {
         mysettings[set.key] = set.val

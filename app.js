@@ -160,11 +160,21 @@ for (i in views) {
 // Base routes
 app.get('/', function (req, res, next) {
   User.find().exec(function (err, users) {
+    if (err) return next(err)
+
     res.render('index', {
-      modules: Object.keys(data.modules),
-      users:   users
+      'modules' : Object.keys(data.modules),
+      'users'   : users
     })
   })
+})
+
+// Error handling middleware
+app.use(function(err, req, res, next) {
+  if (err) {
+    console.error(err)
+    res.send('Something went wrong')
+  }
 })
 
 app.use(app.router)

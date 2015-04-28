@@ -11,11 +11,15 @@ module.exports = function (app) {
     qotd.find().exec(gotQuestions)
 
     function gotQuestions(err, all) {
+      if (err) return next(err)
+
       _self.questions = all
       settings.find().exec(gotSettings)
     }
 
     function gotSettings(err, settings) {
+      if (err) return next(err)
+
       mysettings = {}
       settings.forEach(function(option) {
         mysettings[option.key] = option.val;
@@ -47,12 +51,16 @@ module.exports = function (app) {
     qotd.find().skip(skip).limit(show).exec(gotQotd)
 
     function gotQotd(err, all) {
+      if (err) return next(err)
+
       _self.questions = all
       // Get total number of questions
       qotd.count({}).exec(gotQotdCount)
     }
 
     function gotQotdCount(err, count) {
+      if (err) return next(err)
+
       response = {}
       response.questions = _self.questions
       response.count = count
@@ -63,6 +71,8 @@ module.exports = function (app) {
 
   app.get('/api/qotd/list/dates', function (req, res, next) {
     qotd.find().select({'date': 1, '_id': 0}).exec(function (err, dates) {
+      if (err) return next(err)
+
       dates_list = []
       dates.forEach(function(qotd) {
         dates_list.push(qotd.date.toISOString())
@@ -135,6 +145,8 @@ module.exports = function (app) {
     qotd.findOne({'_id': ObjectId.fromString(req.body.question_id)}).exec(gotQuestion)
 
     function gotQuestion(err, question) {
+      if (err) return next(err)
+
       update = {}
       // Checkif user has viewed the question
       if (question.viewers.indexOf(req.user._id) > -1) {

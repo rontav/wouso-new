@@ -5,6 +5,8 @@ module.exports = function (app) {
 
   app.get('/admin', function (req, res, next) {
     User.find().exec(function (err, all) {
+      if (err) return next(err)
+
       res.render('admin', {
         'user'       : req.user,
         'users'      : all
@@ -21,11 +23,15 @@ module.exports = function (app) {
       Settings.find().exec(gotSettings)
 
     function gotUsers(err, all) {
+      if (err) return next(err)
+
       _self.users = all
       renderPage()
     }
 
     function gotSettings(err, all) {
+      if (err) return next(err)
+
       _self.mysettings = {}
       all.forEach(function(set) {
         _self.mysettings[set.key] = set.val
@@ -47,6 +53,7 @@ module.exports = function (app) {
     var conditions = {'_id': req.params.user}
     var update = {$set: {'role': req.query.role}}
     User.update(conditions, update, function (err, num) {
+      if (err) return next(err)
       if (num) res.json({success: true})
     })
   })
@@ -56,6 +63,7 @@ module.exports = function (app) {
       var conditions = {'key': q}
       var update = {$set: {'val': req.query[q]}}
       Settings.update(conditions, update, {'upsert': true}, function (err, num) {
+        if (err) return next(err)
         if (num) res.json({success: true})
       })
     }
