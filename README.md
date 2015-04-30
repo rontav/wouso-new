@@ -59,7 +59,6 @@ themes directory; you can also have a style.css file to add more styling
 * flag question after answer is shown
 * accept questions proposed by users
 * optimise day mark in datepicker for single month
-* use separate locales for qotd module
 * hide questions instead of delete
 	* when a question's text or options get edited, create a new question and
 	hide the old one, to hold proof for the user's score
