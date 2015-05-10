@@ -68,14 +68,14 @@ $(document).ready(function() {
           // Display answer options
           if (response.answers) {
             response.answers.forEach(function(ans) {
-              // Highlight right response
-              if (response.answer == ans) {
+              // Highlight correct answer
+              if (response.answer.indexOf(ans) > -1) {
                 $('.qotd-play-answers').append('<div class="qotd-play-answer">\
-                  <input type="radio" name="ans" value="' + ans + '"><span\
+                  <input type="checkbox" name="ans"><span\
                   class="qotd-right-answer">' + ans + '</div>')
               } else {
                 $('.qotd-play-answers').append('<div class="qotd-play-answer">\
-                  <input type="radio" name="ans" value="' + ans + '">' + ans + '</div>')
+                  <input type="checkbox" name="ans" value="' + ans + '">' + ans + '</div>')
               }
             })
           }

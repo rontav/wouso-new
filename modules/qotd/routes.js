@@ -2,6 +2,7 @@ module.exports = function (app) {
 
   var mongoose = require('mongoose')
   var qotd     = mongoose.model('Qotd')
+  var QOption  = mongoose.model('QOption')
   var settings = mongoose.model('Settings')
   var util     = require('util')
 
@@ -110,8 +111,11 @@ module.exports = function (app) {
           || (question.wrong_ppl.indexOf(req.user._id.toString())) > -1)) {
           sent = true
 
-          // Add right answer and send
-          question['answer'] = question.answers.right[0]
+          // Add right answers and send
+          question['answer'] = []
+          question.choices.forEach(function(ans) {
+            if (ans.val == true) question['answer'].push(ans.text)
+          })
           res.send(shuffleAnswers(question))
         }
       })
@@ -129,8 +133,9 @@ module.exports = function (app) {
     function shuffleAnswers(question) {
       // Process question answers
       answers = []
-      answers = answers.concat(question.answers.wrong)
-      answers = answers.concat(question.answers.right)
+      question.choices.forEach(function(ans) {
+        answers.push(ans.text)
+      })
       // Shuffle answers
       answers = answers.sort(function() { return 0.5 - Math.random() })
       question.answers = answers
@@ -147,11 +152,22 @@ module.exports = function (app) {
     function gotQuestion(err, question) {
       if (err) return next(err)
 
-      update = {}
+      var update = {}
+      var right = wrong = rightCount = 0
       // Checkif user has viewed the question
       if (question.viewers.indexOf(req.user._id) > -1) {
-        // Check answer
-        if (question.answers.right[0] == req.body.ans) {
+        question.choices.forEach(function(ans) {
+          if (ans.val == true) rightCount++
+
+          if (req.body.ans.indexOf(ans.text) > -1) {
+            right++
+          } else {
+            wrong++
+          }
+        })
+
+        // Check answers
+        if (right == rightCount) {
           update = {$addToSet: {'right_ppl': req.user._id}, $pull: {'viewers': req.user._id}}
         } else {
           update = {$addToSet: {'wrong_ppl': req.user._id}, $pull: {'viewers': req.user._id}}
@@ -169,16 +185,19 @@ module.exports = function (app) {
 
   app.post('/api/qotd/add', function (req, res, next) {
 
-    final_answers = {'right': [], 'wrong': []}
-    for (i in req.body.answer)
+    options = []
+    for (i in req.body.answer) {
+      validity = false
       // Ignore empty answers
       if (req.body.answer[i] != '') {
-        if (req.body.valid[i] == 'true')
-          final_answers.right.push(req.body.answer[i])
-        else
-          final_answers.wrong.push(req.body.answer[i])
-      }
+        if (req.body.valid[i] == 'true') validity = true
 
+        options.push(new QOption({
+          'text' : req.body.answer[i],
+          'val'  : validity
+        }))
+      }
+    }
 
     // Format received date
     formatted_date = util.format('%d.%d.%d',
@@ -189,7 +208,7 @@ module.exports = function (app) {
 
     new qotd ({
       'question'  : req.body.question,
-      'answers'   : final_answers,
+      'choices'   : options,
       'date'      : new Date(formatted_date)
     }).save()
 

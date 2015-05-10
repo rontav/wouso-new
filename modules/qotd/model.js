@@ -4,13 +4,16 @@ var Schema   = mongoose.Schema
 var Qotd = new Schema({
   question   : String,
   date       : Date,
-  answers    : {
-    right: [String],
-    wrong: [String]
-  },
+  choices    : [QOption],
   viewers    : [String],
   right_ppl  : [String],
   wrong_ppl  : [String]
 })
 
+var QOption = new Schema({
+  text       : String,
+  val        : Boolean
+})
+
 mongoose.model('Qotd', Qotd)
+mongoose.model('QOption', QOption)

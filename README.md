@@ -36,6 +36,7 @@ themes directory; you can also have a style.css file to add more styling
 * game simulator
 * stats page
 * user messages
+* use themes as npm packages
 * push [notifications](http://notifyjs.com/) with [socket.io](http://gonzalo123.com/2011/05/23/real-time-notifications-part-ii-now-with-node-js-and-socket-io/)
 	* notify users when a new qotd get's published
 	* notifications for new messages in inbox
