@@ -16,6 +16,8 @@ block content
     a(href='/connect/github') Connect GitHub account
     br
 
+  - if (user)
+    p= user._id
   - if (user && user.local.email)
     b Local data
     p= user.local

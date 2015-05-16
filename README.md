@@ -43,6 +43,7 @@ themes directory; you can also have a style.css file to add more styling
 * make app restart itself. use [this](https://www.npmjs.com/package/forever)
 * add real-time user [analytics](http://coenraets.org/blog/2012/10/real-time-web-analytics-with-node-js-and-socket-io/)
 * move '/' route to own file
+* redirect to previous page, after login
 
 
 ## QOTD

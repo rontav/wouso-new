@@ -1,0 +1,21 @@
+extends layout
+
+block content
+  .row
+    - if (!user)
+      h4 Please log in to view your messages.
+    - else
+      h3 New message
+      form(action='/messages/send', method='post')
+        label TO:
+        input(name='destination', type='text')
+        label Message
+        textarea(name='message', rows='5')
+        button.btn.btn-warning(type='submit') Send
+      br
+
+      h3 My messages
+      - if (messages.length)
+        p= messages
+      - else
+        h5 You have no messages at this moment.
