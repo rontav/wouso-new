@@ -1,6 +1,6 @@
 var Message = require('../config/models/message')
 
-module.exports = function (app) {
+module.exports = function (app, io) {
   app.get('/messages', function (req, res, next) {
 
     Message.find({'destination': req.user._id}).exec(gotMessages)
@@ -22,6 +22,9 @@ module.exports = function (app) {
       'message'      : req.body.message
     }).save(function (err) {
       if (err) return next(err)
+
+      // Alert
+      io.sockets.emit(req.body.destination, { message: 'new mwssage' })
 
       res.redirect('/messages')
     })

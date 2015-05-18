@@ -8,6 +8,7 @@ var passport     = require('passport')
 var i18n         = require('i18n-2')
 var flash        = require('connect-flash')
 var fs           = require('fs')
+var io           = require('socket.io')
 var app = module.exports = express()
 
 // Read config file
@@ -179,13 +180,27 @@ app.set('view engine', 'jade')
 app.set('modules', available_modules)
 app.set('theme', used_theme)
 
+// Launch server
+if (process.env.NODE_ENV != 'test') {
+  server = app.listen(process.env.PORT || 4000, function() {
+    console.log('Server listening on port 4000.')
+  })
+}
+
+// Socket.io
+var io = io.listen(server)
+
+io.sockets.on('connection', function(client) {
+  io.sockets.emit('message', { message: 'welcome to the app' })
+})
+
 
 // Load main routes
 views_dir = './routes'
 var views = fs.readdirSync(views_dir);
 for (i in views) {
   view = views_dir + '/' + views[i]
-  require(view)(app)
+  require(view)(app, io)
 }
 
 
@@ -215,11 +230,3 @@ app.use(app.router)
 app.use(function(req, res, next){
   res.status(404).type('txt').send('Not found')
 })
-
-
-// Launch server
-if (process.env.NODE_ENV != 'test') {
-  app.listen(process.env.PORT || 4000, function() {
-    console.log('Server listening on port 4000.')
-  })
-}
