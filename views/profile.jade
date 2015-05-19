@@ -1,38 +1,43 @@
 extends layout
 
 block content
-  h3 Profile Page
+  .row
+    - if (!user)
+      h4 Login to view your profile.
 
-  if (user && !user.facebook.id && mysettings['login-fb'] === 'true')
-    a(href='/connect/facebook') Connect Facebook account
-    br
-  if (user && !user.twitter.id && mysettings['login-tw'] === 'true')
-    a(href='/connect/twitter') Connect Twitter account
-    br
-  if (user && !user.google.id && mysettings['login-gp'] === 'true')
-    a(href='#', onclick='gapi.auth.signIn({callback: signInCallback})') Connect Google account
-    br
-  if (user && !user.github.id && mysettings['login-gh'] === 'true')
-    a(href='/connect/github') Connect GitHub account
-    br
+    - else
+      h3 Profile Page
 
-  - if (user)
-    p= user._id
-  - if (user && user.local.email)
-    b Local data
-    p= user.local
-  - if (user && user.facebook.id)
-    b Facebook
-    p= user.facebook
-  - if (user && user.twitter.id)
-    b Twitter
-    p= user.twitter
-  - if (user && user.google.id)
-    b Google
-    p= user.google
-  - if (user && user.github.id)
-    b GitHub
-    p= user.github
+      if (user && !user.facebook.id && mysettings['login-fb'] === 'true')
+        a(href='/connect/facebook') Connect Facebook account
+        br
+      if (user && !user.twitter.id && mysettings['login-tw'] === 'true')
+        a(href='/connect/twitter') Connect Twitter account
+        br
+      if (user && !user.google.id && mysettings['login-gp'] === 'true')
+        a(href='#', onclick='gapi.auth.signIn({callback: signInCallback})') Connect Google account
+        br
+      if (user && !user.github.id && mysettings['login-gh'] === 'true')
+        a(href='/connect/github') Connect GitHub account
+        br
 
-  if (user)
-    a(href='/logout') Logout
+      - if (user)
+        p= user._id
+      - if (user && user.local.email)
+        b Local data
+        p= user.local
+      - if (user && user.facebook.id)
+        b Facebook
+        p= user.facebook
+      - if (user && user.twitter.id)
+        b Twitter
+        p= user.twitter
+      - if (user && user.google.id)
+        b Google
+        p= user.google
+      - if (user && user.github.id)
+        b GitHub
+        p= user.github
+
+      if (user)
+        a(href='/logout') Logout

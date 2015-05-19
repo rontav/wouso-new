@@ -3,7 +3,8 @@ var Message = require('../config/models/message')
 module.exports = function (app, io) {
   app.get('/messages', function (req, res, next) {
 
-    Message.find({'destination': req.user._id}).exec(gotMessages)
+    query = (req.user? req.user._id : null)
+    Message.find(query).exec(gotMessages)
 
     function gotMessages(err, all) {
       if (err) return next(err)

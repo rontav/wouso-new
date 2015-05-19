@@ -90,11 +90,12 @@ $.noty.defaults['theme'] = 'relax'
 $.noty.defaults['type'] = 'information'
 $.noty.defaults['timeout'] = 5000
 
-socket.on(myuser, function (msg) {
-  noty({
-    text: 'One new message!',
-    callback: {
-      onCloseClick: function() {document.location.href = '/messages'}
-    }
+if (myuser)
+  socket.on(myuser, function (msg) {
+    noty({
+      text: 'One new message!',
+      callback: {
+        onCloseClick: function() {document.location.href = '/messages'}
+      }
+    })
   })
-})
