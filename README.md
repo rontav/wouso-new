@@ -53,7 +53,8 @@ themes directory; you can also have a style.css file to add more styling
 	* filter by tag
 * add option for number of questions per page in list
 * show question options on click
-* add question tags
+* display tags in qotd list
+* filter qotd list by tag
 * add timer option
 	* option for custom time
 	* option for auto for submission (mark as wrong?)

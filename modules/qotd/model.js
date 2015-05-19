@@ -1,5 +1,6 @@
 var mongoose = require('mongoose')
 var Schema   = mongoose.Schema
+var ObjectId = mongoose.Schema.Types.ObjectId
 
 var Qotd = new Schema({
   question   : String,
@@ -7,7 +8,8 @@ var Qotd = new Schema({
   choices    : [QOption],
   viewers    : [String],
   right_ppl  : [String],
-  wrong_ppl  : [String]
+  wrong_ppl  : [String],
+  tags 		 : [ObjectId]
 })
 
 var QOption = new Schema({

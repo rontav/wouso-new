@@ -4,6 +4,7 @@ module.exports = function (app) {
   var qotd     = mongoose.model('Qotd')
   var QOption  = mongoose.model('QOption')
   var settings = mongoose.model('Settings')
+  var Tag      = mongoose.model('Tag')
   var util     = require('util')
 
 
@@ -206,11 +207,31 @@ module.exports = function (app) {
       req.body.date.split('/')[2]
     )
 
-    new qotd ({
-      'question'  : req.body.question,
-      'choices'   : options,
-      'date'      : new Date(formatted_date)
-    }).save()
+    // Get tags
+    tags = req.body.tags.split(' ')
+    Tag.find({'name': {$in: tags}, 'type': 'qotd'}).exec(gotTags)
+
+    function gotTags(err, all) {
+      tag_ids = []
+      all.forEach(function(tag) {
+        // Increment tag count
+        Tag.update({'_id': tag._id}, {$inc: {'count': 1}}).exec(function (err) {
+          if (err) return next(err)
+        })
+
+        // Save to list
+        tag_ids.push(tag._id)
+      })
+
+      new_qotd = new qotd ({
+        'question'  : req.body.question,
+        'choices'   : options,
+        'date'      : new Date(formatted_date),
+        'tags'      : tag_ids
+      }).save()
+    }
+
+
 
     res.redirect('/qotd');
   })

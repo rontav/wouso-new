@@ -29,8 +29,9 @@ var configDB = require('./config/database.js')
 mongoose.connect(configDB.url)
 
 
-// Require settings schema
+// Require db schemas
 var Settings = require('./config/models/settings')
+var Tag      = require('./config/models/tag')
 
 // Ensure superuser exists
 var User = require('./config/models/user')

@@ -5,6 +5,8 @@ block sidebar
     li
       a(href='/admin/users') Users
     li
+      a(href='/admin/tags') Tags
+    li
       a(href='/admin/settings') Settings
 
 block content
@@ -24,6 +26,21 @@ block content
           - else
             option(value=i)= role
       .spacer
+
+  - if (tab == 'tags')
+    .row
+      .large-12.columns
+        h4 Add a new tag
+        form(method='post', action='/api/tags/add')
+          label Tag name
+          input(name='name', type='text')
+          label Type
+          input(name='type', type='text')
+          input.button.small(type='submit', value='Save')
+
+        .spacer
+        - each tag in mytags
+          p= tag.name + ' ' + tag.type + ' ' + tag.count
 
   - if (tab == 'settings')
     .row
