@@ -23,7 +23,7 @@ $.ajax({
 // Mark selected answers
 // This is done because we need a default behavior for checkboxes
 $('body').on('click', '[name="check"]',function() {
-    valid_field = $(this).parent().parent().children('#valid')
+    valid_field = $(this).parent().parent().children('#qotd-valid')
     if (valid_field.val() == 'false') {
         valid_field.val(true)
         $(this).text('True')
@@ -42,12 +42,6 @@ $(document).ready(function() {
 
     // Add another answer entry to a qotd, by cloning the template
     $('[name="add-qotd-answer"]').click(addQotdOption)
-
-    // Add default number of options for new QotD
-    if (typeof noOfOptions != 'undefined') {
-        for (var i=0; i<noOfOptions; i++)
-            addQotdOption()
-    }
 
     // Get list of questions
     curPage = 1
@@ -93,6 +87,67 @@ $(document).ready(function() {
     })
 })
 
+// Reveal modal to edit qotd
+function editQotd(id) {
+  // Clear data and set default text
+  $('#qotd-question').val('')
+  $('#qotd-tags').val('')
+  $('#qotd-date').val('')
+  $('.qotd-answer-list').empty()
+  $('#qotd-addForm').text('Add question')
+  $('#qotd-submit').val('Save')
+
+  // Reveal modal
+  $('#addQotdModal').foundation('reveal', 'open')
+
+  // Get data if needed
+  if (typeof id !== 'undefined') {
+    $.ajax({
+      url: '/api/qotd/list/1/1?id=' + id,
+      type: 'GET',
+      success: function(response) {
+        if (response) { populateQotd(response) }
+      }
+    })
+
+  } else {
+    // Add default number of options
+    if (typeof noOfOptions != 'undefined') {
+      for (var i=0; i<noOfOptions; i++)
+        addQotdOption()
+    }
+  }
+
+  function populateQotd(data) {
+    q = data.questions[0]
+    $('#qotd-id').val(q._id)
+    $('#qotd-question').val(q.question)
+    if (q.date) $('#qotd-date').val(shortenDate(q.date))
+    // Update title and submit button  for edit mode
+    $('#qotd-addForm').text('Edit question')
+    $('#qotd-submit').val('Update')
+    // Add options
+    for (var i=0; i<q.choices.length; i++)
+      addQotdOption()
+    // Populate options
+    $('.qotd-answer :input[type="text"]').each(function(i) {
+      $(this).val(q.choices[i].text)
+    })
+    // Mark right answer
+    $('.qotd-check:gt(0)').each(function(i) {
+      if (q.choices[i].val == true) {
+        $(this).addClass('success')
+        $(this).text('True')
+        $(this).parent().parent().children('#qotd-valid').val('true')
+      }
+    })
+    // Add tags
+    tags = ''
+    for (var i=0; i<q.tags.length; i++)
+      tags += q.tags[i] + ' '
+    $('#qotd-tags').val(tags)
+  }
+}
 
 // Print answer option
 function addQotdOption() {
@@ -104,10 +159,17 @@ function addQotdOption() {
     .css('display', 'block')
 }
 
+// Transform string data from std format to DD/MM/YY
+function shortenDate(date) {
+  qdate = new Date(date)
+  shortDate = ('0' + qdate.getDate()).slice(-2) + '/'
+  shortDate += ('0' + (qdate.getMonth()+1)).slice(-2) + '/'
+  shortDate += qdate.getFullYear()
+  return shortDate
+}
+
 // Request and print QotD questions in list
 function listQotdQuestions(perPage, currentPage) {
-  nextPage = currentPage + 1
-
   $.ajax({
     url: '/api/qotd/list/' + perPage + '/' + currentPage,
     type: 'GET',
@@ -121,14 +183,14 @@ function listQotdQuestions(perPage, currentPage) {
     $('.qotd-question-list').empty()
     $('.qotd-question-pages').empty()
 
-    // Add each questions
+    // Print each question
     response.questions.forEach(function(q) {
-      qdate = new Date(q.date)
-      fullDate = ('0' + qdate.getDate()).slice(-2) + '/'
-      fullDate += ('0' + (qdate.getMonth()+1)).slice(-2) + '/'
-      fullDate += qdate.getFullYear()
-      $('.qotd-question-list').append('<div class="large-11 columns">' + q.question + '</div>\
-        <div class="large-1 columns text-right">' + fullDate + '</div>')
+      shortDate = '--/--/--'
+      if (q.date) shortDate = shortenDate(q.date)
+
+      $('.qotd-question-list').append('<div class="large-9 columns">' + q.question +
+        '</div><div class="large-1 columns"><a href="#" onclick="editQotd(\'' + q._id + '\')">Edit</a></div>' +
+        '<div class="large-2 columns text-center">' + shortDate + '</div>')
     })
 
     // Add page links
@@ -136,7 +198,7 @@ function listQotdQuestions(perPage, currentPage) {
       if (i == currentPage) {
         $('.qotd-question-pages').append('<b>' + i + ' </b>')
       } else {
-        $('.qotd-question-pages').append('<a href="#" onclick="listQotdQuestions(perPage, nextPage)">' + i + ' </a>')
+        $('.qotd-question-pages').append('<a href="#" onclick="listQotdQuestions(perPage, ' + i + ')">' + i + ' </a>')
       }
     }
   }

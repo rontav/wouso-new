@@ -50,12 +50,28 @@ module.exports = function (app) {
     show = req.params.perPage
     skip = (req.params.page - 1) * show
 
-    qotd.find().skip(skip).limit(show).exec(gotQotd)
+    query = {}
+    if (req.query.id) query = {'_id': req.query.id}
+    qotd.find(query).skip(skip).limit(show).exec(gotQotd)
 
     function gotQotd(err, all) {
       if (err) return next(err)
 
       _self.questions = all
+      Tag.find({'type': 'qotd'}).exec(gotTags)
+    }
+
+    function gotTags(err, tags) {
+      // Replace tag ids with tag names
+      _self.questions.forEach(function(q) {
+        tags.forEach(function(tag) {
+          var i = q.tags.indexOf(tag._id)
+          if (i > -1) {
+            q.tags[i] = tag.name
+          }
+        })
+      })
+
       // Get total number of questions
       qotd.count({}).exec(gotQotdCount)
     }
@@ -77,7 +93,8 @@ module.exports = function (app) {
 
       dates_list = []
       dates.forEach(function(qotd) {
-        dates_list.push(qotd.date.toISOString())
+        if (qotd.date)
+          dates_list.push(qotd.date.toISOString())
       })
       res.send(dates_list)
     })
@@ -201,11 +218,14 @@ module.exports = function (app) {
     }
 
     // Format received date
-    formatted_date = util.format('%d.%d.%d',
-      req.body.date.split('/')[1],
-      req.body.date.split('/')[0],
-      req.body.date.split('/')[2]
-    )
+    if (req.body.date)
+      formatted_date = util.format('%d.%d.%d',
+        req.body.date.split('/')[1],
+        req.body.date.split('/')[0],
+        req.body.date.split('/')[2]
+      )
+    else
+      formatted_date = null
 
     // Get tags
     tags = req.body.tags.split(' ')
@@ -223,17 +243,19 @@ module.exports = function (app) {
         tag_ids.push(tag._id)
       })
 
-      new_qotd = new qotd ({
+      new_qotd = {
         'question'  : req.body.question,
         'choices'   : options,
-        'date'      : new Date(formatted_date),
+        'date'      : formatted_date,
         'tags'      : tag_ids
-      }).save()
+      }
+
+      // If id is provided, we are in edit mode; else we create a new object
+      qotd.update({'_id': req.body.id}, new_qotd, {upsert: true}).exec(function (err) {
+        if (err) return next(err)
+        res.redirect('/qotd')
+      })
     }
-
-
-
-    res.redirect('/qotd');
   })
 
 }

@@ -18,44 +18,49 @@ block content
 
   - if (ROLE < 4)
     .row.collapse.qotd-answer-template
-      input(name='valid', type='hidden', value='false', id='valid', hidden)
+      input(name='valid', type='hidden', value='false', id='qotd-valid', hidden)
       .small-10.columns
         label
           input(name='answer', type='text', id='answer')
       .small-2.columns
-        a.button.postfix(href='javascript:void(0);', name='check') False
+        a.button.postfix.qotd-check(href='javascript:void(0);', name='check') False
 
-    form(method='post', action='/api/qotd/add')
-      .qotd-question
-        .row
-          .large-12.columns
-            h2 Add question
-            label Question
-              input(name='question', type='text')
-        .row
-          .large-12.columns
-            label Tags (space separated)
-              input(name='tags', type='text')
-        .row
-          .large-6.columns.left
-            label Answers
-              .qotd-answer-list
-          .large-6.columns.right
-            label Date (dd/mm/yy)
-              input(name='date', type='text', id='qotd-date')
-            #datepicker
 
-      .spacer
-      .controls.row
-        .large-11.columns.left
-          input.button.small(name='add-qotd-answer', type='button', value='Add answer')
-        .large-1.columns.right
-          input.button.small(id='sub', type='submit', value='Save')
+    .reveal-modal(id='addQotdModal', data-reveal, aria-hidden='true', role='dialog')
+      form#add-qotd-form(method='post', action='/api/qotd/add')
+        .qotd-question
+          .row
+            .large-12.columns
+              h2#qotd-addForm Add question
+              label Question
+                input(name='question', type='text', id='qotd-question')
+                input(name='id', type='hidden', id='qotd-id')
+          .row
+            .large-12.columns
+              label Tags (space separated)
+                input(name='tags', type='text', id='qotd-tags')
+          .row
+            .large-6.columns.left
+              label Answers
+                .qotd-answer-list
+            .large-6.columns.right
+              label Date (dd/mm/yy)
+                input(name='date', type='text', id='qotd-date')
+              #datepicker
+
+        .spacer
+        .controls.row
+          .large-10.columns.left
+            input.button.small(name='add-qotd-answer', type='button', value='Add answer')
+          .large-2.columns.right
+            input.button.small(id='qotd-submit', type='submit', value='Save')
 
     .spacer
     .row
+      a.radius.button(href='#', onclick="editQotd()") Add a new qotd
       h2 List of questions
       .qotd-question-list
+      .spacer
       .qotd-question-pages.text-center
       .spacer
 
