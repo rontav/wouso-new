@@ -1,7 +1,11 @@
 extends layout
 
 block content
-  h3 WoUSO build as modular as possible, using JS all across the stack.
+  .row
+    h3 WoUSO
+    p This is a new version of WoUSO, build as modular as possible, using JS all
+      | across the stack.
 
-  - each u in users
-    p= u
+    h3 Registered users
+    - each u in users
+      p= u

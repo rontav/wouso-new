@@ -46,9 +46,6 @@ html
             li.active
               a(href='/login') Login
           - else
-              li.active
-                a(href='/logout') Logout
-
               // Current role
               - var ROLE = (locals.ROLE ? locals.ROLE : user.role)
 
@@ -85,6 +82,9 @@ html
                     - if (user.role <= 4)
                       li
                         a(href=URL + '?role=4') Player
+
+              li.active
+                a(href='/logout') Logout
 
         ul.left
           li
