@@ -36,17 +36,21 @@ $('body').on('click', '[name="check"]',function() {
 })
 
 
+// Get list of questions
+var curPage = 1
+var perPage = 10
+listQotdQuestions(perPage, curPage)
+
+// Keeps list of selected tag IDs
+var selectedTags = []
+
+
 $(document).ready(function() {
     // Hide question template
     $('.qotd-answer-template').css('display', 'none')
 
     // Add another answer entry to a qotd, by cloning the template
     $('[name="add-qotd-answer"]').click(addQotdOption)
-
-    // Get list of questions
-    curPage = 1
-    perPage = 10
-    listQotdQuestions(perPage, curPage)
 
     // Get today's question and display it
     $.ajax({
@@ -149,6 +153,12 @@ function editQotd(id) {
   }
 }
 
+function selectTag(id) {
+  selectedTags.push(id)
+  // Refresh qotd list
+  listQotdQuestions(perPage, curPage, selectedTags)
+}
+
 // Print answer option
 function addQotdOption() {
   $('.qotd-answer-template')
@@ -169,9 +179,13 @@ function shortenDate(date) {
 }
 
 // Request and print QotD questions in list
-function listQotdQuestions(perPage, currentPage) {
+function listQotdQuestions(perPage, currentPage, sTags) {
+  // Use current tags if none provided
+  if (typeof selectedTags === 'undefined' || selectedTags.length == 0) sTags = ''
+  if (typeof selectedTags === 'object') sTags = selectedTags.join()
+
   $.ajax({
-    url: '/api/qotd/list/' + perPage + '/' + currentPage,
+    url: '/api/qotd/list/' + perPage + '/' + currentPage + '?tags=' + sTags,
     type: 'GET',
     success: function(response) {
       if (response) { printQotd(response) }

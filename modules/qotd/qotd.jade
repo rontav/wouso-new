@@ -1,9 +1,13 @@
 extends ../../views/layout
 
 block content
-  h3= __('qotd-title')
+  .row
+    .large-12.columns
+      h3= __('qotd-title')
+      - if (!user)
+        h2 Log in to play this game.
 
-  - if (ROLE < 2)
+  - if (ROLE < 3)
     .row
       .large-12.columns
         h2 Settings
@@ -57,12 +61,19 @@ block content
 
     .spacer
     .row
-      a.radius.button(href='#', onclick="editQotd()") Add a new qotd
-      h2 List of questions
-      .qotd-question-list
-      .spacer
-      .qotd-question-pages.text-center
-      .spacer
+      a.radius.button(href='#', onclick='editQotd()') Add a new qotd
+      .large-10.columns.left
+        h2 List of questions
+        .qotd-question-list
+        .spacer
+        .qotd-question-pages.text-center
+        .spacer
+      .large-2.columns.left
+        h2 Tags
+        ul
+          - each tag in qtags
+            li.qotd-tag
+              a(href='#', onclick='selectTag("' + tag._id + '")')= tag.name + ' (' + tag.count + ')'
 
 
   - if (ROLE == 4)

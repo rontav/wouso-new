@@ -1,15 +1,16 @@
 var fs           = require('fs')
 var express      = require('express')
-var mongoose     = require('mongoose')
 var bodyParser   = require('body-parser')
 var cookieParser = require('cookie-parser')
 var exprSession  = require('express-session')
 var passport     = require('passport')
-var i18n         = require('i18n-2')
 var flash        = require('connect-flash')
-var fs           = require('fs')
-var io           = require('socket.io')
 var app = module.exports = express()
+
+// Set up logger
+var Logger = require('pretty-logger')
+Logger.setLevel('info')
+log = new Logger()
 
 // Read config file
 var data = (JSON.parse(fs.readFileSync('./config.json', 'utf8')))
@@ -25,8 +26,10 @@ for (theme in data.themes) {
 }
 
 // Connect to database
+var Mongoose = require('mongoose')
 var configDB = require('./config/database.js')
-mongoose.connect(configDB.url)
+Mongoose.connection.on('error', configDB.check)
+Mongoose.connect(configDB.url)
 
 
 // Require db schemas
@@ -71,7 +74,7 @@ enable_multiple_view_folders();
 
 
 app.use(exprSession({
-  cookie: { maxAge: 1800000 }, //30 min
+  cookie: { maxAge: 1800000 }, // 30 min
   secret: 'mySecretKey',
   resave: true,
   saveUninitialized: true
@@ -90,6 +93,7 @@ app.use(passport.session())
 
 
 // Localization
+var i18n = require('i18n-2')
 i18n.expressBind(app, {
   // setup some locales
   locales: ['ro', 'en'],
@@ -102,63 +106,13 @@ i18n.expressBind(app, {
   devMode: false
 })
 
-// Transfer variables to view
-app.use(function(req, res, next) {
-  // Save selected role to session
-  if (req.query.role) {
-    req.session.ROLE = req.query.role
-  }
-
-  // Transfer vars to view
-  res.locals.ROLE = req.session.ROLE
-  res.locals.URL = req.url.split('?')[0]
-
-  // Merge core locales with module locales, for current module page
-  var current_module = req.url.split('/')[1]
-  if (app.get('modules').indexOf(current_module) > -1) {
-    req.i18n.locales = mergeLocales(req.i18n.locales, current_module)
-  }
-
-  function mergeLocales(locales, module) {
-    // Stores merged locales
-    var new_locales = {}
-
-    for (var locale in locales) {
-      var module_locales_path = './modules/' + module + '/locales/' + locale + '.json'
-      var core_locales_path   = './locales/' + locale + '.json'
-
-      var module_locales = JSON.parse(fs.readFileSync(module_locales_path, 'utf8'))
-      var core_locales   = JSON.parse(fs.readFileSync(core_locales_path, 'utf8'))
-
-      // Merge module strings with core ones
-      for (var attr in module_locales)
-        // Do not overwrite core locales
-        if (!(attr in core_locales))
-          core_locales[attr] = module_locales[attr]
-
-      new_locales[locale] = core_locales
-    }
-
-    return new_locales
-  }
-
-  // Set preferred locale
-  req.i18n.setLocale('en')
-
-  next()
-})
-
-
-// Configuring Passport
-require('./config/passport')(passport)
-// Load authentication routes from external file
-require('./auth.js')(app, passport)
-
-
 // Store available views
 // Views in the themes directory have the highest priority and can overwrite
 // core or module views
 views = ['./themes/' + used_theme, 'views']
+
+// Load middleware
+require('./routes/base.js')(app)
 
 // Load enabled modules
 for (module in data.modules) {
@@ -168,11 +122,25 @@ for (module in data.modules) {
     // Load module shema
     require(module + '/model.js')
     // Load module routes
-    require(module)(app)
+    require(module + '/routes.js')(app)
     // Load module views
     views.push('node_modules/' + module)
   }
 }
+
+// Load core routes
+var routes_dir = './routes'
+var routes = fs.readdirSync(routes_dir);
+for (var i in routes) {
+  var route = routes_dir + '/' + routes[i]
+  require(route)(app, io)
+}
+
+
+// Configuring Passport
+require('./config/passport')(passport)
+// Load authentication routes from external file
+require('./auth.js')(app, passport)
 
 
 // Set app settings
@@ -184,50 +152,15 @@ app.set('theme', used_theme)
 // Launch server
 if (process.env.NODE_ENV != 'test') {
   server = app.listen(process.env.PORT || 4000, function() {
-    console.log('Server listening on port 4000.')
+    log.info('Server listening on port 4000')
   })
 }
 
 // Socket.io
-var io = io.listen(server)
-
+var io = require('socket.io').listen(server)
 io.sockets.on('connection', function(client) {
   io.sockets.emit('message', { message: 'welcome to the app' })
 })
 
 
-// Load main routes
-views_dir = './routes'
-var views = fs.readdirSync(views_dir);
-for (i in views) {
-  view = views_dir + '/' + views[i]
-  require(view)(app, io)
-}
-
-
-// Base routes
-app.get('/', function (req, res, next) {
-  User.find().exec(function (err, users) {
-    if (err) return next(err)
-
-    res.render('index', {
-      'modules' : Object.keys(data.modules),
-      'users'   : users
-    })
-  })
-})
-
-// Error handling middleware
-app.use(function(err, req, res, next) {
-  if (err) {
-    console.error(err)
-    res.send('Something went wrong')
-  }
-})
-
 app.use(app.router)
-
-// 404 page
-app.use(function(req, res, next){
-  res.status(404).type('txt').send('Not found')
-})

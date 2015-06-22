@@ -69,19 +69,19 @@ html
                   ul.dropdown
                     - if (user.role == 0)
                       li
-                        a(href=URL + '?role=0') Root
+                        a(href=locals.URL + '?role=0') Root
                     - if (user.role <= 1)
                       li
-                        a(href=URL + '?role=1') Admin
+                        a(href=locals.URL + '?role=1') Admin
                     - if (user.role <= 2)
                       li
-                        a(href=URL + '?role=2') Teacher
+                        a(href=locals.URL + '?role=2') Teacher
                     - if (user.role <= 3)
                       li
-                        a(href=URL + '?role=3') Contributor
+                        a(href=locals.URL + '?role=3') Contributor
                     - if (user.role <= 4)
                       li
-                        a(href=URL + '?role=4') Player
+                        a(href=locals.URL + '?role=4') Player
 
               li.active
                 a(href='/logout') Logout
@@ -95,10 +95,12 @@ html
             a(href='/admin') Admin
 
     dl.sub-nav
-      dt GAMES:
-      - each mod in settings.modules
-        dd.active
-          a(href='/' + mod)= __('module-' + mod)
+      .row
+        .large-12.columns
+          dt GAMES:
+          - each mod in settings.modules
+            dd.active
+              a(href='/' + mod)= __('module-' + mod)
 
     #main
       block sidebar

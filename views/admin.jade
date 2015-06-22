@@ -1,31 +1,35 @@
 extends layout
 
 block sidebar
-  ul
-    li
-      a(href='/admin/users') Users
-    li
-      a(href='/admin/tags') Tags
-    li
-      a(href='/admin/settings') Settings
+  .row
+    .large-12.columns
+      ul
+        li
+          a(href='/admin/users') Users
+        li
+          a(href='/admin/tags') Tags
+        li
+          a(href='/admin/settings') Settings
 
 block content
   roles = {0: 'Root', 1: 'Admin', 2: 'Teacher', 3: 'Contributor', 4: 'Player'}
 
   - if (tab == 'users')
-    h1 Users admin page
+    .row
+      .large-12.columns
+        h1 Users admin page
 
-    - each user in users
-      p= user._id + ' #' + user.role
-      p= user.local
+        - each user in users
+          p= user._id + ' #' + user.role
+          p= user.local
 
-      select.role-select(id=user._id)
-        - each role, i in roles
-          - if (user.role == i)
-            option(value=i, selected)= role
-          - else
-            option(value=i)= role
-      .spacer
+          select.role-select(id=user._id)
+            - each role, i in roles
+              - if (user.role == i)
+                option(value=i, selected)= role
+              - else
+                option(value=i)= role
+          .spacer
 
   - if (tab == 'tags')
     .row

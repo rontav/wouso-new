@@ -6,6 +6,7 @@ module.exports = function (app) {
   var settings = mongoose.model('Settings')
   var Tag      = mongoose.model('Tag')
   var util     = require('util')
+  var fs       = require('fs')
 
 
   app.get('/qotd', function (req, res, next) {
@@ -16,6 +17,13 @@ module.exports = function (app) {
       if (err) return next(err)
 
       _self.questions = all
+      Tag.find({'type': 'qotd'}).exec(gotTags)
+    }
+
+    function gotTags(err, tags) {
+      if (err) return next(err)
+
+      _self.qtags = tags
       settings.find().exec(gotSettings)
     }
 
@@ -24,12 +32,13 @@ module.exports = function (app) {
 
       mysettings = {}
       settings.forEach(function(option) {
-        mysettings[option.key] = option.val;
+        mysettings[option.key] = option.val
       })
 
       res.render('qotd', {
         'questions'  : _self.questions,
         'mysettings' : mysettings,
+        'qtags'       : _self.qtags,
         'user'       : req.user
       })
     }
@@ -51,7 +60,10 @@ module.exports = function (app) {
     skip = (req.params.page - 1) * show
 
     query = {}
-    if (req.query.id) query = {'_id': req.query.id}
+    if (req.query.id) query['_id'] = req.query.id
+    if (req.query.tags) query['tags'] = {$in: req.query.tags.split(',')}
+
+    _self.query = query
     qotd.find(query).skip(skip).limit(show).exec(gotQotd)
 
     function gotQotd(err, all) {
@@ -72,13 +84,10 @@ module.exports = function (app) {
         })
       })
 
-      // Get total number of questions
-      qotd.count({}).exec(gotQotdCount)
+      qotd.count(_self.query).exec(gotCount)
     }
 
-    function gotQotdCount(err, count) {
-      if (err) return next(err)
-
+    function gotCount(err, count) {
       response = {}
       response.questions = _self.questions
       response.count = count
