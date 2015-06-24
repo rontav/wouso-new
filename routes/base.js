@@ -61,6 +61,7 @@ module.exports = function (app) {
 
   // 404 page
   app.use(function(req, res, next){
+    log.error('[404] Not found: ' + req.originalUrl)
     res.status(404).type('txt').send('Not found')
   })
 
