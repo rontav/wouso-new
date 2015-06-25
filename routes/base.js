@@ -53,24 +53,24 @@ module.exports = function (app) {
 	// argument is provided
   app.use(function (req, res, next) {
     if (app.get('env') == 'development' && process.argv[2] == 'login') {
-			req.user = {
-				'facebook': {
-					'id': 0
-				},
-				'twitter': {
-					'id': 0
-				},
-				'google': {
-					'id': 0
-				},
-				'github': {
-					'id': 0
-				},
-				'local': {
-					'email': 'user@user.com'
-				}
-			}
-		}
+      req.user = {
+        'facebook': {
+          'id': 0
+      },
+        'twitter': {
+          'id': 0
+      },
+        'google': {
+          'id': 0
+      },
+        'github': {
+          'id': 0
+      },
+        'local': {
+          'email': 'user@user.com'
+      }
+    }
+  }
 
 		return next()
 	})
