@@ -4,12 +4,12 @@ module.exports = function (app) {
 
   // This must be loaded first
   // Transfer variables to view
-  app.use(function(req, res, next) {
+  app.use(function (req, res, next) {
     // Save selected role to session
     if (req.query.role) {
       req.session.ROLE = req.query.role
     }
-
+	
     // Transfer vars to view
     res.locals.ROLE = req.session.ROLE
     res.locals.URL = req.url.split('?')[0]
@@ -49,6 +49,32 @@ module.exports = function (app) {
     next()
   })
 
+	// Auto login with dummy user in development if 'login'
+	// argument is provided
+  app.use(function (req, res, next) {
+    if (app.get('env') == 'development' && process.argv[2] == 'login') {
+			req.user = {
+				'facebook': {
+					'id': 0
+				},
+				'twitter': {
+					'id': 0
+				},
+				'google': {
+					'id': 0
+				},
+				'github': {
+					'id': 0
+				},
+				'local': {
+					'email': 'user@user.com'
+				}
+			}
+		}
+
+		return next()
+	})
+	
   app.get('/', function (req, res, next) {
     User.find().exec(function (err, users) {
       if (err) return next(err)
@@ -60,13 +86,13 @@ module.exports = function (app) {
   })
 
   // 404 page
-  app.use(function(req, res, next){
+  app.use(function (req, res, next){
     log.error('[404] Not found: ' + req.originalUrl)
     res.status(404).type('txt').send('Not found')
   })
 
   // Error handling middleware
-  app.use(function(err, req, res, next) {
+  app.use(function (err, req, res, next) {
     if (err) {
       log.error(err.stack)
       res.status(500).send('Something went wrong')

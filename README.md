@@ -8,6 +8,7 @@ de utilizare (nu doar la noi in facultate)
 ** suport pentru mai multe limbi
 
 ## Development
+* in development, use node app.js login to automatically log in
 * for locales development please reffer to the [documentation](https://github.com/jeresig/i18n-node-2)
 * when developing modules, create a sym link to the module in /modules, so changes
 are reflected directly, without installing the module
@@ -64,3 +65,11 @@ themes directory; you can also have a style.css file to add more styling
 	* when a question's text or options get edited, create a new question and
 	hide the old one, to hold proof for the user's score
 * import/export questions to json file
+
+## BUGS
+* "User not registered" message for wrong password.
+* cannot login as admin user (password may not be encoded)
+* by default all login methods are deactivated (empty login page)
+* if google login method is disabled, I cannot connect google account after login
+* /favicon.ico missing
+* Warning: connect.session() MemoryStore is not designed for a production environment...
