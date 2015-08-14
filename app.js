@@ -72,14 +72,20 @@ function enable_multiple_view_folders() {
 }
 enable_multiple_view_folders();
 
+// Use this for development only
+// app.use(exprSession({
+//   cookie: { maxAge: 1800000 }, // 30 min
+//   secret: 'mySecretKey',
+//   resave: true,
+//   saveUninitialized: true
+// }))
 
-app.use(exprSession({
-  cookie: { maxAge: 1800000 }, // 30 min
-  secret: 'mySecretKey',
-  resave: true,
-  saveUninitialized: true
+app.use(express.cookieParser('MySecret'))
+app.use(express.cookieSession({
+  cookie: {
+    maxAge: 1800000 //30 min
+  }
 }))
-app.use(cookieParser())
 app.use(bodyParser.urlencoded({
   extended: true
 }))

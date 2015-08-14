@@ -46,9 +46,11 @@ module.exports = function (app) {
 
 
   app.post('/api/qotd/settings', function (req, res, next) {
-    query = {'key': 'qotd-defaultNoOfAns'}
-    update = {$set: {'val': req.body.defaultNoOfAns}}
-    settings.update(query, update, {upsert: true}).exec()
+    for (var key in req.body) {
+      query = {'key': 'qotd-' + key}
+      update = {$set: {'val': req.body[key]}}
+      settings.update(query, update, {upsert: true}).exec()
+    }
 
     res.redirect('/qotd')
   })
@@ -134,6 +136,7 @@ module.exports = function (app) {
           res.send(shuffleAnswers(question))
         }
 
+        // User answered (right or wrong)
         if (!sent && ((question.right_ppl.indexOf(req.user._id.toString()) > -1)
           || (question.wrong_ppl.indexOf(req.user._id.toString())) > -1)) {
           sent = true
@@ -183,15 +186,17 @@ module.exports = function (app) {
       var right = wrong = rightCount = 0
       // Checkif user has viewed the question
       if (question.viewers.indexOf(req.user._id) > -1) {
-        question.choices.forEach(function(ans) {
-          if (ans.val == true) rightCount++
+        if (req.body.ans) {
+          question.choices.forEach(function(ans) {
+            if (ans.val == true) rightCount++
 
-          if (req.body.ans.indexOf(ans.text) > -1) {
-            right++
-          } else {
-            wrong++
-          }
-        })
+            if (req.body.ans.indexOf(ans.text) > -1) {
+              right++
+            } else {
+              wrong++
+            }
+          })
+        }
 
         // Check answers
         if (right == rightCount) {

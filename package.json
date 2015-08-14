@@ -2,7 +2,8 @@
   "name": "wouso-new",
   "version": "0.0.1",
   "scripts": {
-    "run": "./node_modules/nodemon/bin/nodemon.js app.js"
+    "start"  : "./node_modules/nodemon/bin/nodemon.js app.js",
+    "login": "./node_modules/nodemon/bin/nodemon.js app.js login"
   },
   "dependencies": {
     "bcrypt-nodejs": "0.0.3",

@@ -9,7 +9,7 @@ module.exports = function (app) {
     if (req.query.role) {
       req.session.ROLE = req.query.role
     }
-	
+
     // Transfer vars to view
     res.locals.ROLE = req.session.ROLE
     res.locals.URL = req.url.split('?')[0]
@@ -54,23 +54,25 @@ module.exports = function (app) {
   app.use(function (req, res, next) {
     if (app.get('env') == 'development' && process.argv[2] == 'login') {
       req.user = {
+        '_id':  0,
+        'role': 0,
         'facebook': {
           'id': 0
-      },
+        },
         'twitter': {
           'id': 0
-      },
+        },
         'google': {
           'id': 0
-      },
+        },
         'github': {
           'id': 0
-      },
+        },
         'local': {
           'email': 'user@user.com'
+        }
       }
     }
-  }
 
 		return next()
 	})

@@ -7,6 +7,9 @@ de utilizare (nu doar la noi in facultate)
 * internationalizabil
 ** suport pentru mai multe limbi
 
+* interactivitate (notificari live)
+* interfete independente de module
+
 ## Development
 * in development, use node app.js login to automatically log in
 * for locales development please reffer to the [documentation](https://github.com/jeresig/i18n-node-2)
@@ -55,9 +58,6 @@ themes directory; you can also have a style.css file to add more styling
 * show question options on click
 * display tags in qotd list
 * filter qotd list by tag
-* add timer option
-	* option for custom time
-	* option for auto for submission (mark as wrong?)
 * flag question after answer is shown
 * accept questions proposed by users
 * optimise day mark in datepicker for single month
@@ -65,6 +65,7 @@ themes directory; you can also have a style.css file to add more styling
 	* when a question's text or options get edited, create a new question and
 	hide the old one, to hold proof for the user's score
 * import/export questions to json file
+* save question view time and update time countdown accordingly
 
 ## BUGS
 * "User not registered" message for wrong password.

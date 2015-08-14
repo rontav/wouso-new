@@ -15,6 +15,8 @@ block content
         form(method='post', action='/api/qotd/settings')
           label Default number of answers per question
             input(name='defaultNoOfAns', type='text', value=mysettings['qotd-defaultNoOfAns'])
+          label Limit time to respond (positive values only)
+            input(name='countdownTimer', type='text', value=mysettings['qotd-countdownTimer'])
           input.button.small(type='submit', value='Save')
 
     // Transfer number of fields through JS
@@ -80,9 +82,12 @@ block content
     .row
       .large-12.columns
         h2 Play game
-        form.qotd-form(method='post', action='/api/qotd/play')
+        - if (mysettings['qotd-countdownTimer'] > 0)
+          #progress-bar(data-time=mysettings['qotd-countdownTimer']): .pbar
+        form.qotd-form(id='qotd', method='post', action='/api/qotd/play')
           .qotd-play-question
           .qotd-play-answers
 
 block footer
   script(type="text/javascript", src='/modules/qotd/public/js/main.js')
+  script(type="text/javascript", src='/public/js/countdown.js')

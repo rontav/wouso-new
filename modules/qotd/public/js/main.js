@@ -58,6 +58,7 @@ $(document).ready(function() {
       type: 'GET',
       success: function(response) {
         if (response) {
+
           // Display question and store question id
           $('.qotd-play-question').text(response.question)
           $('.qotd-play-question')
@@ -66,25 +67,30 @@ $(document).ready(function() {
           // Display answer options
           if (response.answers) {
             response.answers.forEach(function(ans) {
-              // Highlight correct answer
-              if (response.answer.indexOf(ans) > -1) {
+              if (response.answer && response.answer.indexOf(ans) > -1) {
+                // Highlight correct answer
                 $('.qotd-play-answers').append('<div class="qotd-play-answer">\
-                  <input type="checkbox" name="ans"><span\
+                  <input type="checkbox" name="ans" disabled><span\
                   class="qotd-right-answer">' + ans + '</div>')
+              } else if (response.answer) {
+                $('.qotd-play-answers').append('<div class="qotd-play-answer">\
+                  <input type="checkbox" name="ans" disabled><span>' + ans + '</div>')
               } else {
+                // Add question options
                 $('.qotd-play-answers').append('<div class="qotd-play-answer">\
                   <input type="checkbox" name="ans" value="' + ans + '">' + ans + '</div>')
               }
             })
           }
 
-          // Display message if ther is no answer or question
+          // Display message if there is no answer or question
           if (!response.answer && !response.question) {
             $('.qotd-play-question').append('<p>' + response + '</p>')
 
-          // Display submit button, if there is no answer
+          // Display submit button, if there is no answer, and start timer
           } else if (!response.answer) {
             $('.qotd-form').append('<input class="button small" type="submit" value="Check">')
+            $('#progress-bar').anim_progressbar()
           }
         }
       }
@@ -216,4 +222,9 @@ function listQotdQuestions(perPage, currentPage, sTags) {
       }
     }
   }
+}
+
+// Register function for end of timer
+function do_on_timeout() {
+  $('#qotd').submit()
 }

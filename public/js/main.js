@@ -90,7 +90,7 @@ $.noty.defaults['theme'] = 'relax'
 $.noty.defaults['type'] = 'information'
 $.noty.defaults['timeout'] = 5000
 
-if (myuser)
+if (typeof myuser == 'string')
   socket.on(myuser, function (msg) {
     noty({
       text: 'One new message!',
