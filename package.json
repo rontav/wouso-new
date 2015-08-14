@@ -3,7 +3,8 @@
   "version": "0.0.1",
   "scripts": {
     "start"  : "./node_modules/nodemon/bin/nodemon.js app.js",
-    "login": "./node_modules/nodemon/bin/nodemon.js app.js login"
+    "login": "./node_modules/nodemon/bin/nodemon.js app.js login",
+    "postinstall": "npm link modules/qotd",
   },
   "dependencies": {
     "bcrypt-nodejs": "0.0.3",
