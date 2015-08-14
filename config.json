@@ -7,6 +7,6 @@
 		"white": true
 	},
 	"superuser": {
-		"admin": "marius"
+		"root@root.com": "marius"
 	}
 }

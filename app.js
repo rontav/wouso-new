@@ -42,8 +42,12 @@ var User = require('./config/models/user')
 root = Object.keys(data.superuser)[0]
 pass = data.superuser[root]
 // Add to users collection only if does not already exist
-User.findOne({'local.username': root}).exec(function(err, him) {
-  if (!him) new User({'local.username': root, 'password': pass}).save()
+User.findOne({'local.email': root}).exec(function(err, him) {
+  if (!him) new User({
+    'local.username': 'root',
+    'local.email': root,
+    'local.password': new User().generateHash(pass)
+  }).save()
 })
 
 
@@ -94,6 +98,7 @@ app.use(bodyParser.json())
 app.use('/public',  express.static(__dirname + '/public'))
 app.use('/modules', express.static(__dirname + '/modules'))
 app.use('/themes', express.static(__dirname + '/themes'))
+app.use(express.favicon('public/img/favicon.ico'))
 app.use(passport.initialize())
 app.use(passport.session())
 

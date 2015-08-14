@@ -46,6 +46,7 @@ themes directory; you can also have a style.css file to add more styling
 * add real-time user [analytics](http://coenraets.org/blog/2012/10/real-time-web-analytics-with-node-js-and-socket-io/)
 * redirect to previous page, after login
 * group messages by person
+* use session in dev and cookies in prod
 
 
 ## QOTD
@@ -68,9 +69,5 @@ themes directory; you can also have a style.css file to add more styling
 * save question view time and update time countdown accordingly
 
 ## BUGS
-* "User not registered" message for wrong password.
-* cannot login as admin user (password may not be encoded)
 * by default all login methods are deactivated (empty login page)
 * if google login method is disabled, I cannot connect google account after login
-* /favicon.ico missing
-* Warning: connect.session() MemoryStore is not designed for a production environment...
