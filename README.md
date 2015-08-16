@@ -46,7 +46,6 @@ themes directory; you can also have a style.css file to add more styling
 * add real-time user [analytics](http://coenraets.org/blog/2012/10/real-time-web-analytics-with-node-js-and-socket-io/)
 * redirect to previous page, after login
 * group messages by person
-* use session in dev and cookies in prod
 
 
 ## QOTD
