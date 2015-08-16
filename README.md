@@ -9,6 +9,8 @@ de utilizare (nu doar la noi in facultate)
 
 * interactivitate (notificari live)
 * interfete independente de module
+* mobile friendly
+* more social
 
 ## Development
 * in development, use node app.js login to automatically log in

@@ -330,7 +330,7 @@ module.exports = function(passport) {
             user.github.id          = profile.id
             user.github.token       = token
             user.github.username    = profile.username
-            user.github.displayName = profile.displayName
+            user.github.name        = profile.displayName
             user.github.email       = profile.emails[0].value
 
             user.save(function(err) { if (err) throw err })
@@ -341,7 +341,7 @@ module.exports = function(passport) {
             user.github.id          = profile.id
             user.github.token       = token
             user.github.username    = profile.username
-            user.github.displayName = profile.displayName
+            user.github.name        = profile.displayName
             user.github.email       = profile.emails[0].value
 
             newUser.save(function(err) { if (err) throw err })
@@ -356,7 +356,7 @@ module.exports = function(passport) {
             user.github.id          = profile.id
             user.github.token       = token
             user.github.username    = profile.username
-            user.github.displayName = profile.displayName
+            user.github.name        = profile.displayName
             user.github.email       = profile.emails[0].value
 
             user.save(function(err) { if (err) throw err })

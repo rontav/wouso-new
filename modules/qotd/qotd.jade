@@ -20,7 +20,8 @@ block content
           input.button.small(type='submit', value='Save')
 
     // Transfer number of fields through JS
-    script var noOfOptions = #{mysettings['qotd-defaultNoOfAns']}
+    - if (mysettings['qotd-defaultNoOfAns'])
+      script var noOfOptions = #{mysettings['qotd-defaultNoOfAns']}
 
   - if (ROLE < 4)
     .row.collapse.qotd-answer-template

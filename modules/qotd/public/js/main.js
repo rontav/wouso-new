@@ -203,6 +203,10 @@ function listQotdQuestions(perPage, currentPage, sTags) {
     $('.qotd-question-list').empty()
     $('.qotd-question-pages').empty()
 
+    // Handle 0 questions response
+    if (response.count == 0)
+      $('.qotd-question-list').text('No questions at this moment.')
+
     // Print each question
     response.questions.forEach(function(q) {
       shortDate = '--/--/--'

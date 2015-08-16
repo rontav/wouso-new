@@ -84,12 +84,16 @@ module.exports = function (app) {
   })
 
   app.get('/api/settings/set', function(req, res) {
-    for (q in req.query) {
-      var conditions = {'key': q}
-      var update = {$set: {'val': req.query[q]}}
-      Settings.update(conditions, update, {'upsert': true}, function (err, num) {
+    for (var opt in req.query) {
+
+      var cond = {'key': opt}
+      var update = {$set: {'val': req.query[opt]}}
+      Settings.update(cond, update, {'upsert': true}, function (err, num) {
         if (err) return next(err)
-        if (num) res.json({success: true})
+        if (num) {
+          res.json({success: true})
+          log.info('Setting ' + opt + ' set to ' + req.query[opt])
+        }
       })
     }
   })

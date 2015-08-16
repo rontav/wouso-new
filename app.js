@@ -151,6 +151,8 @@ app.set('views', views)
 app.set('view engine', 'jade')
 app.set('modules', available_modules)
 app.set('theme', used_theme)
+// Pretty print html rendered with Jade
+app.locals.pretty = true
 
 // Launch server
 if (process.env.NODE_ENV != 'test') {

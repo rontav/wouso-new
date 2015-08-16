@@ -21,23 +21,40 @@ block content
         a(href='/connect/github') Connect GitHub account
         br
 
+      br
       - if (user)
-        p= user._id
+        | ID: #{user._id} <br>
+        | ROLE: #{user.role} <br>
+
       - if (user && user.local.email)
-        b Local data
-        p= user.local
+        b Local data <br>
+        | Email: #{user.local.email} <br>
+
       - if (user && user.facebook.id)
-        b Facebook
-        p= user.facebook
+        b Facebook <br>
+        | #{user.facebook.name} (id: #{user.facebook.id}) <br>
+        | Email: #{user.facebook.email} <br>
+        | Token: #{user.facebook.token} <br>
+
       - if (user && user.twitter.id)
-        b Twitter
-        p= user.twitter
+        b Twitter <br>
+        | #{user.twitter.displayName} (id: #{user.twitter.id}) <br>
+        | Username: #{user.twitter.username} <br>
+        | Token: #{user.twitter.token} <br>
+
       - if (user && user.google.id)
-        b Google
-        p= user.google
+        b Google <br>
+        | #{user.google.name} (id: #{user.google.id}) <br>
+        | Email: #{user.google.email} <br>
+        | Avatar: #{user.google.avatar} <br>
+        | Token: #{user.google.token} <br>
+
       - if (user && user.github.id)
-        b GitHub
-        p= user.github
+        b GitHub <br>
+        | #{user.github.name} (id: #{user.github.id}) <br>
+        | Email: #{user.github.email} <br>
+        | Token: #{user.github.token} <br>
 
       if (user)
+        br
         a(href='/logout') Logout
