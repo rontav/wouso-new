@@ -265,10 +265,16 @@ module.exports = function (app) {
       }
 
       // If id is provided, we are in edit mode; else we create a new object
-      qotd.update({'_id': req.body.id}, new_qotd, {upsert: true}).exec(function (err) {
-        if (err) return next(err)
-        res.redirect('/qotd')
-      })
+      if (req.body.id) {
+        qotd.update({'_id': req.body.id}, new_qotd, {upsert: true}).exec(qotdSaved)
+      } else {
+        new qotd(new_qotd).save(qotdSaved)
+      }
+    }
+
+    function qotdSaved(err) {
+      if (err) return next(err)
+      res.redirect('/qotd')
     }
   })
 
