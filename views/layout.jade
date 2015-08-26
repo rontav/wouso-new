@@ -43,6 +43,9 @@ html
         li.name
           h1
             a(href='/') wouso-new
+        li.toggle-topbar.menu-icon
+          a(href="#")
+            span
 
       section.top-bar-section
         ul.right
@@ -55,19 +58,17 @@ html
 
               // Display roles only for non-players
               - if (user.role < 4)
-                li
-                  a(href='#') ROLE:
                 li.has-dropdown
                   - if (ROLE == 0)
-                    a(href='#') Root
+                    a(href='#') ROLE | Root
                   - if (ROLE == 1)
-                    a(href='#') Admin
+                    a(href='#') ROLE | Admin
                   - if (ROLE == 2)
-                    a(href='#') Teacher
+                    a(href='#') ROLE | Teacher
                   - if (ROLE == 3)
-                    a(href='#') Contributor
+                    a(href='#') ROLE | Contributor
                   - if (ROLE == 4)
-                    a(href='#') Player
+                    a(href='#') ROLE | Player
 
                   // Available roles
                   ul.dropdown
