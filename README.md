@@ -11,6 +11,8 @@ de utilizare (nu doar la noi in facultate)
 * interfete independente de module
 * mobile friendly
 * more social
+* API
+
 
 ## Development
 * in development, use node app.js login to automatically log in
