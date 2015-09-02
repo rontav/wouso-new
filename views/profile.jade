@@ -22,6 +22,12 @@ block content
         br
 
       br
+      h3 Badges
+      - each badge in badges
+        h3= badge.name + ' (' + badge.history[0].count + ')'
+
+      br
+      h3 Profile info
       - if (user)
         | ID: #{user._id} <br>
         | ROLE: #{user.role} <br>

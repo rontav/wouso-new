@@ -5,6 +5,7 @@ module.exports = function (app) {
   var QOption  = mongoose.model('QOption')
   var settings = mongoose.model('Settings')
   var Tag      = mongoose.model('Tag')
+  var Badges   = mongoose.model('Badge')
   var util     = require('util')
   var fs       = require('fs')
 
@@ -118,6 +119,34 @@ module.exports = function (app) {
     end = new Date().setHours(23,59,59,999)
 
     qotd.find({'date': {$gte: start, $lt: end}}).exec(function (err, today) {
+
+      // Update qotd-streak
+      query = {
+        'name'           : 'qotd-streak',
+        'history.userId' : req.user._id
+      }
+      Badges.findOne(query).exec(function(err, user) {
+        if (!user) {
+          // Init user to badge db
+          query = {'name': 'qotd-streak'}
+          update = {$push: {'history': {
+            'userId'      : req.user._id,
+            'count'       : 1,
+            'lastUpdate'  : Date.now(),
+            'data'        : ''
+          }}}
+          Badges.update(query, update, {upsert: true}).exec(function (err, update) {
+            if (err) console.log('Could not init badge')
+          })
+        } else {
+          // Increment badge count
+          query = {'name': 'qotd-streak', 'history.userId': req.user._id}
+          update = {$inc: {'history.$.count': 1}}
+          Badges.update(query, update, {upsert: true}).exec(function (err, update) {
+            if (err) console.log('Could not increment badge count')
+          })
+        }
+      })
 
       if (!req.user)
         return res.send('Login')

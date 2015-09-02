@@ -35,6 +35,7 @@ Mongoose.connect(configDB.url)
 // Require db schemas
 var Settings = require('./config/models/settings')
 var Tag      = require('./config/models/tag')
+var Badges   = require('./config/models/badges')
 
 // Ensure superuser exists
 var User = require('./config/models/user')
