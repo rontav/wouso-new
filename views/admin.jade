@@ -5,6 +5,8 @@ block sidebar
     .large-12.columns
       ul
         li
+          a(href='/admin/platform') Platform
+        li
           a(href='/admin/users') Users
         li
           a(href='/admin/tags') Tags
@@ -13,6 +15,29 @@ block sidebar
 
 block content
   roles = {0: 'Root', 1: 'Admin', 2: 'Teacher', 3: 'Contributor', 4: 'Player'}
+
+  - if (tab == 'platform')
+    .row
+      .large-12.columns
+        h1 Platform settings
+        br
+        | Language: #{app_data.language}
+        br
+        | Superuser:
+        - each pass, user in app_data.superuser
+          = "  " + user
+        br
+        | Theme:
+        - each enable, name in app_data.themes
+          - if (enable == true)
+            = ' ' + name
+        br
+        | Modules: <br>
+        - each enable, name in app_data.modules
+           = '* ' + name + ' (' + enable + ')'
+        br
+        br
+        p To chage one of this settings, please edit <b>config.json</b> file and restart the app.
 
   - if (tab == 'users')
     .row

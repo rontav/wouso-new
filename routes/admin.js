@@ -24,6 +24,8 @@ module.exports = function (app) {
       Settings.find().exec(gotSettings)
     else if (req.params.tab == 'tags')
       Tag.find().exec(gotTags)
+    else
+      renderPage()
 
     function gotUsers(err, all) {
       if (err) return next(err)
@@ -55,7 +57,8 @@ module.exports = function (app) {
         'users'      : _self.users,
         'mytags'     : _self.tags,
         'mysettings' : _self.mysettings,
-        'tab'        : req.params.tab
+        'tab'        : req.params.tab,
+        'app_data'   : app.data
       })
     }
   })
