@@ -13,15 +13,15 @@ Logger.setLevel('info')
 log = new Logger()
 
 // Read config file
-var data = (JSON.parse(fs.readFileSync('./config.json', 'utf8')))
+app.data = (JSON.parse(fs.readFileSync('./config.json', 'utf8')))
 
 // List of enabled and available modules
 var available_modules = []
 
 // Used theme
 var used_theme = null
-for (theme in data.themes) {
-  if (data.themes[theme])
+for (theme in app.data.themes) {
+  if (app.data.themes[theme])
     used_theme = theme
 }
 
@@ -40,8 +40,8 @@ var Badges   = require('./config/models/badges')
 // Ensure superuser exists
 var User = require('./config/models/user')
 // Get first superuser from config dict
-root = Object.keys(data.superuser)[0]
-pass = data.superuser[root]
+root = Object.keys(app.data.superuser)[0]
+pass = app.data.superuser[root]
 // Add to users collection only if does not already exist
 User.findOne({'local.email': root}).exec(function(err, him) {
   if (!him) new User({
@@ -119,8 +119,8 @@ views = ['./themes/' + used_theme, 'views']
 require('./routes/base.js')(app)
 
 // Load enabled modules
-for (module in data.modules) {
-  if (data.modules[module]) {
+for (module in app.data.modules) {
+  if (app.data.modules[module]) {
     // Build list of enabled modules
     available_modules.push(module)
     // Load module shema

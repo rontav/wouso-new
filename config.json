@@ -2,6 +2,7 @@
 	"modules": {
 		"qotd" : true
 	},
+	"language": "en",
 	"themes": {
 		"red"  : false,
 		"white": true

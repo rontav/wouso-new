@@ -44,7 +44,7 @@ module.exports = function (app) {
     }
 
     // Set preferred locale
-    req.i18n.setLocale('en')
+    req.i18n.setLocale(app.data.language)
 
     next()
   })
