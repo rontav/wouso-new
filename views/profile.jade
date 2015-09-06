@@ -24,39 +24,54 @@ block content
       br
       h3= __('profile_title_badges')
       - each badge in badges
-        h3= badge.name + ' (' + badge.history[0].count + ')'
+        h5= badge.name + ' (' + badge.history[0].count + ')'
 
       br
       h3= __('profile_title_info')
       - if (user)
         | ID: #{user._id} <br>
         | ROLE: #{user.role} <br>
+        .spacer
 
       - if (user && user.local.email)
         b Local data <br>
         | Email: #{user.local.email} <br>
+        .spacer
 
       - if (user && user.facebook.id)
-        b Facebook <br>
-        | #{user.facebook.name} (id: #{user.facebook.id}) <br>
-        | Email: #{user.facebook.email} <br>
-        | Token: #{user.facebook.token} <br>
+        .profile-card
+          .profile-card-name
+            h3 #{user.facebook.name} (id: #{user.facebook.id})
+          | Email: #{user.facebook.email} <br>
+          | Token: #{user.facebook.token} <br>
+          | From Facebook
+        .spacer
 
       - if (user && user.twitter.id)
-        b Twitter <br>
-        | #{user.twitter.displayName} (id: #{user.twitter.id}) <br>
-        | Username: #{user.twitter.username} <br>
-        | Token: #{user.twitter.token} <br>
+        .profile-card
+          .profile-card-name
+            h3 #{user.twitter.displayName} (id: #{user.twitter.id})
+          | Username: #{user.twitter.username} <br>
+          | Token: #{user.twitter.token} <br>
+          | From Twitter
+        .spacer
 
       - if (user && user.google.id)
-        b Google <br>
-        | #{user.google.name} (id: #{user.google.id}) <br>
-        | Email: #{user.google.email} <br>
-        | Avatar: #{user.google.avatar} <br>
-        | Token: #{user.google.token} <br>
+        .profile-card
+          .profile-card-avatar
+            img(src=user.google.avatar, width='120px', height='120px')
+          .profile-card-name
+            h3 #{user.google.name} (id: #{user.google.id})
+          | Email: #{user.google.email} <br>
+          | Token: #{user.google.token} <br>
+          | From Google
+        .spacer
 
       - if (user && user.github.id)
-        b GitHub <br>
-        | #{user.github.name} (id: #{user.github.id}) <br>
-        | Email: #{user.github.email} <br>
-        | Token: #{user.github.token} <br>
+        .profile-card
+          .profile-card-name
+            h3 #{user.github.name} (id: #{user.github.id})
+          | Email: #{user.github.email} <br>
+          | Token: #{user.github.token} <br>
+          | From GitHub
+        .spacer

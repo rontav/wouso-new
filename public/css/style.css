@@ -20,3 +20,12 @@ input[type="radio"] {
 	border-radius: 5px;
 	color: white;
 }
+
+.profile-card {
+	word-wrap: break-word;
+}
+
+.profile-card-avatar {
+	float: left;
+	margin-right: 10px;
+}
