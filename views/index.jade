@@ -2,10 +2,9 @@ extends layout
 
 block content
   .row
-    h3 WoUSO
-    p This is a new version of WoUSO, build as modular as possible, using JS all
-      | across the stack.
+    h3= __('index_title')
+    p= __('index_description')
 
-    h3 Registered users
+    h3= __('index_title_users')
     - each u in users
       p= u

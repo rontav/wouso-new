@@ -42,7 +42,7 @@ html
       ul.title-area
         li.name
           h1
-            a(href='/') wouso-new
+            a(href='/')= __('nav_home')
         li.toggle-topbar.menu-icon
           a(href="#")
             span
@@ -51,7 +51,7 @@ html
         ul.right
           - if (!user)
             li.active
-              a(href='/login') Login
+              a(href='/login')= __('nav_login')
           - else
               // Current role
               - var ROLE = (locals.ROLE ? locals.ROLE : user.role)
@@ -59,53 +59,54 @@ html
               // Display roles only for non-players
               - if (user.role < 4)
                 li.has-dropdown
-                  - if (ROLE == 0)
-                    a(href='#') ROLE | Root
-                  - if (ROLE == 1)
-                    a(href='#') ROLE | Admin
-                  - if (ROLE == 2)
-                    a(href='#') ROLE | Teacher
-                  - if (ROLE == 3)
-                    a(href='#') ROLE | Contributor
-                  - if (ROLE == 4)
-                    a(href='#') ROLE | Player
+                  a(href='#')= __('role_title') + ' | '
+                    - if (ROLE == 0)
+                      = __('role_root')
+                    - if (ROLE == 1)
+                      a(href='#') ROLE | Admin
+                    - if (ROLE == 2)
+                      a(href='#') ROLE | Teacher
+                    - if (ROLE == 3)
+                      a(href='#') ROLE | Contributor
+                    - if (ROLE == 4)
+                      a(href='#') ROLE | Player
 
                   // Available roles
                   ul.dropdown
                     - if (user.role == 0)
                       li
-                        a(href=locals.URL + '?role=0') Root
+                        a(href=locals.URL + '?role=0')= __('role_root')
                     - if (user.role <= 1)
                       li
-                        a(href=locals.URL + '?role=1') Admin
+                        a(href=locals.URL + '?role=1')= __('role_admin')
                     - if (user.role <= 2)
                       li
-                        a(href=locals.URL + '?role=2') Teacher
+                        a(href=locals.URL + '?role=2')= __('role_teacher')
                     - if (user.role <= 3)
                       li
-                        a(href=locals.URL + '?role=3') Contributor
+                        a(href=locals.URL + '?role=3')= __('role_contributor')
                     - if (user.role <= 4)
                       li
-                        a(href=locals.URL + '?role=4') Player
+                        a(href=locals.URL + '?role=4')= __('role_player')
 
               li.active
                 a(href='/logout') Logout
 
         ul.left
           li
-            a(href='/profile') Profile
+            a(href='/profile')= __('nav_profile')
           li
-            a(href='/messages') Messages
+            a(href='/messages')= __('nav_messages')
           li
-            a(href='/admin') Admin
+            a(href='/admin')= __('nav_admin')
 
     dl.sub-nav
       .row
         .large-12.columns
-          dt GAMES:
+          dt= __('module_title') + ':'
           - each mod in settings.modules
             dd.active
-              a(href='/' + mod)= __('module-' + mod)
+              a(href='/' + mod)= __('module_' + mod)
 
     #main
       block sidebar

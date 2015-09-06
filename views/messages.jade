@@ -3,19 +3,19 @@ extends layout
 block content
   .row
     - if (!user)
-      h4 Please log in to view your messages.
+      h4= __('messages_alert_login')
     - else
-      h3 New message
+      h3= __('messages_new')
       form(action='/messages/send', method='post')
-        label TO:
+        label= __('messages_compose_to')
         input(name='destination', type='text')
-        label Message
+        label= __('messages_compose_body')
         textarea(name='message', rows='5')
-        button.btn.btn-warning(type='submit') Send
+        button.btn.btn-warning(type='submit')= __('messages_compose_send')
       br
 
-      h3 My messages
+      h3= __('messages_title_list')
       - if (messages.length)
         p= messages
       - else
-        h5 You have no messages at this moment.
+        h5= __('messages_alert_nomsg')

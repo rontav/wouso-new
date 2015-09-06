@@ -8,13 +8,16 @@ module.exports = function (app) {
     function gotSettings(err, all) {
       if (err) return next(err)
 
+      // User already authenticated
+      if (req.user) return res.redirect('/profile')
+
+      // Use settings to determine which login methods to use
       mysettings = {}
       all.forEach(function(set) {
         mysettings[set.key] = set.val
       })
 
       res.render('login', {
-        'username'   : (req.user ? req.user : null),
         'mysettings' : mysettings,
         'error'      : req.flash('error')
       })

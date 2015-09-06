@@ -3,31 +3,31 @@ extends layout
 block content
   .row
     - if (!user)
-      h4 Login to view your profile.
+      h4= __('profile_alert_login')
 
     - else
-      h3 Profile Page
+      h3= __('profile_title')
 
       if (user && !user.facebook.id && mysettings['login-fb'] === 'true')
-        a(href='/connect/facebook') Connect Facebook account
+        a(href='/connect/facebook')= __('profile_connect_facebook')
         br
       if (user && !user.twitter.id && mysettings['login-tw'] === 'true')
-        a(href='/connect/twitter') Connect Twitter account
+        a(href='/connect/twitter')= __('profile_connect_twitter')
         br
       if (user && !user.google.id && mysettings['login-gp'] === 'true')
-        a(href='#', onclick='gapi.auth.signIn({callback: signInCallback})') Connect Google account
+        a(href='#', onclick='gapi.auth.signIn({callback: signInCallback})')= __('profile_connect_google')
         br
       if (user && !user.github.id && mysettings['login-gh'] === 'true')
-        a(href='/connect/github') Connect GitHub account
+        a(href='/connect/github')= __('profile_connect_github')
         br
 
       br
-      h3 Badges
+      h3= __('profile_title_badges')
       - each badge in badges
         h3= badge.name + ' (' + badge.history[0].count + ')'
 
       br
-      h3 Profile info
+      h3= __('profile_title_info')
       - if (user)
         | ID: #{user._id} <br>
         | ROLE: #{user.role} <br>
@@ -60,7 +60,3 @@ block content
         | #{user.github.name} (id: #{user.github.id}) <br>
         | Email: #{user.github.email} <br>
         | Token: #{user.github.token} <br>
-
-      if (user)
-        br
-        a(href='/logout') Logout

@@ -4,14 +4,10 @@ block sidebar
   .row
     .large-12.columns
       ul
-        li
-          a(href='/admin/platform') Platform
-        li
-          a(href='/admin/users') Users
-        li
-          a(href='/admin/tags') Tags
-        li
-          a(href='/admin/settings') Settings
+        li: a(href='/admin/platform')= __('admin_nav_platform')
+        li: a(href='/admin/settings')= __('admin_nav_application')
+        li: a(href='/admin/users')= __('admin_nav_users')
+        li: a(href='/admin/tags')= __('admin_nav_tags')
 
 block content
   roles = {0: 'Root', 1: 'Admin', 2: 'Teacher', 3: 'Contributor', 4: 'Player'}
@@ -19,30 +15,31 @@ block content
   - if (tab == 'platform')
     .row
       .large-12.columns
-        h1 Platform settings
+        h1= __('admin_platform_title')
         br
-        | Language: #{app_data.language}
+        = __('admin_platform_language') + ' ' + app_data.language
         br
-        | Superuser:
+        = __('admin_platform_superuser')
         - each pass, user in app_data.superuser
           = "  " + user
         br
-        | Theme:
+        = __('admin_platform_theme')
         - each enable, name in app_data.themes
           - if (enable == true)
             = ' ' + name
         br
-        | Modules: <br>
+        = __('admin_platform_modules')
+        br
         - each enable, name in app_data.modules
            = '* ' + name + ' (' + enable + ')'
         br
         br
-        p To chage one of this settings, please edit <b>config.json</b> file and restart the app.
+        p= __('admin_platform_edit')
 
   - if (tab == 'users')
     .row
       .large-12.columns
-        h1 Users admin page
+        h1= __('admin_users_title')
 
         - each user in users
           p= user._id + ' #' + user.role
@@ -51,44 +48,53 @@ block content
           select.role-select(id=user._id)
             - each role, i in roles
               - if (user.role == i)
-                option(value=i, selected)= role
+                option(value=i, selected)= __('role_' + role.toLowerCase())
               - else
-                option(value=i)= role
+                option(value=i)= __('role_' + role.toLowerCase())
           .spacer
 
   - if (tab == 'tags')
     .row
       .large-12.columns
-        h4 Add a new tag
+        h1= __('admin_tags_title')
+        h4= __('admin_tags_title_add')
         form(method='post', action='/api/tags/add')
-          label Tag name
+          label= __('admin_tags_add_name')
           input(name='name', type='text')
-          label Type
+          label= __('admin_tags_add_game')
           input(name='type', type='text')
-          input.button.small(type='submit', value='Save')
+          input.button.small(type='submit', value=__('button_save'))
 
-        .spacer
-        - each tag in mytags
-          p= tag.name + ' ' + tag.type + ' ' + tag.count
+    .spacer
+    .row
+      .large-12.columns
+        h4= __('admin_tags_title_list')
+
+    - each tag in mytags
+      .row
+        .large-4.columns= tag.name
+        .large-4.columns= tag.type
+        .large-4.columns= tag.count
+
+      //p= tag.name + ' ' + tag.type + ' ' + tag.count
 
   - if (tab == 'settings')
     .row
       .large-12.columns
-        h1 Settings page
+        h1= __('admin_app_title')
       .large-12.columns
-        h4 Login options
+        h4= __('admin_app_login')
         small.login-message-nologin.error(style='display: none')= __('settings-nologin')
 
     .row.login-options
       .large-6.columns
-        label(for='login-level')
-        | Select the login level (higher privileges are allowed)
+        label(for='login-level')= __('admin_app_login_level')
         select.login-level-select(id='login-level')
           - each role, i in roles
             - if (mysettings['login-level'] == i)
-              option(value=i, selected)= role
+              option(value=i, selected)= __('role_' + role.toLowerCase())
             - else
-              option(value=i)= role
+              option(value=i)= __('role_' + role.toLowerCase())
 
         br
         input.setting(type='checkbox', id='login-signup', checked=(mysettings['login-signup']==='true'))
@@ -96,16 +102,16 @@ block content
 
       .large-6.columns
         input.setting(type='checkbox', id='login-local', checked=(mysettings['login-local']==='true'))
-        | Allow Local login
+        = __('admin_app_local')
         br
         input.setting(type='checkbox', id='login-fb', checked=(mysettings['login-fb']==='true'))
-        | Allow Facebook login
+        = __('admin_app_facebook')
         br
         input.setting(type='checkbox', id='login-tw', checked=(mysettings['login-tw']==='true'))
-        | Allow Twitter login
+        = __('admin_app_twitter')
         br
         input.setting(type='checkbox', id='login-gp', checked=(mysettings['login-gp']==='true'))
-        | Allow Google login
+        = __('admin_app_google')
         br
         input.setting(type='checkbox', id='login-gh', checked=(mysettings['login-gh']==='true'))
-        | Allow GitHub login
+        = __('admin_app_github')
