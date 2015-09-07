@@ -41,16 +41,31 @@ block content
       .large-12.columns
         h1= __('admin_users_title')
 
+        .spacer
         - each user in users
-          p= user._id + ' #' + user.role
-          p= user.local
+          .profile-card
+            = 'ID: ' + user._id
+            br
+            - if (user.facebook.name)
+              = 'Facebook name: ' + user.facebook.name
+              br
+            - if (user.twitter.name)
+              = 'Twitter name: ' + user.twitter.name
+              br
+            - if (user.google.name)
+              = 'Google name: ' + user.google.name
+              br
+            - if (user.github.name)
+              = 'GitHub name: ' + user.github.name
+              br
 
-          select.role-select(id=user._id)
-            - each role, i in roles
-              - if (user.role == i)
-                option(value=i, selected)= __('role_' + role.toLowerCase())
-              - else
-                option(value=i)= __('role_' + role.toLowerCase())
+            br
+            select.role-select(id=user._id)
+              - each role, i in roles
+                - if (user.role == i)
+                  option(value=i, selected)= __('role_' + role.toLowerCase())
+                - else
+                  option(value=i)= __('role_' + role.toLowerCase())
           .spacer
 
   - if (tab == 'tags')

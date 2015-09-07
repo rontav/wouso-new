@@ -15,7 +15,10 @@ module.exports = function (app) {
         _self.mysettings[set.key] = set.val
       })
 
-      Badges.find({'history.userId': req.user._id}).exec(gotBadges)
+      if (req.user)
+        Badges.find({'history.userId': req.user._id}).exec(gotBadges)
+      else
+        gotBadges(null, [])
     }
 
     function gotBadges(err, badges) {

@@ -76,15 +76,9 @@ module.exports = function (app) {
 
 		return next()
 	})
-	
-  app.get('/', function (req, res, next) {
-    User.find().exec(function (err, users) {
-      if (err) return next(err)
 
-      res.render('index', {
-        'users'   : users
-      })
-    })
+  app.get('/', function (req, res, next) {
+    res.render('index')
   })
 
   // 404 page
