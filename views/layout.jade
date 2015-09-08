@@ -63,31 +63,26 @@ html
                     - if (ROLE == 0)
                       = __('role_root')
                     - if (ROLE == 1)
-                      a(href='#') ROLE | Admin
+                      = __('role_admin')
                     - if (ROLE == 2)
-                      a(href='#') ROLE | Teacher
+                      = __('role_teacher')
                     - if (ROLE == 3)
-                      a(href='#') ROLE | Contributor
+                      = __('role_contributor')
                     - if (ROLE == 4)
-                      a(href='#') ROLE | Player
+                      = __('role_player')
 
                   // Available roles
                   ul.dropdown
                     - if (user.role == 0)
-                      li
-                        a(href=locals.URL + '?role=0')= __('role_root')
+                      li: a(href=locals.URL + '?role=0')= __('role_root')
                     - if (user.role <= 1)
-                      li
-                        a(href=locals.URL + '?role=1')= __('role_admin')
+                      li: a(href=locals.URL + '?role=1')= __('role_admin')
                     - if (user.role <= 2)
-                      li
-                        a(href=locals.URL + '?role=2')= __('role_teacher')
+                      li: a(href=locals.URL + '?role=2')= __('role_teacher')
                     - if (user.role <= 3)
-                      li
-                        a(href=locals.URL + '?role=3')= __('role_contributor')
+                      li: a(href=locals.URL + '?role=3')= __('role_contributor')
                     - if (user.role <= 4)
-                      li
-                        a(href=locals.URL + '?role=4')= __('role_player')
+                      li: a(href=locals.URL + '?role=4')= __('role_player')
 
               li.active
                 a(href='/logout') Logout

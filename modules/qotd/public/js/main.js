@@ -46,8 +46,9 @@ var selectedTags = []
 
 
 $(document).ready(function() {
-    // Hide question template
+    // Hide question template and check button
     $('.qotd-answer-template').css('display', 'none')
+    $('#qotd-form-submit').hide()
 
     // Add another answer entry to a qotd, by cloning the template
     $('[name="add-qotd-answer"]').click(addQotdOption)
@@ -89,7 +90,7 @@ $(document).ready(function() {
 
           // Display submit button, if there is no answer, and start timer
           } else if (!response.answer) {
-            $('.qotd-form').append('<input class="button small" type="submit" value="Check">')
+            $('#qotd-form-submit').show()
             $('#progress-bar').anim_progressbar()
           }
         }
@@ -105,13 +106,16 @@ function editQotd(id) {
   $('#qotd-date').val('')
   $('.qotd-answer-list').empty()
   $('#qotd-addForm').text('Add question')
-  $('#qotd-submit').val('Save')
 
   // Reveal modal
   $('#addQotdModal').foundation('reveal', 'open')
 
   // Get data if needed
   if (typeof id !== 'undefined') {
+    // Display correct title
+    $('#qotd-addForm-title').hide()
+    $('#qotd-editForm-title').show()
+
     $.ajax({
       url: '/api/qotd/list/1/1?id=' + id,
       type: 'GET',
@@ -121,6 +125,10 @@ function editQotd(id) {
     })
 
   } else {
+    // Display correct title
+    $('#qotd-addForm-title').show()
+    $('#qotd-editForm-title').hide()
+
     // Add default number of options
     if (typeof noOfOptions != 'undefined') {
       for (var i=0; i<noOfOptions; i++)
@@ -133,9 +141,7 @@ function editQotd(id) {
     $('#qotd-id').val(q._id)
     $('#qotd-question').val(q.question)
     if (q.date) $('#qotd-date').val(shortenDate(q.date))
-    // Update title and submit button  for edit mode
-    $('#qotd-addForm').text('Edit question')
-    $('#qotd-submit').val('Update')
+
     // Add options
     for (var i=0; i<q.choices.length; i++)
       addQotdOption()

@@ -3,21 +3,21 @@ extends ../../views/layout
 block content
   .row
     .large-12.columns
-      h3= __('qotd-title')
+      h2= __('qotd_title')
       - if (!user)
-        h2 Log in to play this game.
+        h4= __('qotd_alert_login')
 
   - if (ROLE < 3)
     .row
       .large-12.columns
-        h2 Settings
+        h3= __('qotd_title_settings')
 
         form(method='post', action='/api/qotd/settings')
-          label Default number of answers per question
+          label= __('qotd_settings_default_ans')
             input(name='defaultNoOfAns', type='text', value=mysettings['qotd-defaultNoOfAns'])
-          label Limit time to respond (positive values only)
+          label= __('qotd_settings_timelimit')
             input(name='countdownTimer', type='text', value=mysettings['qotd-countdownTimer'])
-          input.button.small(type='submit', value='Save')
+          input.button.small(type='submit', value=__('button_save'))
 
     // Transfer number of fields through JS
     - if (mysettings['qotd-defaultNoOfAns'])
@@ -38,41 +38,42 @@ block content
         .qotd-question
           .row
             .large-12.columns
-              h2#qotd-addForm Add question
-              label Question
+              h2#qotd-addForm-title= __('qotd_add_title')
+              h2#qotd-editForm-title= __('qotd_edit_title')
+              label= __('qotd_add_field_question')
                 input(name='question', type='text', id='qotd-question')
                 input(name='id', type='hidden', id='qotd-id')
           .row
             .large-12.columns
-              label Tags (space separated)
+              label= __('qotd_add_field_tags')
                 input(name='tags', type='text', id='qotd-tags')
           .row
             .large-6.columns.left
-              label Answers
+              label= __('qotd_add_field_answers')
                 .qotd-answer-list
             .large-6.columns.right
-              label Date (dd/mm/yy)
+              label= __('qotd_add_field_date')
                 input(name='date', type='text', id='qotd-date')
               #datepicker
 
         .spacer
         .controls.row
           .large-10.columns.left
-            input.button.small(name='add-qotd-answer', type='button', value='Add answer')
+            input.button.small(name='add-qotd-answer', type='button', value=__('qotd_add_answer'))
           .large-2.columns.right
-            input.button.small(id='qotd-submit', type='submit', value='Save')
+            input.button.small(id='qotd-submit', type='submit', value=__('button_save'))
 
     .spacer
     .row
-      a.radius.button(href='#', onclick='editQotd()') Add a new qotd
+      a.radius.button(href='#', onclick='editQotd()')= __('qotd_add_button')
       .large-10.columns.left
-        h2 List of questions
+        h2= __('qotd_list_title')
         .qotd-question-list
         .spacer
         .qotd-question-pages.text-center
         .spacer
       .large-2.columns.left
-        h2 Tags
+        h2= __('qotd_tags_title')
         ul
           - each tag in qtags
             li.qotd-tag
@@ -82,12 +83,12 @@ block content
   - if (ROLE == 4)
     .row
       .large-12.columns
-        h2 Play game
         - if (mysettings['qotd-countdownTimer'] > 0)
           #progress-bar(data-time=mysettings['qotd-countdownTimer']): .pbar
         form.qotd-form(id='qotd', method='post', action='/api/qotd/play')
           .qotd-play-question
           .qotd-play-answers
+          input.button.small#qotd-form-submit(type='submit', value=__('qotd_game_check'))
 
 block footer
   script(type="text/javascript", src='/modules/qotd/public/js/main.js')

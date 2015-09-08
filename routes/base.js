@@ -15,7 +15,7 @@ module.exports = function (app) {
     res.locals.URL = req.url.split('?')[0]
 
     // Merge core locales with module locales, for current module page
-    var current_module = req.url.split('/')[1]
+    var current_module = req.url.split('/')[1].split('?')[0]
     if (app.get('modules').indexOf(current_module) > -1) {
       req.i18n.locales = mergeLocales(req.i18n.locales, current_module)
     }

@@ -45,9 +45,10 @@ pass = app.data.superuser[root]
 // Add to users collection only if does not already exist
 User.findOne({'local.email': root}).exec(function(err, him) {
   if (!him) new User({
-    'local.username': 'root',
-    'local.email': root,
-    'local.password': new User().generateHash(pass)
+    'role'           : 0,
+    'local.username' : 'root',
+    'local.email'    : root,
+    'local.password' : new User().generateHash(pass)
   }).save()
 })
 // Enable local login by default

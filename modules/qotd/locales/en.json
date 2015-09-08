@@ -1,3 +1,23 @@
 {
-	"qotd-title": "QotD Pagee"
+	"qotd_title":            "Question of the day",
+	"qotd_alert_login":      "You need to login to play this game",
+
+	"qotd_title_settings": 			 "Settings",
+	"qotd_settings_default_ans": "Default number of available answers:",
+	"qotd_settings_timelimit": 	 "Countdown timer (just positive values):",
+
+	"qotd_add_button":			   "Add a question",
+	"qotd_edit_title":			   "Edit question",
+	"qotd_add_title": 				 "Add a new question",
+	"qotd_add_field_question": "Question:",
+	"qotd_add_field_tags": 		 "Tags (space separated):",
+	"qotd_add_field_answers":  "Available answers:",
+	"qotd_add_field_date":		 "Date (dd/mm/yy):",
+	"qotd_add_answer": 				 "Add answer",
+
+	"qotd_list_title": "List of questions:",
+
+	"qotd_tags_title": "Tags:",
+
+	"qotd_game_check": "Check"
 }

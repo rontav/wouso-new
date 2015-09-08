@@ -111,7 +111,7 @@ block content
 
         br
         input.setting(type='checkbox', id='login-signup', checked=(mysettings['login-signup']==='true'))
-        | Allow User signup
+        = __('admin_app_signup')
 
       .large-6.columns
         input.setting(type='checkbox', id='login-local', checked=(mysettings['login-local']==='true'))

@@ -114,12 +114,13 @@ module.exports = function (app) {
 
 
   app.get('/api/qotd/play', function (req, res, next) {
+    // Check if user is logged in
+    if (!req.user) return res.redirect('/login')
 
     start = new Date().setHours(0,0,0,0)
-    end = new Date().setHours(23,59,59,999)
+    end   = new Date().setHours(23,59,59,999)
 
     qotd.find({'date': {$gte: start, $lt: end}}).exec(function (err, today) {
-
       // Update qotd-streak
       query = {
         'name'           : 'qotd-streak',
