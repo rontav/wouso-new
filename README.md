@@ -14,11 +14,16 @@ This new WoUSO is an upgrade on the existing python [wouso](https://github.com/r
 ## Setup
 
 * Install **node** and **mongod**.
+* Install requirements
+```
+npm install
+```
 * Configure settings under **config.json** file.
 * Link preffered modules
 ```
 npm link modules/qotd
 ```
+* Start mongod databse
 * Run **app.js** file
 ```
 npm start
