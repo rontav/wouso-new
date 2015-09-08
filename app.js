@@ -50,6 +50,13 @@ User.findOne({'local.email': root}).exec(function(err, him) {
     'local.password': new User().generateHash(pass)
   }).save()
 })
+// Enable local login by default
+Settings.findOne({'key': 'login-local'}).exec(function (err, num) {
+  if (!num) new Settings({
+    'key': 'login-local',
+    'val': true
+  }).save()
+})
 
 
 // PATCH to used multiple view directories in express 3.0

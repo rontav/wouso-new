@@ -7,22 +7,22 @@ block content
 
   .spacer
   .row
-    .large-5.columns
-      .reveal-modal(id='signupModal', data-reveal, aria-labelledby='firstModalTitle', aria-hidden='true', role='dialog')
-        h3= __('login_title_create')
-        form(action='/signup', method='post')
-          label= __('login_email')
-          input(name='email', type='text')
-          br
-          label= __('login_pass')
-          input(name='password', type='password')
-          br
-          button.btn.btn-warning(type='submit')= __('login_register')
-          br
-          = __('login_already_reg') + ' '
-          a(href='/login')= __('login_title_auth')
+    .reveal-modal(id='signupModal', data-reveal, aria-labelledby='firstModalTitle', aria-hidden='true', role='dialog')
+      h3= __('login_title_create')
+      form(action='/signup', method='post')
+        label= __('login_email')
+        input(name='email', type='text')
+        br
+        label= __('login_pass')
+        input(name='password', type='password')
+        br
+        button.btn.btn-warning(type='submit')= __('login_register')
+        br
+        = __('login_already_reg') + ' '
+        a(href='/login')= __('login_title_auth')
 
-      - if (mysettings['login-local'] === 'true')
+    - if (mysettings['login-local'] === 'true')
+      .large-5.columns
         h3= __('login_title_auth')
         form(action='/login', method='post')
           label= __('login_email')
@@ -37,8 +37,8 @@ block content
 
           button.btn.btn-warning(type='submit')= __('login_submit')
 
-    .large-5.columns
-      - if (mysettings['login-fb'] === 'true' || mysettings['login-tw'] === 'true' || mysettings['login-gp'] === 'true' || mysettings['login-gh'] === 'true')
+    - if (mysettings['login-fb'] === 'true' || mysettings['login-tw'] === 'true' || mysettings['login-gp'] === 'true' || mysettings['login-gh'] === 'true')
+      .large-5.columns
         h3= __('login_title_social')
         - if (mysettings['login-fb'] === 'true')
           a(href='/auth/facebook')= __('login_facebook')
