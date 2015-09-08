@@ -1,76 +1,28 @@
-## De ce ?
-* design modular
-** ce poate fi usor adaptat la diferite functionalitati pentru mai multe cazuri
-de utilizare (nu doar la noi in facultate)
-* bine documentat
-** usor de contribuit la proiect (bugfix-uri, module noi, etc.)
-* internationalizabil
-** suport pentru mai multe limbi
+## What is this ?
+WoUSO is an evaluation platform that uses gamification to keep it's users engaged. It can be personalized with specific content and custom game modes.
 
-* interactivitate (notificari live)
-* interfete independente de module
-* mobile friendly
-* more social
+This new WoUSO is an upgrade on the existing python [wouso](https://github.com/rosedu/wouso).
+
+## What it brings new to the table ?
+* modular design, which ensures easy extensibility
+* user interactivity, with live notifications
+* mobile friendly interface
+* integration with social networks
+* i18n support
 * API
 
+## Setup
 
-## Development
-* in development, use node app.js login to automatically log in
-* for locales development please reffer to the [documentation](https://github.com/jeresig/i18n-node-2)
-* when developing modules, create a sym link to the module in /modules, so changes
-are reflected directly, without installing the module
-* when developing test cases, reffer to the zombie [docs](http://zombie.js.org/#assertions)
-* when developing themes, you can overwrite the core CSS or any view, by creating
-a .jade file with the name of the file that you would like to overwrite, in the
-themes directory; you can also have a style.css file to add more styling
-* a module can see all instaled modules, by checking
+* Install **node** and **mongod**.
+* Configure settings under **config.json** file.
+* Link preffered modules
+```
+npm link modules/qotd
+```
+* Run **app.js** file
+```
+npm start
+```
 
-	app.get('modules')
-
-
-# TODO:
-
-## Core
-* investigate LDAP login
-* add lang directory that stores strings in different languages
-* better handling of logging
-* timezone option
-* merge login and connect endpoints
-* edit user profile
-	* select used email
-	* select name
-* add groups
-* add score collection
-* game simulator
-* stats page
-* user messages
-* use themes as npm packages
-* notify users when a new qotd get's published
-* make app restart itself. use [this](https://www.npmjs.com/package/forever)
-* add real-time user [analytics](http://coenraets.org/blog/2012/10/real-time-web-analytics-with-node-js-and-socket-io/)
-* redirect to previous page, after login
-* group messages by person
-
-
-## QOTD
-* qotd new question form validation
-	* make sure we don't have the same answer twice
-* batch edit for questions
-* search questions
-	* filter by tag
-* add option for number of questions per page in list
-* show question options on click
-* display tags in qotd list
-* filter qotd list by tag
-* flag question after answer is shown
-* accept questions proposed by users
-* optimise day mark in datepicker for single month
-* hide questions instead of delete
-	* when a question's text or options get edited, create a new question and
-	hide the old one, to hold proof for the user's score
-* import/export questions to json file
-* save question view time and update time countdown accordingly
-
-## BUGS
-* by default all login methods are deactivated (empty login page)
-* if google login method is disabled, I cannot connect google account after login
+## License
+This platform is licensed under the MIT license.
