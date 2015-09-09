@@ -92,8 +92,9 @@ html
             a(href='/profile')= __('nav_profile')
           li
             a(href='/messages')= __('nav_messages')
-          li
-            a(href='/admin')= __('nav_admin')
+          - if (user && user.role <= 1)
+            li
+              a(href='/admin')= __('nav_admin')
 
     dl.sub-nav
       .row

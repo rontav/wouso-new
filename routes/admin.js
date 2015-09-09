@@ -5,6 +5,9 @@ var Settings = require('../config/models/settings')
 module.exports = function (app) {
 
   app.get('/admin', function (req, res, next) {
+    // Check if user is logged in
+    if (!req.user) return res.redirect('/login')
+
     User.find().exec(function (err, all) {
       if (err) return next(err)
 
@@ -16,8 +19,10 @@ module.exports = function (app) {
   })
 
   app.get('/admin/:tab', function (req, res, next) {
-    _self = {}
+    // Check if user is logged in
+    if (!req.user) return res.redirect('/login')
 
+    _self = {}
     if (req.params.tab == 'users')
       User.find().exec(gotUsers)
     else if (req.params.tab == 'settings')
@@ -68,6 +73,9 @@ module.exports = function (app) {
   // For e better organization, tags are managed independently, and they are
   // just linked with the object they represent (e.g. qotd question)
   app.post('/api/tags/add', function(req, res) {
+    // Check if user is logged in
+    if (!req.user) return res.redirect('/login')
+
     new Tag({
       'name' : req.body.name,
       'type' : req.body.type
@@ -78,6 +86,9 @@ module.exports = function (app) {
   })
 
   app.get('/api/user/:user', function(req, res) {
+    // Check if user is logged in
+    if (!req.user) return res.redirect('/login')
+
     var conditions = {'_id': req.params.user}
     var update = {$set: {'role': req.query.role}}
     User.update(conditions, update, function (err, num) {
@@ -87,8 +98,10 @@ module.exports = function (app) {
   })
 
   app.get('/api/settings/set', function(req, res) {
-    for (var opt in req.query) {
+    // Check if user is logged in
+    if (!req.user) return res.redirect('/login')
 
+    for (var opt in req.query) {
       var cond = {'key': opt}
       var update = {$set: {'val': req.query[opt]}}
       Settings.update(cond, update, {'upsert': true}, function (err, num) {

@@ -7,7 +7,7 @@ block content
       - if (!user)
         h4= __('qotd_alert_login')
 
-  - if (ROLE < 3)
+  - if (ROLE < 2)
     .row
       .large-12.columns
         h3= __('qotd_title_settings')
@@ -23,7 +23,7 @@ block content
     - if (mysettings['qotd-defaultNoOfAns'])
       script var noOfOptions = #{mysettings['qotd-defaultNoOfAns']}
 
-  - if (ROLE < 4)
+  - if (ROLE == 3 || ROLE == 2)
     .row.collapse.qotd-answer-template
       input(name='valid', type='hidden', value='false', id='qotd-valid', hidden)
       .small-10.columns
