@@ -15,7 +15,11 @@ block content
       br
 
       h3= __('messages_title_list')
+      .spacer
       - if (messages.length)
-        p= messages
+        - each message in messages
+          .message
+            | <b>#{message.source} --> #{message.destination}:</b> #{message.message}
+
       - else
         h5= __('messages_alert_nomsg')

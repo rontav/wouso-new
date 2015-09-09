@@ -140,14 +140,6 @@ for (module in app.data.modules) {
   }
 }
 
-// Load core routes
-var routes_dir = './routes'
-var routes = fs.readdirSync(routes_dir);
-for (var i in routes) {
-  var route = routes_dir + '/' + routes[i]
-  require(route)(app, io)
-}
-
 
 // Configuring Passport
 require('./config/passport')(passport)
@@ -175,6 +167,14 @@ var io = require('socket.io').listen(server)
 io.sockets.on('connection', function(client) {
   io.sockets.emit('message', { message: 'welcome to the app' })
 })
+
+// Load core routes
+var routes_dir = './routes'
+var routes = fs.readdirSync(routes_dir);
+for (var i in routes) {
+  var route = routes_dir + '/' + routes[i]
+  require(route)(app, io)
+}
 
 
 app.use(app.router)

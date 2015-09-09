@@ -46,16 +46,16 @@ block content
           .profile-card
             = 'ID: ' + user._id
             br
-            - if (user.facebook.name)
+            - if (user.facebook && user.facebook.name)
               = 'Facebook name: ' + user.facebook.name
               br
-            - if (user.twitter.name)
+            - if (user.twitter && user.twitter.name)
               = 'Twitter name: ' + user.twitter.name
               br
-            - if (user.google.name)
+            - if (user.google && user.google.name)
               = 'Google name: ' + user.google.name
               br
-            - if (user.github.name)
+            - if (user.github && user.github.name)
               = 'GitHub name: ' + user.github.name
               br
 
