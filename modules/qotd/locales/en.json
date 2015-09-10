@@ -1,6 +1,7 @@
 {
 	"qotd_title":            "Question of the day",
 	"qotd_alert_login":      "You need to login to play this game",
+	"qotd_alert_noquestion": "No question for today.",
 
 	"qotd_title_settings": 			 "Settings",
 	"qotd_settings_default_ans": "Default number of available answers:",

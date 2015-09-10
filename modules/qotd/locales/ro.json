@@ -1,6 +1,7 @@
 {
 	"qotd_title":            "Întrebarea zilei",
 	"qotd_alert_login":      "Trebuie să te autentifici pentru a putea juca.",
+	"qotd_alert_noquestion": "Nici o întrebare astăzi.",
 
 	"qotd_title_settings": 			 "Setări",
 	"qotd_settings_default_ans": "Numărul implicit de variante de răspuns:",

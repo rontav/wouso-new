@@ -152,8 +152,9 @@ module.exports = function (app) {
       if (!req.user)
         return res.send('Login')
 
-      if (!today.length)
-        return res.send('No question for today.')
+      if (!today.length) {
+        return res.send(req.i18n.__('qotd_alert_noquestion'))
+      }
 
       sent = false
       today.forEach(function (question) {

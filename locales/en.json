@@ -92,7 +92,7 @@
 
   "settings-nologin": "There should be at least one login method enabled.",
 
-
+  "text_from": "from",
   "link_here": "here",
   "button_save": "Save"
 }

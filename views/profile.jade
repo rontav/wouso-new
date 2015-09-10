@@ -34,7 +34,7 @@ block content
         .spacer
 
       - if (user && user.local.email)
-        b Local data <br>
+        b Local <br>
         | Email: #{user.local.email} <br>
         .spacer
 
@@ -43,8 +43,7 @@ block content
           .profile-card-name
             h3 #{user.facebook.name} (id: #{user.facebook.id})
           | Email: #{user.facebook.email} <br>
-          | Token: #{user.facebook.token} <br>
-          | From Facebook
+          | #{__('text_from')} Facebook
         .spacer
 
       - if (user && user.twitter.id)
@@ -52,8 +51,7 @@ block content
           .profile-card-name
             h3 #{user.twitter.displayName} (id: #{user.twitter.id})
           | Username: #{user.twitter.username} <br>
-          | Token: #{user.twitter.token} <br>
-          | From Twitter
+          | #{__('text_from')} Twitter
         .spacer
 
       - if (user && user.google.id)
@@ -63,8 +61,7 @@ block content
           .profile-card-name
             h3 #{user.google.name} (id: #{user.google.id})
           | Email: #{user.google.email} <br>
-          | Token: #{user.google.token} <br>
-          | From Google
+          | #{__('text_from')} Google
         .spacer
 
       - if (user && user.github.id)
@@ -72,6 +69,5 @@ block content
           .profile-card-name
             h3 #{user.github.name} (id: #{user.github.id})
           | Email: #{user.github.email} <br>
-          | Token: #{user.github.token} <br>
-          | From GitHub
+          | #{__('text_from')} GitHub
         .spacer
