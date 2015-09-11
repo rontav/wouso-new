@@ -63,6 +63,19 @@ Settings.findOne({'key': 'login-local'}).exec(function (err, num) {
   }).save()
 })
 
+// Init badges
+query = {'name': 'qotd-streak'}
+update = {$set: {'levels': [{
+  'name'   : 'I',
+  'limit'  : 5
+}, {
+  'name'   : 'II',
+  'limit'  : 20
+}]}}
+Badges.update(query, update, {upsert: true}).exec(function (err) {
+  if (err) log.error('Could not init badges.')
+})
+
 
 // PATCH to used multiple view directories in express 3.0
 // URL: http://stackoverflow.com/questions/11315351/multiple-view-paths-on-node-js-express

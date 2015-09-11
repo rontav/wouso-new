@@ -121,34 +121,6 @@ module.exports = function (app) {
     end   = new Date().setHours(23,59,59,999)
 
     qotd.find({'date': {$gte: start, $lt: end}}).exec(function (err, today) {
-      // Update qotd-streak
-      query = {
-        'name'           : 'qotd-streak',
-        'history.userId' : req.user._id
-      }
-      Badges.findOne(query).exec(function(err, user) {
-        if (!user) {
-          // Init user to badge db
-          query = {'name': 'qotd-streak'}
-          update = {$push: {'history': {
-            'userId'      : req.user._id,
-            'count'       : 1,
-            'lastUpdate'  : Date.now(),
-            'data'        : ''
-          }}}
-          Badges.update(query, update, {upsert: true}).exec(function (err, update) {
-            if (err) console.log('Could not init badge')
-          })
-        } else {
-          // Increment badge count
-          query = {'name': 'qotd-streak', 'history.userId': req.user._id}
-          update = {$inc: {'history.$.count': 1}}
-          Badges.update(query, update, {upsert: true}).exec(function (err, update) {
-            if (err) console.log('Could not increment badge count')
-          })
-        }
-      })
-
       if (!req.user)
         return res.send('Login')
 
@@ -231,6 +203,8 @@ module.exports = function (app) {
 
         // Check answers
         if (right == rightCount) {
+          // Update qotd-streak for correct answer
+          update_badges(req)
           update = {$addToSet: {'right_ppl': req.user._id}, $pull: {'viewers': req.user._id}}
         } else {
           update = {$addToSet: {'wrong_ppl': req.user._id}, $pull: {'viewers': req.user._id}}
@@ -308,5 +282,36 @@ module.exports = function (app) {
       res.redirect('/qotd')
     }
   })
+
+
+
+  function update_badges(req) {
+    query = {
+      'name'           : 'qotd-streak',
+      'history.userId' : req.user._id
+    }
+    Badges.findOne(query).exec(function(err, user) {
+      if (!user) {
+        // Init user to badge db
+        query = {'name': 'qotd-streak'}
+        update = {$push: {'history': {
+          'userId'      : req.user._id,
+          'count'       : 1,
+          'lastUpdate'  : Date.now(),
+          'data'        : ''
+        }}}
+        Badges.update(query, update, {upsert: true}).exec(function (err, update) {
+          if (err) console.log('Could not init badge')
+        })
+      } else {
+        // Increment badge count
+        query = {'name': 'qotd-streak', 'history.userId': req.user._id}
+        update = {$inc: {'history.$.count': 1}}
+        Badges.update(query, update, {upsert: true}).exec(function (err, update) {
+          if (err) console.log('Could not increment badge count')
+        })
+      }
+    })
+  }
 
 }

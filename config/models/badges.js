@@ -4,10 +4,26 @@ var ObjectId = mongoose.Schema.Types.ObjectId
 
 // define the schema for badges
 var badgeSchema = mongoose.Schema({
-  'name'          : {type: String, required: true},
-  'description'   : {type: String, required: false},
-  'required'      : {type: Number, default: null},
-  'history'       : {type: [userInfo], default: []}
+  'name': {
+    type     : String,
+    required : true
+  },
+  'description': {
+    type     : String,
+    required : false
+  },
+  'levels': {
+    type    : [levelInfo],
+    default : []
+  },
+  'required': {
+    type    : Number,
+    default : null
+  },
+  'history': {
+    type    : [userInfo],
+    default : []
+  }
 })
 
 var userInfo = mongoose.Schema({
@@ -15,6 +31,11 @@ var userInfo = mongoose.Schema({
   'count'        : Number,
   'lastUpdate'   : Date,
   'data'         : String
+})
+
+var levelInfo = mongoose.Schema({
+  'name'  : String,
+  'limit' : Number
 })
 
 module.exports = mongoose.model('Badge', badgeSchema)

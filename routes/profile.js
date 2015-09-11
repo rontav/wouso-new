@@ -15,17 +15,41 @@ module.exports = function (app) {
         _self.mysettings[set.key] = set.val
       })
 
-      if (req.user)
-        Badges.find({'history.userId': req.user._id}).exec(gotBadges)
-      else
+      if (req.user) {
+        query = {'history.userId': req.user._id}
+        projection = {
+          '_id'     : 0,
+          'name'    : 1,
+          'levels'  : 1,
+          'history' : {'$elemMatch': {'userId': req.user._id}}}
+        Badges.find(query, projection).exec(gotBadges)
+      } else {
         gotBadges(null, [])
+      }
     }
 
     function gotBadges(err, badges) {
+      _self.badges = []
+
+      badges.forEach(function(badge) {
+        // Init temporary badge
+        var tmp_badge = {'limit': 0}
+        // Get badge level
+        badge.levels.forEach(function(level) {
+          // Update ttemporary badge object biggest level available
+          if (level.limit < badge.history[0].count && level.limit > tmp_badge.limit) {
+            tmp_badge.limit = level.limit
+            tmp_badge.name  = badge.name + ' ' + level.name
+          }
+        })
+        // Save badge if count got beyond first limit
+        if (tmp_badge.limit != 0)
+          _self.badges.push(tmp_badge)
+      })
 
       res.render('profile', {
         'user'       : req.user,
-        'badges'     : badges,
+        'badges'     : _self.badges,
         'mysettings' : _self.mysettings
       })
     }
