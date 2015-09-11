@@ -29,7 +29,11 @@ for (theme in app.data.themes) {
 var Mongoose = require('mongoose')
 var configDB = require('./config/database.js')
 Mongoose.connection.on('error', configDB.check)
-Mongoose.connect(configDB.url)
+if (process.env.NODE_ENV == 'production') {
+  Mongoose.connect(app.data.mongo_url.remote)
+} else {
+  Mongoose.connect(app.data.mongo_url.local)
+}
 
 
 // Require db schemas

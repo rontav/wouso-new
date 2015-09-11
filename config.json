@@ -9,5 +9,9 @@
 	},
 	"superuser": {
 		"root@root.com": "marius"
+	},
+	"mongo_url": {
+		"local"  : "mongodb://localhost/wouso-new",
+		"remote" : "mongodb://admin:admin@ds039271.mongolab.com:39271/heroku_jjp74lcx"
 	}
 }
