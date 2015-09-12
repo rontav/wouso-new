@@ -25,14 +25,17 @@ for (theme in app.data.themes) {
     used_theme = theme
 }
 
-// Connect to database
+// Init db connection
 var Mongoose = require('mongoose')
 var configDB = require('./config/database.js')
 Mongoose.connection.on('error', configDB.check)
+// Connect to proper db
 if (process.env.NODE_ENV == 'production') {
-  Mongoose.connect(app.data.mongo_url.remote)
+  Mongoose.connect(app.data.mongo_url.prod)
+} else if (process.env.NODE_ENV == 'testing'){
+  Mongoose.connect(app.data.mongo_url.test)
 } else {
-  Mongoose.connect(app.data.mongo_url.local)
+  Mongoose.connect(app.data.mongo_url.dev)
 }
 
 
