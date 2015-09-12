@@ -4,6 +4,7 @@ block content
   .row
     .large-12.columns
       h2= __('qotd_title')
+      .spacer
       - if (!user)
         h4= __('qotd_alert_login')
 
@@ -90,7 +91,8 @@ block content
         form.qotd-form(id='qotd', method='post', action='/api/qotd/play')
           .qotd-play-question
           .qotd-play-answers
-          input.button.small#qotd-form-submit(type='submit', value=__('qotd_game_check'))
+          .spacer
+          input.button.small#qotd-form-submit(type='submit', value=__('qotd_game_check'), style='display:none')
 
 block footer
   script(type="text/javascript", src='/modules/qotd/public/js/main.js')

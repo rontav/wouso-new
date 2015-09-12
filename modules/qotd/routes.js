@@ -287,7 +287,6 @@ module.exports = function (app) {
   })
 
 
-
   function update_badges(req) {
     query = {
       'name'           : 'qotd-streak',
