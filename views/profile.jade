@@ -22,9 +22,19 @@ block content
         br
 
       br
+      h3= __('profile_title_points')
+        - if (user.points)
+          p= user.points
+        - else
+          p 0
+
+      br
       h3= __('profile_title_badges')
-      - each badge in badges
-        p= badge.name
+      - if (badges.count)
+        - each badge in badges
+          p= badge.name
+      - else
+        p= __('profile_alert_nobadge')
 
       br
       h3= __('profile_title_info')

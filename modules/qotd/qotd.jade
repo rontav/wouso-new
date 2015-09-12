@@ -17,6 +17,8 @@ block content
             input(name='defaultNoOfAns', type='text', value=mysettings['qotd-defaultNoOfAns'])
           label= __('qotd_settings_timelimit')
             input(name='countdownTimer', type='text', value=mysettings['qotd-countdownTimer'])
+          label= __('qotd_settings_points')
+            input(name='points', type='text', value=mysettings['qotd-points'])
           input.button.small(type='submit', value=__('button_save'))
 
     // Transfer number of fields through JS

@@ -37,11 +37,13 @@
   "login_already_reg":  "Already have an account?",
 
   "profile_alert_login":      "You need to login to view your profile",
+  "profile_alert_nobadge":    "You have no badges yet.",
   "profile_title":            "Your profile",
   "profile_connect_facebook": "Connect Facebook account",
   "profile_connect_twitter":  "Connect Twitter account",
   "profile_connect_google":   "Connect Google account",
   "profile_connect_github":   "Connect GitHub account",
+  "profile_title_points":     "Points",
   "profile_title_badges":     "Badges",
   "profile_title_info":       "Details",
 

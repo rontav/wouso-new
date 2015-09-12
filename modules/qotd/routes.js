@@ -6,6 +6,7 @@ module.exports = function (app) {
   var settings = mongoose.model('Settings')
   var Tag      = mongoose.model('Tag')
   var Badges   = mongoose.model('Badge')
+  var User     = mongoose.model('User')
   var util     = require('util')
   var fs       = require('fs')
 
@@ -205,6 +206,8 @@ module.exports = function (app) {
         if (right == rightCount) {
           // Update qotd-streak for correct answer
           update_badges(req)
+          // Update user points
+          update_points(req)
           update = {$addToSet: {'right_ppl': req.user._id}, $pull: {'viewers': req.user._id}}
         } else {
           update = {$addToSet: {'wrong_ppl': req.user._id}, $pull: {'viewers': req.user._id}}
@@ -312,6 +315,21 @@ module.exports = function (app) {
         })
       }
     })
+  }
+
+  function update_points(req) {
+    // Get points for qotd
+    settings.findOne({'key': 'qotd-points'}).exec(gotPoints)
+
+    function gotPoints(err, points) {
+      // Update user points
+      User.update({'_id': req.user._id}, {$inc: {'points': points}}).exec(updatedPoints)
+    }
+
+    function updatedPoints(err) {
+      if (err) console.log('Could not update points')
+    }
+
   }
 
 }

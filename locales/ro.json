@@ -37,11 +37,13 @@
   "login_already_reg":  "Ai deja un cont?",
 
   "profile_alert_login":      "Trebuie să te autentifici pentru a vedea profilul.",
+  "profile_alert_nobadge":    "Nu ai acumulat nici o insignă.",
   "profile_title":            "Profilul tău",
   "profile_connect_facebook": "Conectează contul de Facebook",
   "profile_connect_twitter":  "Conectează contul de Twitter",
   "profile_connect_google":   "Conectează contul de Google",
   "profile_connect_github":   "Conectează contul de GitHub",
+  "profile_title_points":     "Puncte",
   "profile_title_badges":     "Insigne",
   "profile_title_info":       "Detalii",
 
