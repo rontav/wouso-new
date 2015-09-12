@@ -176,17 +176,19 @@ app.set('theme', used_theme)
 app.locals.pretty = true
 
 // Launch server
-if (process.env.NODE_ENV != 'test') {
+if (process.env.NODE_ENV != 'testing') {
   server = app.listen(process.env.PORT || 4000, function() {
     log.info('Server listening on port 4000')
   })
-}
 
 // Socket.io
 var io = require('socket.io').listen(server)
 io.sockets.on('connection', function(client) {
   io.sockets.emit('message', { message: 'welcome to the app' })
 })
+}
+
+
 
 // Load core routes
 var routes_dir = './routes'
