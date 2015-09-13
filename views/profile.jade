@@ -30,9 +30,13 @@ block content
 
       br
       h3= __('profile_title_badges')
-      - if (badges.count)
+      - if (badges.length)
         - each badge in badges
-          p= badge.name
+          .profile-badge
+            .profile-badge-img
+              img(src='/public/img/#{badge.name}.png', width='30px', height='30px')
+            .profile-badge-name
+              p #{badge.name} #{badge.level}
       - else
         p= __('profile_alert_nobadge')
 

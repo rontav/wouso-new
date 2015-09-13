@@ -39,7 +39,8 @@ module.exports = function (app) {
           // Update ttemporary badge object biggest level available
           if (level.limit < badge.history[0].count && level.limit > tmp_badge.limit) {
             tmp_badge.limit = level.limit
-            tmp_badge.name  = badge.name + ' ' + level.name
+            tmp_badge.name  = badge.name
+            tmp_badge.level = level.name
           }
         })
         // Save badge if count got beyond first limit

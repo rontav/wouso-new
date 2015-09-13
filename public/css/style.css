@@ -33,6 +33,11 @@ input[type="radio"] {
 	margin-right: 10px;
 }
 
+.profile-badge-img {
+	margin-right: 10px;
+	float: left;
+}
+
 .message {
 	border-bottom: 1px solid #D3D3D3;
 }

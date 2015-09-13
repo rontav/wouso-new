@@ -50,14 +50,13 @@ var User = require('./config/models/user')
 root = Object.keys(app.data.superuser)[0]
 pass = app.data.superuser[root]
 // Add to users collection only if does not already exist
-User.findOne({'local.email': root}).exec(function(err, him) {
-  if (!him) new User({
-    'role'           : 0,
-    'local.username' : 'root',
-    'local.email'    : root,
-    'local.password' : new User().generateHash(pass)
-  }).save()
-})
+update = {$set: {
+  'role'           : 0,
+  'local.username' : 'root',
+  'local.email'    : root,
+  'local.password' : new User().generateHash(pass)
+}}
+User.update({'local.email': root}, update, {upsert: true}).exec(function() {})
 // Enable local login by default
 Settings.findOne({'key': 'login-local'}).exec(function (err, num) {
   if (!num) new Settings({
