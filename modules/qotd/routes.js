@@ -208,12 +208,20 @@ module.exports = function (app) {
             question.choices.forEach(function(ans) {
               if (ans.val == true) rightCount++
 
-              if (req.body.ans.indexOf(ans.text) > -1) {
-                given_answers.push(ans)
-                right++
-              } else {
-                wrong++
-              }
+              var found = 0
+              // Convert single answer to array
+              if (typeof req.body.ans === 'string')
+                req.body.ans = req.body.ans.split()
+              // Count right/wrong answers
+              req.body.ans.forEach(function (response) {
+                if (ans.text == response) {
+                  given_answers.push(ans)
+                  found++
+                  right++
+                }
+              })
+
+              if (!found) wrong++
             })
           }
 
@@ -228,11 +236,11 @@ module.exports = function (app) {
           })
 
           // Reward user if necessary
-          if (right == rightCount) {
+          if (right) {
             // Update qotd-streak for correct answer
-            update_badges(req)
+            update_badges(req, right, rightCount)
             // Update user points
-            update_points(req)
+            update_points(req, right, rightCount)
           }
 
           return res.redirect('/qotd')
@@ -306,7 +314,9 @@ module.exports = function (app) {
   })
 
 
-  function update_badges(req) {
+  function update_badges(req, right, rightCount) {
+    if (right != rightCount) return
+
     query = {
       'name'           : 'qotd-streak',
       'history.userId' : req.user._id
@@ -335,13 +345,17 @@ module.exports = function (app) {
     })
   }
 
-  function update_points(req) {
+  function update_points(req, right, rightCount) {
     // Get points for qotd
     settings.findOne({'key': 'qotd-points'}).exec(gotPoints)
 
     function gotPoints(err, points) {
       // Update user points
-      User.update({'_id': req.user._id}, {$inc: {'points': points}}).exec(updatedPoints)
+      points = points.val / rightCount * right
+      query  = {'_id': req.user._id}
+      update = {$inc: {'points': points}}
+
+      User.update(query, update).exec(updatedPoints)
     }
 
     function updatedPoints(err) {
