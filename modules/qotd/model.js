@@ -6,15 +6,19 @@ var Qotd = new Schema({
   question   : String,
   date       : Date,
   choices    : [QOption],
-  viewers    : [String],
-  right_ppl  : [String],
-  wrong_ppl  : [String],
+  answers    : [QResponse],
   tags 		 : [ObjectId]
 })
 
 var QOption = new Schema({
   text       : String,
   val        : Boolean
+})
+
+var QResponse = new Schema({
+  user       : ObjectId,
+  res        : [QOption],
+  date       : Date
 })
 
 mongoose.model('Qotd', Qotd)

@@ -120,8 +120,9 @@ module.exports = function (app) {
 
     start = new Date().setHours(0,0,0,0)
     end   = new Date().setHours(23,59,59,999)
+    query = {'date': {$gte: start, $lt: end}}
 
-    qotd.find({'date': {$gte: start, $lt: end}}).exec(function (err, today) {
+    qotd.find(query).exec(function (err, today) {
       if (!req.user)
         return res.send('Login')
 
@@ -135,32 +136,39 @@ module.exports = function (app) {
         question = question.toJSON()
 
         // Check if user already saw a question and deliver the same one
-        if (!sent && question.viewers.indexOf(req.user._id.toString()) > -1) {
-          sent = true
-          res.send(shuffleAnswers(question))
-        }
+        question.answers.forEach(function (ans) {
+          if (ans.user == req.user._id.toString()) {
+            sent = true
 
-        // User answered (right or wrong)
-        if (!sent && ((question.right_ppl.indexOf(req.user._id.toString()) > -1)
-          || (question.wrong_ppl.indexOf(req.user._id.toString())) > -1)) {
-          sent = true
+            // Compute remaining time
+            var diff = Math.abs(Date.now() - ans.date)
+            var mins = Math.ceil(diff / (1000 * 60))
 
-          // Add right answers and send
-          question['answer'] = []
-          question.choices.forEach(function(ans) {
-            if (ans.val == true) question['answer'].push(ans.text)
-          })
-          res.send(shuffleAnswers(question))
-        }
+            if (ans.res) {
+              // Provide choice if user already answered
+              question['answer'] = []
+              question.choices.forEach(function(ans) {
+                if (ans.val == true) question['answer'].push(ans.text)
+              })
+            }
+
+            return res.send(shuffleAnswers(question))
+          }
+        })
       })
 
       if (!sent && today.length) {
         // Else, choose a random question from today's poll
         rand = Math.floor(Math.random() * today.length)
         // Update question viewer
-        qotd.update({'_id': today[rand]._id}, {$addToSet: {'viewers': req.user._id}}).exec()
+        query  = {'_id': today[rand]._id}
+        update = {$push: {'answers': {
+          'user' : req.user._id,
+          'date' : Date.now()
+        }}}
+        qotd.update(query, update).exec()
 
-        res.send(shuffleAnswers(today[rand]))
+        return res.send(shuffleAnswers(today[rand]))
       }
     })
 
@@ -181,44 +189,55 @@ module.exports = function (app) {
 
   app.post('/api/qotd/play', function (req, res, next) {
     ObjectId = mongoose.Types.ObjectId
-    qotd.findOne({'_id': ObjectId.fromString(req.body.question_id)}).exec(gotQuestion)
+
+    query = {'_id': ObjectId.fromString(req.body.question_id)}
+    qotd.findOne(query).exec(gotQuestion)
 
     function gotQuestion(err, question) {
       if (err) return next(err)
 
       var update = {}
       var right = wrong = rightCount = 0
-      // Checkif user has viewed the question
-      if (question.viewers.indexOf(req.user._id) > -1) {
-        if (req.body.ans) {
-          question.choices.forEach(function(ans) {
-            if (ans.val == true) rightCount++
 
-            if (req.body.ans.indexOf(ans.text) > -1) {
-              right++
-            } else {
-              wrong++
-            }
+      question.answers.forEach(function (ans) {
+        if (ans.user == req.user._id.toString() && !ans.res) {
+          // User did not answer yet, check his answers
+          var given_answers = []
+
+          if (req.body.ans) {
+            question.choices.forEach(function(ans) {
+              if (ans.val == true) rightCount++
+
+              if (req.body.ans.indexOf(ans.text) > -1) {
+                given_answers.push(ans)
+                right++
+              } else {
+                wrong++
+              }
+            })
+          }
+
+          // Save user response
+          query = {
+            '_id'          : ObjectId.fromString(req.body.question_id),
+            'answers.user' : req.user._id
+          }
+          update = {$set: {'answers.$.res': given_answers}}
+          qotd.update(query, update).exec(function (err, update) {
+            if (err) console.log('Could not save user response')
           })
-        }
 
-        // Check answers
-        if (right == rightCount) {
-          // Update qotd-streak for correct answer
-          update_badges(req)
-          // Update user points
-          update_points(req)
-          update = {$addToSet: {'right_ppl': req.user._id}, $pull: {'viewers': req.user._id}}
-        } else {
-          update = {$addToSet: {'wrong_ppl': req.user._id}, $pull: {'viewers': req.user._id}}
-        }
+          // Reward user if necessary
+          if (right == rightCount) {
+            // Update qotd-streak for correct answer
+            update_badges(req)
+            // Update user points
+            update_points(req)
+          }
 
-        // Remove from viewers and add to corresponding category
-        qotd.update({'_id': ObjectId.fromString(req.body.question_id)}, update).exec()
-        res.redirect('/qotd')
-      } else {
-        res.redirect('/qotd')
-      }
+          return res.redirect('/qotd')
+        }
+      })
     }
   })
 
