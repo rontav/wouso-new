@@ -1,43 +1,50 @@
 .spacer {
-	height: 40px;
-	clear: both;
+  height: 40px;
+  clear: both;
 }
 
 .activeClass{
-    background: #C2C2C2;
+  background: #C2C2C2;
 }
 
 input[type="checkbox"] {
-	margin: 8px 5px 0px 0px;
+  margin: 8px 5px 0px 0px;
 }
 
 input[type="radio"] {
-	margin: 8px 5px 0px 0px;
+  margin: 8px 5px 0px 0px;
 }
 
 .qotd-right-answer {
-	background-color: #8dc53e;
-	border-radius: 5px;
-	color: white;
+  background-color: #8dc53e;
+  border-radius: 5px;
+  color: white;
 }
 
 .profile-card {
-	word-wrap: break-word;
-	border-style: solid;
+  word-wrap: break-word;
+  border-style: solid;
   border-width: 2px;
   padding: 10px;
 }
 
 .profile-card-avatar {
-	float: left;
-	margin-right: 10px;
+  float: left;
+  margin-right: 10px;
 }
 
 .profile-badge-img {
-	margin-right: 10px;
-	float: left;
+  margin-right: 10px;
+  float: left;
 }
 
 .message {
-	border-bottom: 1px solid #D3D3D3;
+  border-bottom: 1px solid #D3D3D3;
+}
+
+.qotd-question-li {
+  height: 20px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }

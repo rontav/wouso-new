@@ -218,7 +218,7 @@ function listQotdQuestions(perPage, currentPage, sTags) {
       shortDate = '--/--/--'
       if (q.date) shortDate = shortenDate(q.date)
 
-      $('.qotd-question-list').append('<div class="large-9 columns">' + q.question +
+      $('.qotd-question-list').append('<div class="large-9 columns qotd-question-li">' + q.question +
         '</div><div class="large-1 columns"><a href="#" onclick="editQotd(\'' + q._id + '\')">Edit</a></div>' +
         '<div class="large-2 columns text-center">' + shortDate + '</div>')
     })

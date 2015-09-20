@@ -8,6 +8,10 @@ block content
       - if (!user)
         h4= __('qotd_alert_login')
 
+  // Transfer number of fields through JS
+  - if (mysettings['qotd-defaultNoOfAns'])
+    script var noOfOptions = #{mysettings['qotd-defaultNoOfAns']}
+
   - if (ROLE < 2)
     .row
       .large-12.columns
@@ -21,10 +25,6 @@ block content
           label= __('qotd_settings_points')
             input(name='points', type='text', value=mysettings['qotd-points'])
           input.button.small(type='submit', value=__('button_save'))
-
-    // Transfer number of fields through JS
-    - if (mysettings['qotd-defaultNoOfAns'])
-      script var noOfOptions = #{mysettings['qotd-defaultNoOfAns']}
 
   - if (ROLE == 3 || ROLE == 2)
     .row.collapse.qotd-answer-template
