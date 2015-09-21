@@ -344,7 +344,7 @@ module.exports = function(passport) {
             user.github.name        = profile.displayName
             user.github.email       = profile.emails[0].value
 
-            newUser.save(function(err) { if (err) throw err })
+            user.save(function(err) { if (err) throw err })
 
           // User is logged in and connected an account
           } else {
