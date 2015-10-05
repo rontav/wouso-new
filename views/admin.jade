@@ -10,7 +10,7 @@ block sidebar
         li: a(href='/admin/tags')= __('admin_nav_tags')
 
 block content
-  roles = {0: 'Root', 1: 'Admin', 2: 'Teacher', 3: 'Contributor', 4: 'Player'}
+  - var roles = {0: 'Root', 1: 'Admin', 2: 'Teacher', 3: 'Contributor', 4: 'Player'}
 
   - if (tab == 'platform')
     .row
