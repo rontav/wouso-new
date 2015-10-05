@@ -9,6 +9,7 @@ var passport      = require('passport')
 var flash         = require('connect-flash')
 var app = module.exports = express()
 
+
 // Set up logger
 var Logger = require('pretty-logger')
 Logger.setLevel('info')
@@ -81,38 +82,6 @@ Badges.update(query, update, {upsert: true}).exec(function (err) {
 })
 
 
-// PATCH to used multiple view directories in express 3.0
-// URL: http://stackoverflow.com/questions/11315351/multiple-view-paths-on-node-js-express
-function enable_multiple_view_folders() {
-    // Monkey-patch express to accept multiple paths for looking up views.
-    // this path may change depending on your setup.
-    var View = require("./node_modules/express/lib/view"),
-        lookup_proxy = View.prototype.lookup;
-
-    View.prototype.lookup = function(viewName) {
-        var context, match;
-        if (this.root instanceof Array) {
-            for (var i = 0; i < this.root.length; i++) {
-                context = {root: this.root[i]};
-                match = lookup_proxy.call(context, viewName);
-                if (match) {
-                    return match;
-                }
-            }
-            return null;
-        }
-        return lookup_proxy.call(this, viewName);
-    };
-}
-//enable_multiple_view_folders();
-
-//app.use(cookieParser('MySecret'))
-// app.use(cookieSession({
-//   keys   : 'MySecret',
-//   cookie : {
-//     maxAge: 1800000 //30 min
-//   }
-// }))
 app.use(bodyParser.urlencoded({
   extended: true
 }))
@@ -149,8 +118,6 @@ i18n.expressBind(app, {
   // do not automatically resolve unknown strings
   devMode: false
 })
-
-
 
 
 // Store available views
@@ -266,8 +233,6 @@ app.use(require('./routes/base'))
 
 // Configuring Passport
 require('./config/passport')(passport)
-// Load authentication routes from external file
-//app.use(require('./auth')(app, passport))
 
 
 // Set app settings
@@ -284,9 +249,9 @@ if (process.env.NODE_ENV != 'testing') {
     log.info('Server listening on port 4000')
   })
 
-// Socket.io
-var io = require('socket.io').listen(server)
-io.sockets.on('connection', function(client) {
-  io.sockets.emit('message', { message: 'welcome to the app' })
-})
+  // Socket.io
+  var io = require('socket.io').listen(server)
+  io.sockets.on('connection', function(client) {
+    io.sockets.emit('message', { message: 'welcome to the app' })
+  })
 }
