@@ -1,10 +1,12 @@
-var fs           = require('fs')
-var express      = require('express')
-var bodyParser   = require('body-parser')
-var cookieParser = require('cookie-parser')
-var exprSession  = require('express-session')
-var passport     = require('passport')
-var flash        = require('connect-flash')
+var fs            = require('fs')
+var express       = require('express')
+var bodyParser    = require('body-parser')
+var cookieParser  = require('cookie-parser')
+var cookieSession = require('cookie-session')
+var exprSession   = require('express-session')
+var favicon       = require('serve-favicon')
+var passport      = require('passport')
+var flash         = require('connect-flash')
 var app = module.exports = express()
 
 // Set up logger
@@ -102,14 +104,15 @@ function enable_multiple_view_folders() {
         return lookup_proxy.call(this, viewName);
     };
 }
-enable_multiple_view_folders();
+//enable_multiple_view_folders();
 
-app.use(express.cookieParser('MySecret'))
-app.use(express.cookieSession({
-  cookie: {
-    maxAge: 1800000 //30 min
-  }
-}))
+//app.use(cookieParser('MySecret'))
+// app.use(cookieSession({
+//   keys   : 'MySecret',
+//   cookie : {
+//     maxAge: 1800000 //30 min
+//   }
+// }))
 app.use(bodyParser.urlencoded({
   extended: true
 }))
@@ -117,8 +120,18 @@ app.use(flash())
 app.use(bodyParser.json())
 app.use('/public',  express.static(__dirname + '/public'))
 app.use('/modules', express.static(__dirname + '/modules'))
-app.use('/themes', express.static(__dirname + '/themes'))
-app.use(express.favicon('public/img/favicon.ico'))
+app.use('/themes',  express.static(__dirname + '/themes'))
+app.use(favicon('public/img/favicon.ico'))
+app.use(exprSession({
+  secret            : 'MySecret',
+  name              : "mycookie",
+  resave            : true,
+  saveUninitialized : true,
+  cookie: {
+    secure: false,
+    maxAge: 1800000 //30 min
+  }
+}))
 app.use(passport.initialize())
 app.use(passport.session())
 
@@ -137,13 +150,90 @@ i18n.expressBind(app, {
   devMode: false
 })
 
+
+
+
 // Store available views
 // Views in the themes directory have the highest priority and can overwrite
 // core or module views
 views = ['./themes/' + used_theme, 'views']
 
-// Load middleware
-require('./routes/base.js')(app)
+
+// Auto login with dummy user in development if 'login'
+// argument is provided
+app.use(function (req, res, next) {
+  if (req.app.get('env') == 'development' && process.argv[2] == 'login') {
+    req.user = {
+      '_id':  0,
+      'role': 0,
+      'facebook': {
+        'id': 0
+      },
+      'twitter': {
+        'id': 0
+      },
+      'google': {
+        'id': 0
+      },
+      'github': {
+        'id': 0
+      },
+      'local': {
+        'email': 'user@user.com'
+      }
+    }
+  }
+
+  return next()
+})
+
+app.use(function (req, res, next) {
+  // Save selected role to session
+  if (req.query.role) {
+    req.session.ROLE = req.query.role
+  }
+
+  // Transfer vars to view
+  res.locals.ROLE = req.session.ROLE
+  res.locals.URL = req.url.split('?')[0]
+
+  // Merge core locales with module locales, for current module page
+  var current_module = req.url.split('/')[1].split('?')[0]
+  // If current_module is api, get second argument
+  if (current_module == 'api') current_module = req.url.split('/')[2].split('?')[0]
+
+  if (req.app.get('modules').indexOf(current_module) > -1) {
+    req.i18n.locales = mergeLocales(req.i18n.locales, current_module)
+  }
+
+  function mergeLocales(locales, module) {
+    // Stores merged locales
+    var new_locales = {}
+
+    for (var locale in locales) {
+      var module_locales_path = './modules/' + module + '/locales/' + locale + '.json'
+      var core_locales_path   = './locales/' + locale + '.json'
+
+      var module_locales = JSON.parse(fs.readFileSync(module_locales_path, 'utf8'))
+      var core_locales   = JSON.parse(fs.readFileSync(core_locales_path, 'utf8'))
+
+      // Merge module strings with core ones
+      for (var attr in module_locales)
+        // Do not overwrite core locales
+        if (!(attr in core_locales))
+          core_locales[attr] = module_locales[attr]
+
+      new_locales[locale] = core_locales
+    }
+
+    return new_locales
+  }
+
+  // Set preferred locale
+  req.i18n.setLocale(req.app.data.language)
+
+  next()
+})
 
 // Load enabled modules
 for (module in app.data.modules) {
@@ -153,17 +243,31 @@ for (module in app.data.modules) {
     // Load module shema
     require(module + '/model.js')
     // Load module routes
-    require(module + '/routes.js')(app)
+    app.use(require(module + '/routes.js'))
     // Load module views
     views.push('node_modules/' + module)
   }
 }
 
+// Load core routes
+var routes_dir = './routes'
+var routes = fs.readdirSync(routes_dir);
+for (var i in routes) {
+  var route = routes_dir + '/' + routes[i]
+  // Load middleware in the end
+  if (route != './routes/base.js')
+    app.use(require(route))
+}
+
+
+// Load middleware
+app.use(require('./routes/base'))
+
 
 // Configuring Passport
 require('./config/passport')(passport)
 // Load authentication routes from external file
-require('./auth.js')(app, passport)
+//app.use(require('./auth')(app, passport))
 
 
 // Set app settings
@@ -186,16 +290,3 @@ io.sockets.on('connection', function(client) {
   io.sockets.emit('message', { message: 'welcome to the app' })
 })
 }
-
-
-
-// Load core routes
-var routes_dir = './routes'
-var routes = fs.readdirSync(routes_dir);
-for (var i in routes) {
-  var route = routes_dir + '/' + routes[i]
-  require(route)(app, io)
-}
-
-
-app.use(app.router)

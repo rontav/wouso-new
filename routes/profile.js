@@ -1,9 +1,10 @@
 var Settings = require('../config/models/settings')
 var Badges   = require('../config/models/badges')
+var express  = require('express')
+var router   = express.Router()
 
-module.exports = function (app) {
 
-  app.get('/profile', function (req, res, next) {
+router.get('/profile', function (req, res, next) {
     _self = {}
     Settings.find({'key': /login-.*/}).exec(gotSettings)
 
@@ -56,4 +57,5 @@ module.exports = function (app) {
     }
   })
 
-}
+
+module.exports = router

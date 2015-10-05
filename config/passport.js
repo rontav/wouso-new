@@ -137,7 +137,10 @@ module.exports = function(passport) {
             user.facebook.name  = profile.name.givenName + ' ' + profile.name.familyName
             user.facebook.email = profile.emails[0].value
 
-            user.save(function(err) { if (err) throw err })
+            user.save(function(err) {
+              if (err)
+                log.error('Could not login Facebook user.')
+            })
 
           // User is not logged in and not found in db
           } else if (!req.user && !user) {
@@ -147,7 +150,10 @@ module.exports = function(passport) {
             user.facebook.name  = profile.name.givenName + ' ' + profile.name.familyName
             user.facebook.email = profile.emails[0].value
 
-            user.save(function(err) { if (err) throw err })
+            user.save(function(err) {
+              if (err)
+                log.error('Could not register new Facebook user.')
+            })
 
           // User is logged in and connected an account
           } else {
@@ -161,7 +167,10 @@ module.exports = function(passport) {
             user.facebook.name  = profile.name.givenName + ' ' + profile.name.familyName
             user.facebook.email = profile.emails[0].value
 
-            user.save(function(err) { if (err) throw err })
+            user.save(function(err) {
+              if (err)
+                log.error('Could not connect Facebook user.')
+            })
           }
 
           // Return one happy user
@@ -201,7 +210,10 @@ module.exports = function(passport) {
             user.twitter.username    = profile.username
             user.twitter.displayName = profile.displayName
 
-            user.save(function(err) { if (err) throw err })
+            user.save(function(err) {
+              if (err)
+                log.error('Could not login Twitter user.')
+            })
 
           // User is not logged in and not found in db
           } else if (!req.user && !user) {
@@ -211,7 +223,10 @@ module.exports = function(passport) {
             user.twitter.username    = profile.username
             user.twitter.displayName = profile.displayName
 
-            user.save(function(err) { if (err) throw err })
+            user.save(function(err) {
+              if (err)
+                log.error('Could not register new Twitter user.')
+            })
 
           // User is logged in and connected an account
           } else {
@@ -225,7 +240,10 @@ module.exports = function(passport) {
             user.twitter.username    = profile.username
             user.twitter.displayName = profile.displayName
 
-            user.save(function(err) { if (err) throw err })
+            user.save(function(err) {
+              if (err)
+                log.error('Could not connect Twitter user.')
+            })
           }
 
           // Return one happy user
@@ -265,7 +283,10 @@ module.exports = function(passport) {
             user.google.email  = profile.email
             user.google.avatar = profile.image.url.split('?')[0]
 
-            user.save(function(err) { if (err) throw err })
+            user.save(function(err) {
+              if (err)
+                log.error('Could not login Google user.')
+            })
 
           // User is not logged in and not found in db
           } else if (!req.user && !user) {
@@ -276,7 +297,10 @@ module.exports = function(passport) {
             user.google.email  = profile.email
             user.google.avatar = profile.image.url.split('?')[0]
 
-            user.save(function(err) { if (err) throw err })
+            user.save(function(err) {
+              if (err)
+                log.error('Could not register new Google user.')
+            })
 
           // User is logged in and connected an account
           } else {
@@ -291,7 +315,10 @@ module.exports = function(passport) {
             user.google.email  = profile.email
             user.google.avatar = profile.image.url.split('?')[0]
 
-            user.save(function(err) { if (err) throw err })
+            user.save(function(err) {
+              if (err)
+                log.error('Could not connect Google user.')
+            })
           }
 
           // Return one happy user
@@ -333,7 +360,10 @@ module.exports = function(passport) {
             user.github.name        = profile.displayName
             user.github.email       = profile.emails[0].value
 
-            user.save(function(err) { if (err) throw err })
+            user.save(function(err) {
+              if (err)
+                log.error('Could not login GitHub user.')
+            })
 
           // User is not logged in and not found in db
           } else if (!req.user && !user) {
@@ -344,7 +374,10 @@ module.exports = function(passport) {
             user.github.name        = profile.displayName
             user.github.email       = profile.emails[0].value
 
-            user.save(function(err) { if (err) throw err })
+            user.save(function(err) {
+              if (err)
+                log.error('Could not register new GitHub user.')
+            })
 
           // User is logged in and connected an account
           } else {
@@ -359,7 +392,10 @@ module.exports = function(passport) {
             user.github.name        = profile.displayName
             user.github.email       = profile.emails[0].value
 
-            user.save(function(err) { if (err) throw err })
+            user.save(function(err) {
+              if (err)
+                log.error('Could not connect GitHub user.')
+            })
           }
 
           // Return one happy user
