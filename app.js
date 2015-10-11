@@ -89,7 +89,7 @@ app.use(flash())
 app.use(bodyParser.json())
 app.use('/public',  express.static(__dirname + '/public'))
 app.use('/modules', express.static(__dirname + '/modules'))
-app.use('/themes',  express.static(__dirname + '/themes'))
+app.use('/theme',  express.static(__dirname + '/node_modules/' + used_theme))
 app.use(favicon('public/img/favicon.ico'))
 app.use(exprSession({
   secret            : 'MySecret',
@@ -123,7 +123,7 @@ i18n.expressBind(app, {
 // Store available views
 // Views in the themes directory have the highest priority and can overwrite
 // core or module views
-views = ['./themes/' + used_theme, 'views']
+views = ['views', './node_modules/' + used_theme + '/views']
 
 
 // Auto login with dummy user in development if 'login'

@@ -4,8 +4,7 @@
 	},
 	"language": "ro",
 	"themes": {
-		"red"  : false,
-		"white": true
+		"wouso-foundation": true
 	},
 	"superuser": {
 		"root@root.com": "marius"
