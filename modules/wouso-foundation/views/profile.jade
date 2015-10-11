@@ -9,16 +9,16 @@ block content
       h3= __('profile_title')
 
       if (user && !user.facebook.id && mysettings['login-fb'] === 'true')
-        a(href='/connect/facebook')= __('profile_connect_facebook')
+        a(href='/wouso-social-login/connect/facebook')= __('profile_connect_facebook')
         br
       if (user && !user.twitter.id && mysettings['login-tw'] === 'true')
-        a(href='/connect/twitter')= __('profile_connect_twitter')
+        a(href='/wouso-social-login/connect/twitter')= __('profile_connect_twitter')
         br
       if (user && !user.google.id && mysettings['login-gp'] === 'true')
         a(href='#', onclick='gapi.auth.signIn({callback: signInCallback})')= __('profile_connect_google')
         br
       if (user && !user.github.id && mysettings['login-gh'] === 'true')
-        a(href='/connect/github')= __('profile_connect_github')
+        a(href='/wouso-social-login/connect/github')= __('profile_connect_github')
         br
 
       br

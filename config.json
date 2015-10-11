@@ -1,8 +1,11 @@
 {
+	"language": "ro",
 	"modules": {
+		"wouso-social-login" : true
+	},
+	"games": {
 		"qotd" : true
 	},
-	"language": "ro",
 	"themes": {
 		"wouso-foundation": true
 	},

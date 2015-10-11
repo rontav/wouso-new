@@ -98,7 +98,7 @@ html
       .row
         .large-12.columns
           dt= __('module_title') + ':'
-          - each mod in settings.modules
+          - each mod in settings.games
             dd.active
               a(href='/' + mod)= __('module_' + mod)
 

@@ -41,13 +41,13 @@ block content
       .large-5.columns
         h3= __('login_title_social')
         - if (mysettings['login-fb'] === 'true')
-          a(href='/auth/facebook')= __('login_facebook')
+          a(href='/wouso-social-login/auth/facebook')= __('login_facebook')
           br
         - if (mysettings['login-tw'] === 'true')
-          a(href='/auth/twitter')= __('login_twitter')
+          a(href='/wouso-social-login/auth/twitter')= __('login_twitter')
           br
         - if (mysettings['login-gp'] === 'true')
           a(href='#', onclick='gapi.auth.signIn({callback: signInCallback})')= __('login_google')
           br
         - if (mysettings['login-gh'] === 'true')
-          a(href='/auth/github')= __('login_github')
+          a(href='/wouso-social-login/auth/github')= __('login_github')

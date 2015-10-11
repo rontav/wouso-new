@@ -1,0 +1,9 @@
+{
+  "name": "wouso-social-login",
+  "version": "0.0.0",
+  "description": "Social login",
+  "main": "routes.js",
+  "author": "",
+  "license": "MIT",
+  "wouso": "module"
+}
