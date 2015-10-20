@@ -3,18 +3,18 @@ var FacebookStrategy = require('passport-facebook').Strategy
 var TwitterStrategy  = require('passport-twitter').Strategy
 var GoogleStrategy   = require('passport-google-plus')
 var GitHubStrategy   = require('passport-github').Strategy
+var util             = require('util')
 
+
+var DEFAULT_ROUTE = 'http://%s/wouso-social-login/auth/%s/callback'
 
 // load up the user model
 var User = require('./models/user')
-
 // load up the settings
 var Settings = require('./models/settings')
 
-// load the auth variables
-var configAuth = require('./credentials')
 
-module.exports = function(passport) {
+module.exports = function(app, passport) {
 
   // used to serialize the user for the session
   passport.serializeUser(function(user, done) {
@@ -110,9 +110,9 @@ module.exports = function(passport) {
 
   // FACEBOOK
   passport.use(new FacebookStrategy({
-    clientID          : configAuth.facebookAuth.clientID,
-    clientSecret      : configAuth.facebookAuth.clientSecret,
-    callbackURL       : configAuth.facebookAuth.callbackURL,
+    clientID          : app.data.credentials.facebook.clientID,
+    clientSecret      : app.data.credentials.facebook.clientSecret,
+    callbackURL       : util.format(DEFAULT_ROUTE, app.data.hostname, 'facebook'),
     passReqToCallback : true
 
   }, function(req, token, refreshToken, profile, done) {
@@ -183,9 +183,9 @@ module.exports = function(passport) {
 
   // TWITTER
   passport.use(new TwitterStrategy({
-    consumerKey       : configAuth.twitterAuth.consumerKey,
-    consumerSecret    : configAuth.twitterAuth.consumerSecret,
-    callbackURL       : configAuth.twitterAuth.callbackURL,
+    consumerKey       : app.data.credentials.twitter.clientID,
+    consumerSecret    : app.data.credentials.twitter.clientSecret,
+    callbackURL       : util.format(DEFAULT_ROUTE, app.data.hostname, 'twitter'),
     passReqToCallback : true
 
   }, function(req, token, tokenSecret, profile, done) {
@@ -256,8 +256,9 @@ module.exports = function(passport) {
 
   // GOOGLE
   passport.use(new GoogleStrategy({
-    clientId          : configAuth.googleAuth.clientID,
-    clientSecret      : configAuth.googleAuth.clientSecret,
+    clientId          : app.data.credentials.google.clientID,
+    clientSecret      : app.data.credentials.google.clientSecret,
+    callbackURL       : util.format(DEFAULT_ROUTE, app.data.hostname, 'google'),
     passReqToCallback : true
 
   }, function(req, tokens, profile, done) {
@@ -331,9 +332,9 @@ module.exports = function(passport) {
 
   // GITHUB
   passport.use(new GitHubStrategy({
-    clientID          : configAuth.githubAuth.clientID,
-    clientSecret      : configAuth.githubAuth.clientSecret,
-    callbackURL       : configAuth.githubAuth.callbackURL,
+    clientID          : app.data.credentials.github.clientID,
+    clientSecret      : app.data.credentials.github.clientSecret,
+    callbackURL       : util.format(DEFAULT_ROUTE, app.data.hostname, 'github'),
     passReqToCallback : true
 
   }, function(req, token, refreshToken, profile, done) {
