@@ -37,17 +37,19 @@ block content
 
           button.btn.btn-warning(type='submit')= __('login_submit')
 
-    - if (mysettings['login-fb'] === 'true' || mysettings['login-tw'] === 'true' || mysettings['login-gp'] === 'true' || mysettings['login-gh'] === 'true')
-      .large-5.columns
-        h3= __('login_title_social')
-        - if (mysettings['login-fb'] === 'true')
-          a(href='/wouso-social-login/auth/facebook')= __('login_facebook')
-          br
-        - if (mysettings['login-tw'] === 'true')
-          a(href='/wouso-social-login/auth/twitter')= __('login_twitter')
-          br
-        - if (mysettings['login-gp'] === 'true')
-          a(href='#', onclick='gapi.auth.signIn({callback: signInCallback})')= __('login_google')
-          br
-        - if (mysettings['login-gh'] === 'true')
-          a(href='/wouso-social-login/auth/github')= __('login_github')
+
+    - if (settings.modules.indexOf('wouso-social-login') > -1)
+      - if (mysettings['login-fb'] === 'true' || mysettings['login-tw'] === 'true' || mysettings['login-gp'] === 'true' || mysettings['login-gh'] === 'true')
+        .large-5.columns
+          h3= __('login_title_social')
+          - if (mysettings['login-fb'] === 'true')
+            a(href='/wouso-social-login/auth/facebook')= __('login_facebook')
+            br
+          - if (mysettings['login-tw'] === 'true')
+            a(href='/wouso-social-login/auth/twitter')= __('login_twitter')
+            br
+          - if (mysettings['login-gp'] === 'true')
+            a(href='#', onclick='gapi.auth.signIn({callback: signInCallback})')= __('login_google')
+            br
+          - if (mysettings['login-gh'] === 'true')
+            a(href='/wouso-social-login/auth/github')= __('login_github')
