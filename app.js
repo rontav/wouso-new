@@ -4,6 +4,7 @@ var bodyParser    = require('body-parser')
 var cookieParser  = require('cookie-parser')
 var cookieSession = require('cookie-session')
 var exprSession   = require('express-session')
+var passport      = require('passport')
 var favicon       = require('serve-favicon')
 var flash         = require('connect-flash')
 var app = module.exports = express()
@@ -68,6 +69,9 @@ Settings.findOne({'key': 'login-local'}).exec(function (err, num) {
   }).save()
 })
 
+// Configuring Passport
+require('./core/auth')(app, passport)
+
 // Init badges
 query = {'name': 'qotd-streak'}
 update = {$set: {'levels': [{
@@ -101,14 +105,8 @@ app.use(exprSession({
     maxAge: 1800000 //30 min
   }
 }))
-
-if ('wouso-social-login' in app.data.modules && app.data.modules['wouso-social-login'] == true) {
-  // Configuring Passport
-  var passport = require('passport')
-  require('./config/passport')(app, passport)
-  app.use(passport.initialize())
-  app.use(passport.session())
-}
+app.use(passport.initialize())
+app.use(passport.session())
 
 
 // Localization

@@ -2,7 +2,7 @@
 	"hostname": "localhost:4000",
 	"language": "ro",
 	"modules" : {
-		"wouso-social-login" : true
+		"wouso-social-login" : false
 	},
 	"games": {
 		"qotd" : true
