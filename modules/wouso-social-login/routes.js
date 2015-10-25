@@ -21,13 +21,6 @@ router.get('/wouso-social-login/connect/facebook',
     scope : 'email'
   }))
 
-// handle the callback after facebook has authorized the user
-router.get('/wouso-social-login/connect/facebook/callback',
-  passport.authorize('facebook', {
-      successRedirect : '/profile',
-      failureRedirect : '/'
-  }))
-
 
 // TWITTER LOGIN
 router.get('/wouso-social-login/auth/twitter',
@@ -54,11 +47,25 @@ router.get('/wouso-social-login/connect/twitter/callback',
 
 
 // GOOGLE LOGIN
-router.post('/wouso-social-login/auth/google/callback',
-  passport.authenticate('google'), function(req, res) {
-  // Return user back to client
-  res.send('profile')
-})
+router.get('/wouso-social-login/auth/google',
+  passport.authenticate('google', {
+    scope: 'email'
+  }))
+router.get('/wouso-social-login/auth/google/callback',
+  passport.authenticate('google', {
+      successRedirect : '/profile',
+      failureRedirect : '/login'
+  }))
+router.get('/wouso-social-login/connect/google',
+  passport.authorize('google', {
+    scope : 'email'
+  }))
+
+router.get('/wouso-social-login/connect/google/callback',
+  passport.authorize('google', {
+      successRedirect : '/profile',
+      failureRedirect : '/'
+  }))
 
 
 // GITHUB LOGIN

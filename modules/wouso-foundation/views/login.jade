@@ -49,7 +49,7 @@ block content
             a(href='/wouso-social-login/auth/twitter')= __('login_twitter')
             br
           - if (mysettings['login-gp'] === 'true')
-            a(href='#', onclick='gapi.auth.signIn({callback: signInCallback})')= __('login_google')
+            a(href='/wouso-social-login/auth/google')= __('login_google')
             br
           - if (mysettings['login-gh'] === 'true')
             a(href='/wouso-social-login/auth/github')= __('login_github')

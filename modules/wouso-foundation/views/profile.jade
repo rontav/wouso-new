@@ -15,7 +15,7 @@ block content
         a(href='/wouso-social-login/connect/twitter')= __('profile_connect_twitter')
         br
       if (user && !user.google.id && mysettings['login-gp'] === 'true')
-        a(href='#', onclick='gapi.auth.signIn({callback: signInCallback})')= __('profile_connect_google')
+        a(href='/wouso-social-login/connect/google')= __('profile_connect_google')
         br
       if (user && !user.github.id && mysettings['login-gh'] === 'true')
         a(href='/wouso-social-login/connect/github')= __('profile_connect_github')

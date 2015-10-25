@@ -1,6 +1,6 @@
 var FacebookStrategy = require('passport-facebook').Strategy
 var TwitterStrategy  = require('passport-twitter').Strategy
-var GoogleStrategy   = require('passport-google-plus')
+var GoogleStrategy   = require('passport-google-oauth').OAuth2Strategy
 var GitHubStrategy   = require('passport-github').Strategy
 var util             = require('util')
 
@@ -160,12 +160,12 @@ module.exports = function(app, passport) {
 
   // GOOGLE
   passport.use(new GoogleStrategy({
-    clientId          : app.data.credentials.google.clientID,
+    clientID          : app.data.credentials.google.clientID,
     clientSecret      : app.data.credentials.google.clientSecret,
     callbackURL       : util.format(DEFAULT_ROUTE, app.data.hostname, 'google'),
     passReqToCallback : true
 
-  }, function(req, tokens, profile, done) {
+  }, function(req, access_token, refresh_token, profile, done) {
     process.nextTick(function() {
       Settings.find({'key': /login-.*/}, function (err, settings) {
         if (err) return done(null, false, req.flash('error', err))
@@ -181,12 +181,13 @@ module.exports = function(app, passport) {
               return done(null, false, req.flash('error', req.i18n.__('login-gp-disabled')))
           })
 
+
           // User is not logged in, but found in db
           if (!req.user && user) {
-            user.google.token  = tokens.access_token
+            user.google.token  = access_token
             user.google.name   = profile.displayName
-            user.google.email  = profile.email
-            user.google.avatar = profile.image.url.split('?')[0]
+            user.google.email  = profile.emails[0].value
+            user.google.avatar = profile.photos[0].value.split('?')[0]
 
             user.save(function(err) {
               if (err)
@@ -197,10 +198,10 @@ module.exports = function(app, passport) {
           } else if (!req.user && !user) {
             user               = new User()
             user.google.id     = profile.id
-            user.google.token  = tokens.access_token
+            user.google.token  = access_token
             user.google.name   = profile.displayName
-            user.google.email  = profile.email
-            user.google.avatar = profile.image.url.split('?')[0]
+            user.google.email  = profile.emails[0].value
+            user.google.avatar = profile.photos[0].value.split('?')[0]
 
             user.save(function(err) {
               if (err)
@@ -215,10 +216,10 @@ module.exports = function(app, passport) {
 
             user               = req.user
             user.google.id     = profile.id
-            user.google.token  = tokens.access_token
+            user.google.token  = access_token
             user.google.name   = profile.displayName
-            user.google.email  = profile.email
-            user.google.avatar = profile.image.url.split('?')[0]
+            user.google.email  = profile.emails[0].value
+            user.google.avatar = profile.photos[0].value.split('?')[0]
 
             user.save(function(err) {
               if (err)
