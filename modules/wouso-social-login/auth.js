@@ -43,7 +43,7 @@ module.exports = function(app, passport) {
 
             user.save(function(err) {
               if (err)
-                log.error('Could not login Facebook user.')
+                log.error('Could not login Facebook user: ' + err)
             })
 
           // User is not logged in and not found in db
@@ -56,7 +56,7 @@ module.exports = function(app, passport) {
 
             user.save(function(err) {
               if (err)
-                log.error('Could not register new Facebook user.')
+                log.error('Could not register new Facebook user: ' + err)
             })
 
           // User is logged in and connected an account
@@ -73,7 +73,7 @@ module.exports = function(app, passport) {
 
             user.save(function(err) {
               if (err)
-                log.error('Could not connect Facebook user.')
+                log.error('Could not connect Facebook user: ' + err)
             })
           }
 
@@ -116,7 +116,7 @@ module.exports = function(app, passport) {
 
             user.save(function(err) {
               if (err)
-                log.error('Could not login Twitter user.')
+                log.error('Could not login Twitter user: ' + err)
             })
 
           // User is not logged in and not found in db
@@ -129,7 +129,7 @@ module.exports = function(app, passport) {
 
             user.save(function(err) {
               if (err)
-                log.error('Could not register new Twitter user.')
+                log.error('Could not register new Twitter user: ' + err)
             })
 
           // User is logged in and connected an account
@@ -146,7 +146,7 @@ module.exports = function(app, passport) {
 
             user.save(function(err) {
               if (err)
-                log.error('Could not connect Twitter user.')
+                log.error('Could not connect Twitter user: ' + err)
             })
           }
 
@@ -190,7 +190,7 @@ module.exports = function(app, passport) {
 
             user.save(function(err) {
               if (err)
-                log.error('Could not login Google user.')
+                log.error('Could not login Google user: ' + err)
             })
 
           // User is not logged in and not found in db
@@ -204,7 +204,7 @@ module.exports = function(app, passport) {
 
             user.save(function(err) {
               if (err)
-                log.error('Could not register new Google user.')
+                log.error('Could not register new Google user: ' + err)
             })
 
           // User is logged in and connected an account
@@ -222,7 +222,7 @@ module.exports = function(app, passport) {
 
             user.save(function(err) {
               if (err)
-                log.error('Could not connect Google user.')
+                log.error('Could not connect Google user: ' + err)
             })
           }
 
