@@ -1,0 +1,15 @@
+{
+  "name": "wouso-social-login",
+  "version": "0.0.0",
+  "description": "Social login",
+  "main": "routes.js",
+  "author": "",
+  "license": "MIT",
+  "wouso": "module",
+  "dependencies": {
+    "passport-facebook": "^2.0.0",
+    "passport-github": "^1.0.0",
+    "passport-twitter": "^1.0.2",
+    "passport-google-oauth": "^0.2.0"
+  }
+}

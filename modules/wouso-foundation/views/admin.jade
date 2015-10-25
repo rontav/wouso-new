@@ -116,15 +116,17 @@ block content
       .large-6.columns
         input.setting(type='checkbox', id='login-local', checked=(mysettings['login-local']==='true'))
         = __('admin_app_local')
-        br
-        input.setting(type='checkbox', id='login-fb', checked=(mysettings['login-fb']==='true'))
-        = __('admin_app_facebook')
-        br
-        input.setting(type='checkbox', id='login-tw', checked=(mysettings['login-tw']==='true'))
-        = __('admin_app_twitter')
-        br
-        input.setting(type='checkbox', id='login-gp', checked=(mysettings['login-gp']==='true'))
-        = __('admin_app_google')
-        br
-        input.setting(type='checkbox', id='login-gh', checked=(mysettings['login-gh']==='true'))
-        = __('admin_app_github')
+
+        - if (settings.modules.indexOf('wouso-social-login') > -1)
+          br
+          input.setting(type='checkbox', id='login-fb', checked=(mysettings['login-fb']==='true'))
+          = __('admin_app_facebook')
+          br
+          input.setting(type='checkbox', id='login-tw', checked=(mysettings['login-tw']==='true'))
+          = __('admin_app_twitter')
+          br
+          input.setting(type='checkbox', id='login-gp', checked=(mysettings['login-gp']==='true'))
+          = __('admin_app_google')
+          br
+          input.setting(type='checkbox', id='login-gh', checked=(mysettings['login-gh']==='true'))
+          = __('admin_app_github')

@@ -1,118 +1,22 @@
-var LocalStrategy    = require('passport-local').Strategy
 var FacebookStrategy = require('passport-facebook').Strategy
 var TwitterStrategy  = require('passport-twitter').Strategy
-var GoogleStrategy   = require('passport-google-plus')
+var GoogleStrategy   = require('passport-google-oauth').OAuth2Strategy
 var GitHubStrategy   = require('passport-github').Strategy
+var util             = require('util')
 
 
-// load up the user model
-var User = require('./models/user')
+var DEFAULT_ROUTE = 'http://%s/wouso-social-login/auth/%s/callback'
 
-// load up the settings
-var Settings = require('./models/settings')
-
-// load the auth variables
-var configAuth = require('./credentials')
-
-module.exports = function(passport) {
-
-  // used to serialize the user for the session
-  passport.serializeUser(function(user, done) {
-    done(null, user.id)
-  })
-  // used to deserialize the user
-  passport.deserializeUser(function(id, done) {
-    User.findById(id, function(err, user) {
-      done(err, user)
-    })
-  })
+// Load up core db models
+var User = require('../../config/models/user')
+var Settings = require('../../config/models/settings')
 
 
-  // LOCAL LOGIN
-  passport.use('local-login', new LocalStrategy({
-    usernameField     : 'email',
-    passwordField     : 'password',
-    passReqToCallback : true
-
-  }, function(req, email, password, done) {
-    // find a user whose email is the same as the forms email
-    // we are checking to see if the user trying to login already exists
-    Settings.find({'key': /login-.*/}, function(err, settings) {
-      if (err) return done(null, false, req.flash('error', err))
-
-      User.findOne({'local.email': email}, function(err, user) {
-        if (err) return done(null, false, req.flash('error', err))
-
-        // Check if user is returned
-        if (!user)
-          return done(null, false, req.flash('error', req.i18n.__('login-wrong-user')))
-
-        // Check if password is correct
-        if (!user.validPassword(password))
-          return done(null, false, req.flash('error', req.i18n.__('login-wrong-pass')))
-
-        // Check user privilege level
-        settings.forEach(function (set) {
-          if (set.key == 'login-level' && user && user.role > set.val)
-            return done(null, false, req.flash('error', req.i18n.__('login-level-disabled')))
-          if (set.key == 'login-local' && set.val == 'false')
-            return done(null, false, req.flash('error', req.i18n.__('login-local-disabled')))
-        })
-
-        // Return successful user
-        return done(null, user)
-      })
-    })
-  }))
-
-
-  // LOCAL SIGNUP
-  passport.use('local-signup', new LocalStrategy({
-    usernameField     : 'email',
-    passwordField     : 'password',
-    passReqToCallback : true
-
-  }, function(req, email, password, done) {
-    process.nextTick(function() {
-      Settings.find({'key': /login-.*/}, function(err, settings) {
-        if (err) return done(null, false, req.flash('error', err))
-
-        User.findOne({'local.email': email}, function(err, user) {
-          if (err) return done(null, false, req.flash('error', err))
-
-          // Check if signup is enabled
-          settings.forEach(function (set) {
-            if (set.key == 'login-signup' && set.val == 'false')
-              return done(null, false, req.flash('error', req.i18n.__('login-signup-disabled')))
-          })
-
-          // Check if there is another user with that email
-          if (user) {
-            return done(null, false, req.flash('error', req.i18n.__('login-wrong-email')))
-
-          // Create new user
-          } else {
-            var newUser = new User()
-            newUser.local.email    = email
-            newUser.local.password = newUser.generateHash(password)
-
-            newUser.save(function(err) {
-              if (err) throw err
-              return done(null, newUser)
-            })
-          }
-
-        })
-      })
-    })
-  }))
-
-
-  // FACEBOOK
+module.exports = function(app, passport) {
   passport.use(new FacebookStrategy({
-    clientID          : configAuth.facebookAuth.clientID,
-    clientSecret      : configAuth.facebookAuth.clientSecret,
-    callbackURL       : configAuth.facebookAuth.callbackURL,
+    clientID          : app.data.credentials.facebook.clientID,
+    clientSecret      : app.data.credentials.facebook.clientSecret,
+    callbackURL       : util.format(DEFAULT_ROUTE, app.data.hostname, 'facebook'),
     passReqToCallback : true
 
   }, function(req, token, refreshToken, profile, done) {
@@ -139,7 +43,7 @@ module.exports = function(passport) {
 
             user.save(function(err) {
               if (err)
-                log.error('Could not login Facebook user.')
+                log.error('Could not login Facebook user: ' + err)
             })
 
           // User is not logged in and not found in db
@@ -152,7 +56,7 @@ module.exports = function(passport) {
 
             user.save(function(err) {
               if (err)
-                log.error('Could not register new Facebook user.')
+                log.error('Could not register new Facebook user: ' + err)
             })
 
           // User is logged in and connected an account
@@ -169,7 +73,7 @@ module.exports = function(passport) {
 
             user.save(function(err) {
               if (err)
-                log.error('Could not connect Facebook user.')
+                log.error('Could not connect Facebook user: ' + err)
             })
           }
 
@@ -183,9 +87,9 @@ module.exports = function(passport) {
 
   // TWITTER
   passport.use(new TwitterStrategy({
-    consumerKey       : configAuth.twitterAuth.consumerKey,
-    consumerSecret    : configAuth.twitterAuth.consumerSecret,
-    callbackURL       : configAuth.twitterAuth.callbackURL,
+    consumerKey       : app.data.credentials.twitter.clientID,
+    consumerSecret    : app.data.credentials.twitter.clientSecret,
+    callbackURL       : util.format(DEFAULT_ROUTE, app.data.hostname, 'twitter'),
     passReqToCallback : true
 
   }, function(req, token, tokenSecret, profile, done) {
@@ -212,7 +116,7 @@ module.exports = function(passport) {
 
             user.save(function(err) {
               if (err)
-                log.error('Could not login Twitter user.')
+                log.error('Could not login Twitter user: ' + err)
             })
 
           // User is not logged in and not found in db
@@ -225,7 +129,7 @@ module.exports = function(passport) {
 
             user.save(function(err) {
               if (err)
-                log.error('Could not register new Twitter user.')
+                log.error('Could not register new Twitter user: ' + err)
             })
 
           // User is logged in and connected an account
@@ -242,7 +146,7 @@ module.exports = function(passport) {
 
             user.save(function(err) {
               if (err)
-                log.error('Could not connect Twitter user.')
+                log.error('Could not connect Twitter user: ' + err)
             })
           }
 
@@ -256,11 +160,12 @@ module.exports = function(passport) {
 
   // GOOGLE
   passport.use(new GoogleStrategy({
-    clientId          : configAuth.googleAuth.clientID,
-    clientSecret      : configAuth.googleAuth.clientSecret,
+    clientID          : app.data.credentials.google.clientID,
+    clientSecret      : app.data.credentials.google.clientSecret,
+    callbackURL       : util.format(DEFAULT_ROUTE, app.data.hostname, 'google'),
     passReqToCallback : true
 
-  }, function(req, tokens, profile, done) {
+  }, function(req, access_token, refresh_token, profile, done) {
     process.nextTick(function() {
       Settings.find({'key': /login-.*/}, function (err, settings) {
         if (err) return done(null, false, req.flash('error', err))
@@ -276,30 +181,31 @@ module.exports = function(passport) {
               return done(null, false, req.flash('error', req.i18n.__('login-gp-disabled')))
           })
 
+
           // User is not logged in, but found in db
           if (!req.user && user) {
-            user.google.token  = tokens.access_token
+            user.google.token  = access_token
             user.google.name   = profile.displayName
-            user.google.email  = profile.email
-            user.google.avatar = profile.image.url.split('?')[0]
+            user.google.email  = profile.emails[0].value
+            user.google.avatar = profile.photos[0].value.split('?')[0]
 
             user.save(function(err) {
               if (err)
-                log.error('Could not login Google user.')
+                log.error('Could not login Google user: ' + err)
             })
 
           // User is not logged in and not found in db
           } else if (!req.user && !user) {
             user               = new User()
             user.google.id     = profile.id
-            user.google.token  = tokens.access_token
+            user.google.token  = access_token
             user.google.name   = profile.displayName
-            user.google.email  = profile.email
-            user.google.avatar = profile.image.url.split('?')[0]
+            user.google.email  = profile.emails[0].value
+            user.google.avatar = profile.photos[0].value.split('?')[0]
 
             user.save(function(err) {
               if (err)
-                log.error('Could not register new Google user.')
+                log.error('Could not register new Google user: ' + err)
             })
 
           // User is logged in and connected an account
@@ -310,14 +216,14 @@ module.exports = function(passport) {
 
             user               = req.user
             user.google.id     = profile.id
-            user.google.token  = tokens.access_token
+            user.google.token  = access_token
             user.google.name   = profile.displayName
-            user.google.email  = profile.email
-            user.google.avatar = profile.image.url.split('?')[0]
+            user.google.email  = profile.emails[0].value
+            user.google.avatar = profile.photos[0].value.split('?')[0]
 
             user.save(function(err) {
               if (err)
-                log.error('Could not connect Google user.')
+                log.error('Could not connect Google user: ' + err)
             })
           }
 
@@ -331,9 +237,9 @@ module.exports = function(passport) {
 
   // GITHUB
   passport.use(new GitHubStrategy({
-    clientID          : configAuth.githubAuth.clientID,
-    clientSecret      : configAuth.githubAuth.clientSecret,
-    callbackURL       : configAuth.githubAuth.callbackURL,
+    clientID          : app.data.credentials.github.clientID,
+    clientSecret      : app.data.credentials.github.clientSecret,
+    callbackURL       : util.format(DEFAULT_ROUTE, app.data.hostname, 'github'),
     passReqToCallback : true
 
   }, function(req, token, refreshToken, profile, done) {
@@ -404,5 +310,4 @@ module.exports = function(passport) {
       })
     })
   }))
-
 }

@@ -4,8 +4,8 @@ var bodyParser    = require('body-parser')
 var cookieParser  = require('cookie-parser')
 var cookieSession = require('cookie-session')
 var exprSession   = require('express-session')
-var favicon       = require('serve-favicon')
 var passport      = require('passport')
+var favicon       = require('serve-favicon')
 var flash         = require('connect-flash')
 var app = module.exports = express()
 
@@ -18,7 +18,8 @@ log = new Logger()
 // Read config file
 app.data = (JSON.parse(fs.readFileSync('./config.json', 'utf8')))
 
-// List of enabled and available modules
+// List of enabled and available modules and games
+var available_games = []
 var available_modules = []
 
 // Used theme
@@ -67,6 +68,9 @@ Settings.findOne({'key': 'login-local'}).exec(function (err, num) {
     'val': true
   }).save()
 })
+
+// Configuring Passport
+require('./core/auth')(app, passport)
 
 // Init badges
 query = {'name': 'qotd-streak'}
@@ -166,10 +170,13 @@ app.use(function (req, res, next) {
 
   // Merge core locales with module locales, for current module page
   var current_module = req.url.split('/')[1].split('?')[0]
+
   // If current_module is api, get second argument
   if (current_module == 'api') current_module = req.url.split('/')[2].split('?')[0]
+  // If current_module is not a game, skip
+  if (!(current_module in app.data.games)) return next()
 
-  if (req.app.get('modules').indexOf(current_module) > -1) {
+  if (req.app.get('games').indexOf(current_module) > -1) {
     req.i18n.locales = mergeLocales(req.i18n.locales, current_module)
   }
 
@@ -202,13 +209,37 @@ app.use(function (req, res, next) {
   next()
 })
 
+// Load enabled games
+for (game in app.data.games) {
+  if (app.data.games[game]) {
+    // Build list of enabled modules
+    available_games.push(game)
+
+    // Load module shema, if exists
+    // Modules such as wouso-social-login do not provide any shema
+    try {
+      require(game + '/model.js')
+    } catch (err) {}
+
+    // Load module routes
+    app.use(require(game + '/routes.js'))
+    // Load module views
+    views.push('node_modules/' + game)
+  }
+}
+
 // Load enabled modules
 for (module in app.data.modules) {
   if (app.data.modules[module]) {
     // Build list of enabled modules
     available_modules.push(module)
-    // Load module shema
-    require(module + '/model.js')
+
+    // Load module shema, if exists
+    // Modules such as wouso-social-login do not provide any shema
+    try {
+      require(module + '/model.js')
+    } catch (err) {}
+
     // Load module routes
     app.use(require(module + '/routes.js'))
     // Load module views
@@ -231,14 +262,11 @@ for (var i in routes) {
 app.use(require('./routes/base'))
 
 
-// Configuring Passport
-require('./config/passport')(passport)
-
-
 // Set app settings
 app.set('views', views)
 app.set('view engine', 'jade')
 app.set('modules', available_modules)
+app.set('games', available_games)
 app.set('theme', used_theme)
 // Pretty print html rendered with Jade
 app.locals.pretty = true

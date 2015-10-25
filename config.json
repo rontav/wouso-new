@@ -1,8 +1,12 @@
 {
-	"modules": {
+	"hostname": "localhost:4000",
+	"language": "ro",
+	"modules" : {
+		"wouso-social-login" : true
+	},
+	"games": {
 		"qotd" : true
 	},
-	"language": "ro",
 	"themes": {
 		"wouso-foundation": true
 	},
@@ -13,5 +17,23 @@
 		"test" : "mongodb://localhost/wouso-new-test",
 		"dev"  : "mongodb://localhost/wouso-new",
 		"prod" : "mongodb://admin:admin@ds039271.mongolab.com:39271/heroku_jjp74lcx"
+	},
+	"credentials": {
+		"facebook": {
+			"clientID"    : "893450493999553",
+        	"clientSecret": "9b471a6e23add11c8c06dc7a68f3320c"
+		},
+		"twitter": {
+			"clientID"    : "JJIFjjLVYXbUpwEv4kffKYW9q",
+        	"clientSecret": "C2wi4vFDPhowoY25fI1zYHzj9dL8uMDsNCqFlVwJlD9ibmNQyM"
+		},
+		"google": {
+			"clientID"    : "749085539075-tihno91bjfqlm8950uocj6b5t1tf1asc.apps.googleusercontent.com",
+        	"clientSecret": "Adjo7Sz0zNe0974qPAWSXbvN"
+		},
+		"github": {
+			"clientID"    : "834afc76d55160202261",
+        	"clientSecret": "de1f8986e0dd2ec8a2e0bd6dd081ee4298b81fe1"
+		}
 	}
 }
