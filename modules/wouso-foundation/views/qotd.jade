@@ -90,7 +90,7 @@ block content
           #progress-bar(data-time=mysettings['qotd-countdownTimer']): .pbar
         form.qotd-form(id='qotd', method='post', action='/api/qotd/play')
           .qotd-play-question
-          .qotd-play-answers
+          #qotd-play-answers
           .spacer
           input.button.small#qotd-form-submit(type='submit', value=__('qotd_game_check'), style='display:none')
 

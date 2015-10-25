@@ -94,6 +94,7 @@ app.use(bodyParser.json())
 app.use('/public',  express.static(__dirname + '/public'))
 app.use('/modules', express.static(__dirname + '/modules'))
 app.use('/theme',  express.static(__dirname + '/node_modules/' + used_theme))
+app.use('/components', express.static(__dirname + '/node_modules/' + used_theme + '/components'))
 app.use(favicon('public/img/favicon.ico'))
 app.use(exprSession({
   secret            : 'MySecret',
