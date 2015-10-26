@@ -4,39 +4,37 @@ var QotdOption = React.createClass({
     return (
       <div className="qotd-play-answer">
         <input type="checkbox" name="ans" disabled></input>
-        <span className="qotd-right-answer">{this.props.data}</span>
+        <span className="qotd-right-answer">{this.props.text}</span>
       </div>
     )
   }
 })
 
 var QotdGame = React.createClass({
-  render: function() {
-    var options = []
+  getInitialState: function() {
+    return {
+      options : []
+    }
+  },
+
+  componentDidMount: function() {
     $.get('/api/qotd/play', function(result) {
-      return (
-        <div>
-          {result.answers.map(function(res, i) {
-            return (<QotdOption key={i} data={res} />)
-          })}
-        </div>
-      )
+      if (this.isMounted()) {
+        this.setState({
+          options: result.answers
+        });
+      }
+    }.bind(this))
+  },
 
-      // for (var i=0; i < result.answers.length; i++) {
-      //   options.push(<QotdOption text={result.answers[i]} />)
-      // }
-    })
-
-    // options.map(function (opt) {
-    //   return <div>{opt}, </div>
-    // })
-
-
-      // <div className="qotd-play-answer">
-      //   <input type="checkbox" name="ans" disabled></input>
-      //   <span className="qotd-right-answer">ca</span>
-      // </div>
-    //)
+  render: function() {
+    return (
+      <div>
+        {this.state.options.map(function (opt, i) {
+          return <QotdOption text={opt} />
+        })}
+      </div>
+    )
   }
 })
 
