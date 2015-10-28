@@ -11,6 +11,9 @@ block content
   // Transfer number of fields through JS
   - if (mysettings['qotd-defaultNoOfAns'])
     script var noOfOptions = #{mysettings['qotd-defaultNoOfAns']}
+  - if (mysettings['qotd-countdownTimer'])
+    script var countdownTimer = #{mysettings['qotd-countdownTimer']}
+  script function do_on_timeout() { $('#qotd').submit() }
 
   - if (ROLE < 2)
     .row
@@ -85,15 +88,10 @@ block content
 
   - if (ROLE == 4)
     .row
-      .large-12.columns
-        - if (mysettings['qotd-countdownTimer'] > 0)
-          #progress-bar(data-time=mysettings['qotd-countdownTimer']): .pbar
-        form.qotd-form(id='qotd', method='post', action='/api/qotd/play')
-          .qotd-play-question
-          #qotd-play-answers
-          .spacer
-          input.button.small#qotd-form-submit(type='submit', value=__('qotd_game_check'), style='display:none')
-
+      .large-12.columns        
+        #game-qotd
+          
+          
 block footer
   script(type="text/javascript", src='/modules/qotd/public/js/main.js')
   script(type="text/javascript", src='/public/js/countdown.js')

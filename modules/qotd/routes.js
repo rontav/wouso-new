@@ -144,7 +144,7 @@ router.get('/api/qotd/play', function (req, res, next) {
           var diff = Math.abs(Date.now() - ans.date)
           var mins = Math.ceil(diff / (1000 * 60))
 
-          if (ans.res.length != 0) {
+          if (ans.res != null) {
             // Provide answer contains response
             question['answer'] = []
             question.choices.forEach(function(ans) {
@@ -164,7 +164,8 @@ router.get('/api/qotd/play', function (req, res, next) {
       query  = {'_id': today[rand]._id}
       update = {$push: {'answers': {
         'user' : req.user._id,
-        'date' : Date.now()
+        'date' : Date.now(),
+        'res'  : null
       }}}
       qotd.update(query, update).exec()
 
@@ -200,7 +201,7 @@ router.post('/api/qotd/play', function (req, res, next) {
     var right = wrong = rightCount = 0
 
     question.answers.forEach(function (ans) {
-      if (ans.user == req.user._id.toString() && ans.res.length == 0) {
+      if (ans.user == req.user._id.toString() && ans.res == null) {
         // User did not answer yet, check his answers
         var given_answers = []
 
