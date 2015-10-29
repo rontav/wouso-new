@@ -70,7 +70,7 @@ var QotdGame = React.createClass({
           id       : (res._id      ? res._id      : ''),
           question : (res.question ? res.question : res),
           options  : (res.answers  ? res.answers  : []),
-          submit   : (!res.answer   ? true         : false),
+          submit   : ((!res.answer && res.question)  ? true : false),
           answer   : res.answer
         });
       }
