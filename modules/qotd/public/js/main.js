@@ -52,50 +52,6 @@ $(document).ready(function() {
 
     // Add another answer entry to a qotd, by cloning the template
     $('[name="add-qotd-answer"]').click(addQotdOption)
-
-    // Get today's question and display it
-    $.ajax({
-      url: '/api/qotd/play',
-      type: 'GET',
-      success: function(response) {
-        if (response) {
-
-          // Display question and store question id
-          $('.qotd-play-question').text(response.question)
-          $('.qotd-play-question')
-            .append('<input name="question_id" type="hidden" value="' + response._id + '" hidden>')
-
-          // Display answer options
-          if (response.answers) {
-            response.answers.forEach(function(ans) {
-              if (response.answer && response.answer.indexOf(ans) > -1) {
-                // Highlight correct answer
-                $('.qotd-play-answers').append('<div class="qotd-play-answer">\
-                  <input type="checkbox" name="ans" disabled><span\
-                  class="qotd-right-answer">' + ans + '</div>')
-              } else if (response.answer) {
-                $('.qotd-play-answers').append('<div class="qotd-play-answer">\
-                  <input type="checkbox" name="ans" disabled><span>' + ans + '</div>')
-              } else {
-                // Add question options
-                $('.qotd-play-answers').append('<div class="qotd-play-answer">\
-                  <input type="checkbox" name="ans" value="' + ans + '">' + ans + '</div>')
-              }
-            })
-          }
-
-          // Display message if there is no answer or question
-          if (!response.answer && !response.question) {
-            $('.qotd-play-question').append('<p>' + response + '</p>')
-
-          // Display submit button, if there is no answer, and start timer
-          } else if (!response.answer) {
-            $('#qotd-form-submit').show()
-            $('#progress-bar').anim_progressbar()
-          }
-        }
-      }
-    })
 })
 
 // Reveal modal to edit qotd
@@ -232,9 +188,4 @@ function listQotdQuestions(perPage, currentPage, sTags) {
       }
     }
   }
-}
-
-// Register function for end of timer
-function do_on_timeout() {
-  $('#qotd').submit()
 }

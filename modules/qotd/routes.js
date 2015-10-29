@@ -144,8 +144,8 @@ router.get('/api/qotd/play', function (req, res, next) {
           var diff = Math.abs(Date.now() - ans.date)
           var mins = Math.ceil(diff / (1000 * 60))
 
-          if (ans.res) {
-            // Provide choice if user already answered
+          if (ans.res != null) {
+            // Provide answer contains response
             question['answer'] = []
             question.choices.forEach(function(ans) {
               if (ans.val == true) question['answer'].push(ans.text)
@@ -164,7 +164,8 @@ router.get('/api/qotd/play', function (req, res, next) {
       query  = {'_id': today[rand]._id}
       update = {$push: {'answers': {
         'user' : req.user._id,
-        'date' : Date.now()
+        'date' : Date.now(),
+        'res'  : null
       }}}
       qotd.update(query, update).exec()
 
@@ -188,9 +189,9 @@ router.get('/api/qotd/play', function (req, res, next) {
 
 
 router.post('/api/qotd/play', function (req, res, next) {
-  ObjectId = mongoose.Types.ObjectId
+  var ObjectId = mongoose.Types.ObjectId
 
-  query = {'_id': ObjectId.fromString(req.body.question_id)}
+  query = {'_id': new ObjectId(req.body.question_id)}
   qotd.findOne(query).exec(gotQuestion)
 
   function gotQuestion(err, question) {
@@ -200,7 +201,7 @@ router.post('/api/qotd/play', function (req, res, next) {
     var right = wrong = rightCount = 0
 
     question.answers.forEach(function (ans) {
-      if (ans.user == req.user._id.toString() && !ans.res) {
+      if (ans.user == req.user._id.toString() && ans.res == null) {
         // User did not answer yet, check his answers
         var given_answers = []
 
@@ -227,7 +228,7 @@ router.post('/api/qotd/play', function (req, res, next) {
 
         // Save user response
         query = {
-          '_id'          : ObjectId.fromString(req.body.question_id),
+          '_id'          : new ObjectId(req.body.question_id),
           'answers.user' : req.user._id
         }
         update = {$set: {'answers.$.res': given_answers}}
@@ -242,10 +243,9 @@ router.post('/api/qotd/play', function (req, res, next) {
           // Update user points
           update_points(req, right, rightCount)
         }
-
-        return res.redirect('/qotd')
       }
     })
+    return res.redirect('/qotd')
   }
 })
 
