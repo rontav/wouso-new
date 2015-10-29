@@ -13,7 +13,7 @@ var app;
 // Read config file
 var data = (JSON.parse(fs.readFileSync('./config.json', 'utf8')))
 
-describe('Superuser login tests:', function () {
+describe('User signup tests:', function () {
   before(function (done) {
     // Drop DB and start app
     var conn = mongoose.createConnection(data.mongo_url.test)
@@ -27,13 +27,13 @@ describe('Superuser login tests:', function () {
       })
     })
   })
-  it('should create user session for valid user', function (done) {
+  it('should signup user', function (done) {
     // Wait for app to start and user to be added
     setTimeout(function() {
       request(app)
-        .post('/login')
+        .post('/signup')
         .set('Accept','application/json')
-        .send({"email": "root@root.com", "password": "marius"})
+        .send({"email": "test@test.com", "password": "test"})
         .expect('Content-Type', /json/)
         .expect(200)
         .end(function (err, res) {
@@ -43,7 +43,7 @@ describe('Superuser login tests:', function () {
         })
     }, 300);
   })
-  it('should redirect /login to /profile after auth', function (done) {
+  it('should redirect /signup to /profile after auth', function (done) {
     req = request(app).get('/login')
     req.cookies = Cookies;
     req.set('Accept','application/json')
