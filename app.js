@@ -11,9 +11,60 @@ var app = module.exports = express()
 
 
 // Set up logger
-var Logger = require('pretty-logger')
-Logger.setLevel('info')
-log = new Logger()
+var winston = require('winston')
+var log = new (winston.Logger)({
+  levels: {
+    crit    : 0,
+    error   : 1,
+    warning : 2,
+    notice  : 3,
+    game    : 4,
+    info    : 5,
+    debug   : 6
+  },
+  colors: {
+    crit    : "red",
+    error   : "red",
+    warning : "yellow",
+    notice  : "white",
+    game    : "green",
+    info    : "white",
+    debug   : "white"
+  },
+  transports: [
+    new (winston.transports.Console)({
+      level: 'debug',
+      colorize: true,
+      timestamp: function() {
+        var d = new Date()
+        // Define time format
+        // DD-MM-YYYY hh:mm
+        return ("0" + d.getDate()).slice(-2) + "-" +
+               ("0"+(d.getMonth()+1)).slice(-2) + "-" +
+               d.getFullYear() + " " +
+               ("0" + d.getHours()).slice(-2) + ":" +
+               ("0" + d.getMinutes()).slice(-2);
+      },
+      formatter: function(options) {
+        // Require config to use colors in custom formatter
+        var config = require('winston/lib/winston/config');
+        // Define custom log formater
+        // [LEVEL] My log message
+        var msg = '[' + options.level.toUpperCase() + '] ' +
+                  (undefined !== options.message ? options.message : '') +
+                  (options.meta && Object.keys(options.meta).length ? '\n\t' +
+                  JSON.stringify(options.meta) : '' );
+
+        return options.timestamp() + ' ' + config.colorize(options.level, msg)
+      }
+    }),
+    new (winston.transports.File)({
+      level: 'info',
+      filename: 'main.log'
+    })
+  ]
+})
+
 
 // Read config file
 app.data = (JSON.parse(fs.readFileSync('./config.json', 'utf8')))
@@ -160,6 +211,8 @@ app.use(function (req, res, next) {
 })
 
 app.use(function (req, res, next) {
+  log.debug(req.url)
+
   // Save selected role to session
   if (req.query.role) {
     req.session.ROLE = req.query.role
