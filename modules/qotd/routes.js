@@ -5,10 +5,12 @@ var settings = mongoose.model('Settings')
 var Tag      = mongoose.model('Tag')
 var Badges   = mongoose.model('Badge')
 var User     = mongoose.model('User')
+var log      = require('../../core/logging')('qotd')
 var util     = require('util')
 var fs       = require('fs')
 var express  = require('express')
 var router   = express.Router()
+
 
 
 router.get('/qotd', function (req, res, next) {
