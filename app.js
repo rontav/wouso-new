@@ -7,13 +7,9 @@ var exprSession   = require('express-session')
 var passport      = require('passport')
 var favicon       = require('serve-favicon')
 var flash         = require('connect-flash')
+var log           = require('./core/logging')('core')
 var app = module.exports = express()
 
-
-// Set up logger
-var Logger = require('pretty-logger')
-Logger.setLevel('info')
-log = new Logger()
 
 // Read config file
 app.data = (JSON.parse(fs.readFileSync('./config.json', 'utf8')))
@@ -160,6 +156,8 @@ app.use(function (req, res, next) {
 })
 
 app.use(function (req, res, next) {
+  log.debug(req.url)
+
   // Save selected role to session
   if (req.query.role) {
     req.session.ROLE = req.query.role
@@ -275,7 +273,7 @@ app.locals.pretty = true
 // Launch server
 if (process.env.NODE_ENV != 'testing') {
   server = app.listen(process.env.PORT || 4000, function() {
-    log.info('Server listening on port 4000')
+    log.notice('Server listening on port 4000')
   })
 
   // Socket.io
