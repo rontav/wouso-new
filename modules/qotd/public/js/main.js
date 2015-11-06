@@ -165,19 +165,19 @@ function listQotdQuestions(perPage, currentPage, sTags) {
     $('.qotd-question-list').empty()
     $('.qotd-question-pages').empty()
 
-    // Handle 0 questions response
-    if (response.count == 0)
-      $('.qotd-question-list').text('No questions at this moment.')
-
-    // Print each question
-    response.questions.forEach(function(q) {
-      shortDate = '--/--/--'
-      if (q.date) shortDate = shortenDate(q.date)
-
-      $('.qotd-question-list').append('<div class="large-9 columns qotd-question-li">' + q.question +
-        '</div><div class="large-1 columns"><a href="#" onclick="editQotd(\'' + q._id + '\')">Edit</a></div>' +
-        '<div class="large-2 columns text-center">' + shortDate + '</div>')
-    })
+    // // Handle 0 questions response
+    // if (response.count == 0)
+    //   $('.qotd-question-list').text('No questions at this moment.')
+    //
+    // // Print each question
+    // response.questions.forEach(function(q) {
+    //   shortDate = '--/--/--'
+    //   if (q.date) shortDate = shortenDate(q.dat e)
+    //
+    //   $('.qotd-question-list').append('<div class="large-9 columns qotd-question-li">' + q.question +
+    //     '</div><div class="large-1 columns"><a href="#" onclick="editQotd(\'' + q._id + '\')">Edit</a></div>' +
+    //     '<div class="large-2 columns text-center">' + shortDate + '</div>')
+    // })
 
     // Add page links
     for (var i=1; i<=response.count/perPage+1; i++) {

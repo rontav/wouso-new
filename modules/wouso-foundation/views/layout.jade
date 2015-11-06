@@ -25,15 +25,9 @@ html
     // Load socket.io and noty.js
     script(type="text/javascript", src="/socket.io/socket.io.js")
     script(type="text/javascript", src="https://cdnjs.cloudflare.com/ajax/libs/jquery-noty/2.3.5/packaged/jquery.noty.packaged.js")
-
-    // React.js
-    script(src="http://fb.me/react-0.14.0.js")
-    script(src="http://fb.me/react-dom-0.14.0.js")
-    script(src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.23/browser.min.js")
-
-
+    
+    
   body
-    script(type="text/babel", src="components/qotd.jsx")
     nav.top-bar(data-topbar, role='navigation', data-options="is_hover:false,dropdown_autoclose:false")
       ul.title-area
         li.name
@@ -109,3 +103,4 @@ html
     script var myuser = '#{user._id}'
   // Insert core js
   script(type="text/javascript", src='/public/js/main.js')
+  script(type="text/javascript", src="/theme/js/bundle.js")

@@ -15,7 +15,7 @@ require('../modules/qotd/model.js')
 var qotd     = mongoose.model('Qotd')
 var QOption  = mongoose.model('QOption')
 
-IMPORT_FILE = './imports/question_qotd_export.txt'
+IMPORT_FILE = '../imports/question_qotd_export.txt'
 var array = fs.readFileSync(IMPORT_FILE).toString().split('\n')
 var total = parseInt(array.length/7)
 var count = 0
