@@ -180,12 +180,12 @@ function listQotdQuestions(perPage, currentPage, sTags) {
     // })
 
     // Add page links
-    for (var i=1; i<=response.count/perPage+1; i++) {
-      if (i == currentPage) {
-        $('.qotd-question-pages').append('<b>' + i + ' </b>')
-      } else {
-        $('.qotd-question-pages').append('<a href="#" onclick="listQotdQuestions(perPage, ' + i + ')">' + i + ' </a>')
-      }
-    }
+    // for (var i=1; i<=response.count/perPage+1; i++) {
+    //   if (i == currentPage) {
+    //     $('.qotd-question-pages').append('<b>' + i + ' </b>')
+    //   } else {
+    //     $('.qotd-question-pages').append('<a href="#" onclick="listQotdQuestions(perPage, ' + i + ')">' + i + ' </a>')
+    //   }
+    // }
   }
 }

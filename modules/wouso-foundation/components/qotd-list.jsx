@@ -1,4 +1,6 @@
-var React = require('react')
+var React      = require('react');
+var MsgStore = require('../stores/messages');
+var AppDispatcher = require('../dispatchers/app');
 
 
 var QotdListEntry = React.createClass({
@@ -34,6 +36,14 @@ var QotdListEntry = React.createClass({
 });
 
 var QotdListNav = React.createClass({
+  refreshList: function (page) {
+    AppDispatcher.handleViewAction({
+      type : 'refreshPage',
+      no   : String(this.props.no),
+      page : String(page)
+    });
+  },
+
   render: function() {
     this.pages = [];
     if (this.props.total) {
@@ -44,7 +54,7 @@ var QotdListNav = React.createClass({
     return (
       <div className="qotd-question-pages text-center">
         { this.pages.map(function (opt, i) {
-          return <a key={i} href="#" onClick={this.props.onClick}>{opt}</a>
+          return <a key={i} href="#" onClick={this.refreshList.bind(this, opt)}>{opt}</a>
         }, this) }
       </div>
     );
@@ -59,44 +69,38 @@ var QotdList = React.createClass({
     }
   },
 
-  componentDidMount: function(page, no) {
-    if (typeof page === 'undefined')
-      page = 1
-    if (typeof no === 'undefined')
-      no = 3
-
-    var url = '/api/qotd/list/' + no + '/' + page
-    $.get(url, function(res) {
-      if (this.isMounted()) {
-        this.setState({
-          questions : res.questions,
-          total     : res.count
-        });
-      }
-    }.bind(this));
+  componentDidMount: function() {
+    MsgStore.addChangeListener(this._onChange);
+    AppDispatcher.handleViewAction({
+      type : 'refreshPage',
+      no   : String(this.props.no),
+      page : String(this.props.page),
+    });
   },
 
-  handlePgeSwitch: function() {
-    this.componentDidMount(2, 3)
+  componentWillUnmount: function() {
+    MsgStore.removeChangeListener(this._onChange);
   },
 
   render: function() {
-    var boundClick = this.handlePgeSwitch.bind(this, 0);
-
     return (
       <div>
-        { this.state.questions.length == 0 ? 'No questions' : null}
+        { this.state.total == 0 ? 'No questions' : null}
         { this.state.questions.map(function (opt, i) {
           return <QotdListEntry key={opt._id} text={opt.question} date={opt.date} />
         }, this)}
         <div className='spacer'></div>
-        <QotdListNav key='0' total={this.state.total} no={this.props.no} page={this.props.page} onClick={boundClick}/>
+        <QotdListNav key='0' total={this.state.total} no={this.props.no} page={this.props.page} />
       </div>
     );
+  },
+
+  _onChange: function() {
+    this.setState({
+      questions : MsgStore.getCurrent(),
+      total     : MsgStore.getCount()
+    });
   }
 });
 
-module.exports = QotdList
-
-// if( $('#qotd-question-list').length )
-//   ReactDOM.render(<QotdList no='3' page='1' />, document.getElementById('qotd-question-list'));
+module.exports = QotdList;

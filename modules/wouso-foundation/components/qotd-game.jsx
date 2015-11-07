@@ -94,6 +94,4 @@ var QotdGame = React.createClass({
   }
 })
 
-module.exports = QotdGame
-// if( $('#game-qotd').length )
-//   ReactDOM.render(<QotdGame />, document.getElementById('game-qotd'))
+module.exports = QotdGame;
