@@ -47,7 +47,7 @@
 	var React = __webpack_require__(1)
 	var ReactDOM = __webpack_require__(158)
 	var QotdList = __webpack_require__(159)
-	var QotdGame = __webpack_require__(167)
+	var QotdGame = __webpack_require__(168)
 
 
 	if( $('#game-qotd').length )
@@ -19644,14 +19644,116 @@
 /* 159 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React      = __webpack_require__(1);
-	var MsgStore = __webpack_require__(160);
+	var React         = __webpack_require__(1);
+	var ReactDOM      = __webpack_require__(158);
+	var MsgStore      = __webpack_require__(160);
+	var DateStore     = __webpack_require__(167);
 	var AppDispatcher = __webpack_require__(161);
 
 
-	var QotdListEntry = React.createClass({displayName: "QotdListEntry",
-	  handleEditClick: function() {
+	var QotdQuestionForm = React.createClass({displayName: "QotdQuestionForm",
+	  getInitialState: function() {
+	    // Render datepicker
+	    $.get('/api/qotd/list/dates', function(res) {
+	      $('#datepicker').datepicker({
+	        inline: true,
+	        beforeShowDay: function(date) {
+	          formated_date = new Date(Date.parse(date)).toISOString();
+	          if (res.indexOf(formated_date) > -1)
+	            return { classes: 'activeClass' };
+	        }
+	      }).on('changeDate', function(e) {
+	        AppDispatcher.handleViewAction({
+	          type : 'refreshDate',
+	          date :  e.format('dd/mm/yyyy'),
+	        });
+
+	        //document.getElementById('qotd-date').setAttribute("value", "democlass");
+	        //{this.refreshDate.bind(this, e.format('dd/mm/yyyy'))};
+	        //$('#qotd-date').val(e.format('dd/mm/yyyy'))
+	      });
+	    }.bind(this));
+
+	    return {
+	      question : '',
+	      tags     : '',
+	      date     : DateStore.getDate()
+	    }
+	  },
+
+	  componentDidMount: function() {
+	    DateStore.addChangeListener(this._onChange);
+
+	    $.get('/api/qotd/list?id=' + this.props.id, function(res) {
+	      if (this.isMounted()) {
+	        this.setState({
+	          question : res.question,
+	          tags     : res.tags.join(' ')
+	        });
+	      }
+	    }.bind(this));
+	  },
+
+	  componentWillUnmount: function() {
+	    DateStore.removeChangeListener(this._onChange);
+
 	    this.setState({
+	      question: ''
+	    });
+	  },
+
+	  render: function() {
+	    return (
+	      React.createElement("form", {id: "add-qotd-form", method: "post", action: "/api/qotd/add"}, 
+	        React.createElement("div", {className: "qotd-question"}, 
+	          React.createElement("div", {className: "row"}, 
+	            React.createElement("div", {className: "large-12 columns"}, 
+	              React.createElement("h2", null, "Edit question"), 
+	                React.createElement("label", null, "Question:"), 
+	                React.createElement("input", {name: "question", type: "text", id: "qotd-question", value: this.state.question}), 
+	                React.createElement("input", {name: "id", type: "hidden", id: "qotd-id", value: this.props.id})
+	            )
+	          ), 
+	          React.createElement("div", {className: "row"}, 
+	            React.createElement("div", {className: "large-12 columns"}, 
+	              React.createElement("label", null, "Tags (space separated):"), 
+	              React.createElement("input", {name: "tags", type: "text", id: "qotd-tags", value: this.state.tags})
+	            )
+	          ), 
+	          React.createElement("div", {className: "row"}, 
+	            React.createElement("div", {className: "large-6 columns"}, 
+	              React.createElement("label", null, "Answers:"), 
+	              React.createElement("div", {id: "qotd-answer-list"})
+	            ), 
+	            React.createElement("div", {className: "large-6 columns"}, 
+	              React.createElement("label", null, "Date:"), 
+	              React.createElement("input", {name: "date", type: "text", id: "qotd-date", value: this.state.date}), 
+	              React.createElement("div", {id: "datepicker"})
+	            )
+	          )
+	        )
+	      )
+	    );
+	  },
+
+	  _onChange: function() {
+	    console.log('Changing ...')
+	    this.setState({
+	      date : DateStore.getDate()
+	    });
+	  }
+	});
+
+
+	var QotdListEntry = React.createClass({displayName: "QotdListEntry",
+	  handleEditClick: function(id) {
+	    // Mount component and reveal modal
+	    ReactDOM.render(React.createElement(QotdQuestionForm, {id: id}), document.getElementById('qotdModal'));
+	    $('#qotdModal').foundation('reveal', 'open');
+
+	    // On modal close, unmount component
+	    $(document).on('closed.fndtn.reveal', '[data-reveal]', function () {
+	      ReactDOM.unmountComponentAtNode(document.getElementById('qotdModal'));
 	    });
 	  },
 
@@ -19673,13 +19775,14 @@
 	      React.createElement("div", null, 
 	        React.createElement("div", {className: "large-9 columns qotd-question-li"}, this.props.text), 
 	        React.createElement("div", {className: "large-1 columns"}, 
-	          React.createElement("a", {href: "#", onclick: this.handleEditClick}, "Edit")
+	          React.createElement("a", {href: "#", onClick: this.handleEditClick.bind(this, this.props.id)}, "Edit")
 	        ), 
 	        React.createElement("div", {className: "large-2 columns text-center"}, entryDate)
 	      )
 	    );
 	  }
 	});
+
 
 	var QotdListNav = React.createClass({displayName: "QotdListNav",
 	  refreshList: function (page) {
@@ -19693,19 +19796,20 @@
 	  render: function() {
 	    this.pages = [];
 	    if (this.props.total) {
-	      this.pages = parseInt(this.props.total/this.props.no, 10) + 1;
-	      this.pages = Array.apply(0, Array(this.pages)).map(function(j, i) { return i+1; })
+	      this.pages = Math.ceil(this.props.total/this.props.no);
+	      this.pages = Array.apply(0, Array(this.pages)).map(function(j, i) { return i+1; });
 	    }
 
 	    return (
 	      React.createElement("div", {className: "qotd-question-pages text-center"}, 
 	         this.pages.map(function (opt, i) {
-	          return React.createElement("a", {key: i, href: "#", onClick: this.refreshList.bind(this, opt)}, opt)
+	          return (React.createElement("a", {key: i, href: "#", onClick: this.refreshList.bind(this, opt)}, opt))
 	        }, this) 
 	      )
 	    );
 	  }
 	});
+
 
 	var QotdList = React.createClass({displayName: "QotdList",
 	  getInitialState: function() {
@@ -19733,7 +19837,7 @@
 	      React.createElement("div", null, 
 	         this.state.total == 0 ? 'No questions' : null, 
 	         this.state.questions.map(function (opt, i) {
-	          return React.createElement(QotdListEntry, {key: opt._id, text: opt.question, date: opt.date})
+	          return React.createElement(QotdListEntry, {key: opt._id, id: opt._id, text: opt.question, date: opt.date})
 	        }, this), 
 	        React.createElement("div", {className: "spacer"}), 
 	        React.createElement(QotdListNav, {key: "0", total: this.state.total, no: this.props.no, page: this.props.page})
@@ -19748,6 +19852,7 @@
 	    });
 	  }
 	});
+
 
 	module.exports = QotdList;
 
@@ -20491,6 +20596,66 @@
 
 /***/ },
 /* 167 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var AppDispatcher = __webpack_require__(161);
+	var EventEmitter  = __webpack_require__(166).EventEmitter;
+	var assign        = __webpack_require__(165);
+
+	var CHANGE_EVENT = 'change';
+
+	var _date = null;
+
+	// function getData(no, page) {
+	//   var url = '/api/qotd/list/' + no + '/' + page;
+	//   $.get(url, function(res) {
+	//     _todos = res.questions;
+	//     _count = res.count;
+	//     MsgStore.emitChange();
+	//   });
+	// }
+
+	var DateStore = assign({}, EventEmitter.prototype, {
+
+	  getDate: function() {
+	    return _date;
+	  },
+
+	  // getCount: function() {
+	  //   return _count;
+	  // },
+	  //
+	  emitChange: function() {
+	    this.emit(CHANGE_EVENT);
+	  },
+
+	  addChangeListener: function(callback) {
+	    this.on(CHANGE_EVENT, callback);
+	  },
+
+	  removeChangeListener: function(callback) {
+	    this.removeListener(CHANGE_EVENT, callback);
+	  },
+
+	  dispatcherIndex: AppDispatcher.register(function(payload) {
+	    switch(payload.action.type) {
+	      case 'refreshDate':
+	        console.log(payload.action.date)
+	        _date = payload.action.date;
+	        DateStore.emitChange();
+	        break;
+	    }
+
+	    // No errors. Needed by promise in Dispatcher.
+	    return true;
+	  })
+	});
+
+	module.exports = DateStore;
+
+
+/***/ },
+/* 168 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(1);

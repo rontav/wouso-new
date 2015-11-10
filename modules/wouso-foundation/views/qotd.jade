@@ -38,7 +38,7 @@ block content
       .small-2.columns
         a.button.postfix.qotd-check(href='javascript:void(0);', name='check') False
 
-
+    .reveal-modal(id='qotdModal', data-reveal, aria-hidden='true', role='dialog')
     .reveal-modal(id='addQotdModal', data-reveal, aria-hidden='true', role='dialog')
       form#add-qotd-form(method='post', action='/api/qotd/add')
         .qotd-question
@@ -60,7 +60,7 @@ block content
             .large-6.columns.right
               label= __('qotd_add_field_date')
                 input(name='date', type='text', id='qotd-date')
-              #datepicker
+              .datepicker
 
         .spacer
         .controls.row
@@ -75,9 +75,7 @@ block content
       .large-10.columns.left
         h2= __('qotd_list_title')
         #qotd-question-list
-        .spacer
-        .qotd-question-pages.text-center
-        .spacer
+
       .large-2.columns.left
         h2= __('qotd_tags_title')
         ul
