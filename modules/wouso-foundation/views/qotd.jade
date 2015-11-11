@@ -8,12 +8,16 @@ block content
       - if (!user)
         h4= __('qotd_alert_login')
 
+
+
   // Transfer number of fields through JS
   - if (mysettings['qotd-defaultNoOfAns'])
     script var noOfOptions = #{mysettings['qotd-defaultNoOfAns']}
   - if (mysettings['qotd-countdownTimer'])
     script var countdownTimer = #{mysettings['qotd-countdownTimer']}
   script function do_on_timeout() { $('#qotd').submit() }
+
+
 
   - if (ROLE < 2)
     .row
@@ -30,51 +34,9 @@ block content
           input.button.small(type='submit', value=__('button_save'))
 
   - if (ROLE == 3 || ROLE == 2)
-    .row.collapse.qotd-answer-template
-      input(name='valid', type='hidden', value='false', id='qotd-valid', hidden)
-      .small-10.columns
-        label
-          input(name='answer', type='text', id='answer')
-      .small-2.columns
-        a.button.postfix.qotd-check(href='javascript:void(0);', name='check') False
-
     .reveal-modal(id='qotdModal', data-reveal, aria-hidden='true', role='dialog')
-    .reveal-modal(id='addQotdModal', data-reveal, aria-hidden='true', role='dialog')
-      form#add-qotd-form(method='post', action='/api/qotd/add')
-        .qotd-question
-          .row
-            .large-12.columns
-              h2#qotd-addForm-title= __('qotd_add_title')
-              h2#qotd-editForm-title= __('qotd_edit_title')
-              label= __('qotd_add_field_question')
-                input(name='question', type='text', id='qotd-question')
-                input(name='id', type='hidden', id='qotd-id')
-          .row
-            .large-12.columns
-              label= __('qotd_add_field_tags')
-                input(name='tags', type='text', id='qotd-tags')
-          .row
-            .large-6.columns.left
-              label= __('qotd_add_field_answers')
-                .qotd-answer-list
-            .large-6.columns.right
-              label= __('qotd_add_field_date')
-                input(name='date', type='text', id='qotd-date')
-              .datepicker
-
-        .spacer
-        .controls.row
-          .large-10.columns.left
-            input.button.small(name='add-qotd-answer', type='button', value=__('qotd_add_answer'))
-          .large-2.columns.right
-            input.button.small(id='qotd-submit', type='submit', value=__('button_save'))
-
-    .spacer
     .row
-      a.radius.button(href='#', onclick='editQotd()')= __('qotd_add_button')
-      .large-10.columns.left
-        h2= __('qotd_list_title')
-        #qotd-question-list
+      #qotd-question-list
 
       .large-2.columns.left
         h2= __('qotd_tags_title')
@@ -91,5 +53,4 @@ block content
           
           
 block footer
-  script(type="text/javascript", src='/modules/qotd/public/js/main.js')
   script(type="text/javascript", src='/public/js/countdown.js')

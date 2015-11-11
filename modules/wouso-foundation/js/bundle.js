@@ -19651,6 +19651,48 @@
 	var AppDispatcher = __webpack_require__(161);
 
 
+	var QotdQuestionOption = React.createClass({displayName: "QotdQuestionOption",
+	  getInitialState: function() {
+	    return {
+	      val  : null
+	    }
+	  },
+
+	  render: function() {
+	    if (this.state.val != null) {
+	      optionState = this.state.val;
+	    } else {
+	      optionState = this.props.val;
+	    }
+
+	    var default_class = 'button postfix qotd-check';
+	    var optionClass   = optionState ? default_class + ' success' : default_class;
+	    var value         = optionState ? 'true' : 'false';
+	    var valueText     = optionState ? 'True' : 'False';
+
+	    return (
+	      React.createElement("div", {className: "row collapse qotd-answer"}, 
+	        React.createElement("input", {name: "valid", type: "hidden", value: value, hidden: true}), 
+	        React.createElement("div", {className: "small-10 columns"}, 
+	          React.createElement("label", null, 
+	            React.createElement("input", {name: "answer", type: "text", value: this.props.text})
+	          )
+	        ), 
+	        React.createElement("div", {className: "small-2 columns"}, 
+	          React.createElement("a", {className: optionClass, href: "javascript:void(0);", name: "check", onClick: this.changeOptionValueTo.bind(this, !optionState)}, valueText)
+	        )
+	      )
+	    );
+	  },
+
+	  changeOptionValueTo: function(value) {
+	    this.setState({
+	      val : value
+	    });
+	  }
+	});
+
+
 	var QotdQuestionForm = React.createClass({displayName: "QotdQuestionForm",
 	  getInitialState: function() {
 	    // Render datepicker
@@ -19667,31 +19709,32 @@
 	          type : 'refreshDate',
 	          date :  e.format('dd/mm/yyyy'),
 	        });
-
-	        //document.getElementById('qotd-date').setAttribute("value", "democlass");
-	        //{this.refreshDate.bind(this, e.format('dd/mm/yyyy'))};
-	        //$('#qotd-date').val(e.format('dd/mm/yyyy'))
 	      });
 	    }.bind(this));
 
 	    return {
 	      question : '',
 	      tags     : '',
-	      date     : DateStore.getDate()
+	      date     : DateStore.getDate(),
+	      options  : Array.apply(0, Array(noOfOptions)).map(function(j, i) { return i+1; })
 	    }
 	  },
 
 	  componentDidMount: function() {
 	    DateStore.addChangeListener(this._onChange);
 
-	    $.get('/api/qotd/list?id=' + this.props.id, function(res) {
-	      if (this.isMounted()) {
-	        this.setState({
-	          question : res.question,
-	          tags     : res.tags.join(' ')
-	        });
-	      }
-	    }.bind(this));
+	    if (this.props.id) {
+	      $.get('/api/qotd/list?id=' + this.props.id, function(res) {
+	        if (this.isMounted()) {
+	          this.setState({
+	            question : res.question,
+	            tags     : res.tags.join(' '),
+	            date     : QotdListEntry.shortenDate(res.date),
+	            options  : res.choices
+	          });
+	        }
+	      }.bind(this));
+	    }
 	  },
 
 	  componentWillUnmount: function() {
@@ -19703,32 +19746,49 @@
 	  },
 
 	  render: function() {
+	    var modalTitle  = this.props.id ? "Edit question" : "Add question";
+	    var modalSubmit = this.props.id ? "Update" : "Add";
 	    return (
 	      React.createElement("form", {id: "add-qotd-form", method: "post", action: "/api/qotd/add"}, 
 	        React.createElement("div", {className: "qotd-question"}, 
 	          React.createElement("div", {className: "row"}, 
 	            React.createElement("div", {className: "large-12 columns"}, 
-	              React.createElement("h2", null, "Edit question"), 
+	              React.createElement("h2", null, modalTitle), 
 	                React.createElement("label", null, "Question:"), 
-	                React.createElement("input", {name: "question", type: "text", id: "qotd-question", value: this.state.question}), 
-	                React.createElement("input", {name: "id", type: "hidden", id: "qotd-id", value: this.props.id})
+	                React.createElement("input", {name: "question", type: "text", value: this.state.question, onChange: this.editQuestion}), 
+	                React.createElement("input", {name: "id", type: "hidden", value: this.props.id})
 	            )
 	          ), 
 	          React.createElement("div", {className: "row"}, 
 	            React.createElement("div", {className: "large-12 columns"}, 
 	              React.createElement("label", null, "Tags (space separated):"), 
-	              React.createElement("input", {name: "tags", type: "text", id: "qotd-tags", value: this.state.tags})
+	              React.createElement("input", {name: "tags", type: "text", id: "qotd-tags", value: this.state.tags, onChange: this.editTags})
 	            )
 	          ), 
 	          React.createElement("div", {className: "row"}, 
 	            React.createElement("div", {className: "large-6 columns"}, 
 	              React.createElement("label", null, "Answers:"), 
-	              React.createElement("div", {id: "qotd-answer-list"})
+	              React.createElement("div", {id: "qotd-answer-list"}, 
+	                 this.state.options.map(function(opt, i) {
+	                  return (
+	                    React.createElement(QotdQuestionOption, {key: i, text: this.state.options[i].text, val: this.state.options[i].val})
+	                  );
+	                }, this) 
+	              )
 	            ), 
 	            React.createElement("div", {className: "large-6 columns"}, 
 	              React.createElement("label", null, "Date:"), 
 	              React.createElement("input", {name: "date", type: "text", id: "qotd-date", value: this.state.date}), 
 	              React.createElement("div", {id: "datepicker"})
+	            )
+	          ), 
+	          React.createElement("div", {className: "spacer"}), 
+	          React.createElement("div", {className: "row controls"}, 
+	            React.createElement("div", {className: "large-10 left"}, 
+	              React.createElement("input", {className: "button small left", onClick: this.addOption, type: "button", value: "ADD"})
+	            ), 
+	            React.createElement("div", {className: "large-2 right"}, 
+	              React.createElement("input", {className: "button small right", type: "submit", value: modalSubmit})
 	            )
 	          )
 	        )
@@ -19737,15 +19797,44 @@
 	  },
 
 	  _onChange: function() {
-	    console.log('Changing ...')
 	    this.setState({
 	      date : DateStore.getDate()
+	    });
+	  },
+
+	  addOption: function() {
+	    this.setState({
+	      options  : Array.apply(0, Array(this.state.options.length+1)).map(function(j, i) { return i+1; })
+	    });
+	  },
+
+	  editQuestion: function(event) {
+	    this.setState({
+	      question: event.target.value
+	    });
+	  },
+
+	  editTags: function(event) {
+	    this.setState({
+	      tags: event.target.value
 	    });
 	  }
 	});
 
 
 	var QotdListEntry = React.createClass({displayName: "QotdListEntry",
+	  statics: {
+	    shortenDate: function(date) {
+	      if (!date) return null;
+
+	      var qdate = new Date(date);
+	      var shortDate = ('0' + qdate.getDate()).slice(-2) + '/';
+	      shortDate += ('0' + (qdate.getMonth()+1)).slice(-2) + '/';
+	      shortDate += qdate.getFullYear();
+	      return shortDate;
+	    }
+	  },
+
 	  handleEditClick: function(id) {
 	    // Mount component and reveal modal
 	    ReactDOM.render(React.createElement(QotdQuestionForm, {id: id}), document.getElementById('qotdModal'));
@@ -19757,19 +19846,11 @@
 	    });
 	  },
 
-	  shortenDate: function(date) {
-	    var qdate = new Date(date);
-	    var shortDate = ('0' + qdate.getDate()).slice(-2) + '/';
-	    shortDate += ('0' + (qdate.getMonth()+1)).slice(-2) + '/';
-	    shortDate += qdate.getFullYear();
-	    return shortDate;
-	  },
-
 	  render: function() {
 	    var entryDate = '--/--/--';
 
 	    if (this.props.date)
-	      entryDate = this.shortenDate(this.props.date);
+	      entryDate = QotdListEntry.shortenDate(this.props.date);
 
 	    return (
 	      React.createElement("div", null, 
@@ -19835,12 +19916,16 @@
 	  render: function() {
 	    return (
 	      React.createElement("div", null, 
-	         this.state.total == 0 ? 'No questions' : null, 
-	         this.state.questions.map(function (opt, i) {
-	          return React.createElement(QotdListEntry, {key: opt._id, id: opt._id, text: opt.question, date: opt.date})
-	        }, this), 
-	        React.createElement("div", {className: "spacer"}), 
-	        React.createElement(QotdListNav, {key: "0", total: this.state.total, no: this.props.no, page: this.props.page})
+	        React.createElement("div", {className: "large-10 columns left"}, 
+	          React.createElement("a", {className: "radius button", href: "#", onClick: this.openModal}, "Add qotd"), 
+	          React.createElement("h2", null, "Qotd list:"), 
+	           this.state.total == 0 ? 'No questions' : null, 
+	           this.state.questions.map(function (opt) {
+	            return React.createElement(QotdListEntry, {key: opt._id, id: opt._id, text: opt.question, date: opt.date})
+	          }, this), 
+	          React.createElement("div", {className: "spacer"}), 
+	          React.createElement(QotdListNav, {key: "0", total: this.state.total, no: this.props.no, page: this.props.page})
+	        )
 	      )
 	    );
 	  },
@@ -19849,6 +19934,17 @@
 	    this.setState({
 	      questions : MsgStore.getCurrent(),
 	      total     : MsgStore.getCount()
+	    });
+	  },
+
+	  openModal: function() {
+	    // Mount component and reveal modal
+	    ReactDOM.render(React.createElement(QotdQuestionForm, null), document.getElementById('qotdModal'));
+	    $('#qotdModal').foundation('reveal', 'open');
+
+	    // On modal close, unmount component
+	    $(document).on('closed.fndtn.reveal', '[data-reveal]', function () {
+	      ReactDOM.unmountComponentAtNode(document.getElementById('qotdModal'));
 	    });
 	  }
 	});
@@ -20606,14 +20702,6 @@
 
 	var _date = null;
 
-	// function getData(no, page) {
-	//   var url = '/api/qotd/list/' + no + '/' + page;
-	//   $.get(url, function(res) {
-	//     _todos = res.questions;
-	//     _count = res.count;
-	//     MsgStore.emitChange();
-	//   });
-	// }
 
 	var DateStore = assign({}, EventEmitter.prototype, {
 
@@ -20621,10 +20709,6 @@
 	    return _date;
 	  },
 
-	  // getCount: function() {
-	  //   return _count;
-	  // },
-	  //
 	  emitChange: function() {
 	    this.emit(CHANGE_EVENT);
 	  },
@@ -20640,7 +20724,6 @@
 	  dispatcherIndex: AppDispatcher.register(function(payload) {
 	    switch(payload.action.type) {
 	      case 'refreshDate':
-	        console.log(payload.action.date)
 	        _date = payload.action.date;
 	        DateStore.emitChange();
 	        break;
