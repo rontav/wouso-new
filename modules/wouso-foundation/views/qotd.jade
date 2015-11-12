@@ -8,15 +8,12 @@ block content
       - if (!user)
         h4= __('qotd_alert_login')
 
-
-
   // Transfer number of fields through JS
   - if (mysettings['qotd-defaultNoOfAns'])
     script var noOfOptions = #{mysettings['qotd-defaultNoOfAns']}
   - if (mysettings['qotd-countdownTimer'])
     script var countdownTimer = #{mysettings['qotd-countdownTimer']}
   script function do_on_timeout() { $('#qotd').submit() }
-
 
 
   - if (ROLE < 2)
@@ -34,22 +31,10 @@ block content
           input.button.small(type='submit', value=__('button_save'))
 
   - if (ROLE == 3 || ROLE == 2)
-    .reveal-modal(id='qotdModal', data-reveal, aria-hidden='true', role='dialog')
-    .row
-      #qotd-question-list
+    #qotd-question-list
 
-      .large-2.columns.left
-        h2= __('qotd_tags_title')
-        ul
-          - each tag in qtags
-            li.qotd-tag
-              a(href='#', onclick='selectTag("' + tag._id + '")')= tag.name + ' (' + tag.count + ')'
-
-
-  - if (ROLE == 4)
-    .row
-      .large-12.columns        
-        #game-qotd
+  - if (ROLE == 4)   
+    #game-qotd
           
           
 block footer

@@ -19915,16 +19915,20 @@
 
 	  render: function() {
 	    return (
-	      React.createElement("div", null, 
-	        React.createElement("div", {className: "large-10 columns left"}, 
+	      React.createElement("div", {className: "row"}, 
+	        React.createElement("div", {className: "reveal-modal", id: "qotdModal", "data-reveal": true, "aria-hidden": "true", role: "dialog"}), 
+	        React.createElement("div", {className: "large-10 columns"}, 
 	          React.createElement("a", {className: "radius button", href: "#", onClick: this.openModal}, "Add qotd"), 
 	          React.createElement("h2", null, "Qotd list:"), 
-	           this.state.total == 0 ? 'No questions' : null, 
+	           this.state.total == 0 ? "No questions" : null, 
 	           this.state.questions.map(function (opt) {
 	            return React.createElement(QotdListEntry, {key: opt._id, id: opt._id, text: opt.question, date: opt.date})
 	          }, this), 
 	          React.createElement("div", {className: "spacer"}), 
 	          React.createElement(QotdListNav, {key: "0", total: this.state.total, no: this.props.no, page: this.props.page})
+	        ), 
+	        React.createElement("div", {className: "large-2 columns"}, 
+	          React.createElement("h2", null, "Tags:")
 	        )
 	      )
 	    );
@@ -20825,13 +20829,17 @@
 
 	  render: function() {
 	    return (
-	      React.createElement("form", {className: "qotd-form", id: "qotd", method: "post", action: "/api/qotd/play"}, 
-	         countdownTimer > 0 ? React.createElement(QotdCountdown, {timer: countdownTimer}) : null, 
-	        React.createElement(QotdQuestion, {id: this.state.id, text: this.state.question}), 
-	         this.state.options.map(function (opt, i) {
-	          return React.createElement(QotdOption, {key: i, text: opt, ans: this.state.answer})
-	        }, this), 
-	         this.state.submit ? React.createElement(QotdSubmit, null) : null
+	      React.createElement("div", {className: "row"}, 
+	        React.createElement("div", {className: "large-12 columns"}, 
+	          React.createElement("form", {className: "qotd-form", id: "qotd", method: "post", action: "/api/qotd/play"}, 
+	             countdownTimer > 0 ? React.createElement(QotdCountdown, {timer: countdownTimer}) : null, 
+	            React.createElement(QotdQuestion, {id: this.state.id, text: this.state.question}), 
+	             this.state.options.map(function (opt, i) {
+	              return React.createElement(QotdOption, {key: i, text: opt, ans: this.state.answer})
+	            }, this), 
+	             this.state.submit ? React.createElement(QotdSubmit, null) : null
+	          )
+	        )
 	      )
 	    )
 	  }

@@ -269,16 +269,20 @@ var QotdList = React.createClass({
 
   render: function() {
     return (
-      <div>
-        <div className="large-10 columns left">
-          <a className="radius button" href='#' onClick={this.openModal}>Add qotd</a>
+      <div className="row">
+        <div className="reveal-modal" id="qotdModal" data-reveal aria-hidden="true" role="dialog"></div>
+        <div className="large-10 columns">
+          <a className="radius button" href="#" onClick={this.openModal}>Add qotd</a>
           <h2>Qotd list:</h2>
-          { this.state.total == 0 ? 'No questions' : null}
+          { this.state.total == 0 ? "No questions" : null}
           { this.state.questions.map(function (opt) {
             return <QotdListEntry key={opt._id} id={opt._id} text={opt.question} date={opt.date} />
           }, this)}
-          <div className='spacer'></div>
-          <QotdListNav key='0' total={this.state.total} no={this.props.no} page={this.props.page} />
+          <div className="spacer"></div>
+          <QotdListNav key="0" total={this.state.total} no={this.props.no} page={this.props.page} />
+        </div>
+        <div className="large-2 columns">
+          <h2>Tags:</h2>
         </div>
       </div>
     );

@@ -82,14 +82,18 @@ var QotdGame = React.createClass({
 
   render: function() {
     return (
-      <form className="qotd-form" id="qotd" method="post" action="/api/qotd/play">
-        { countdownTimer > 0 ? <QotdCountdown timer={countdownTimer}/> : null }
-        <QotdQuestion id={this.state.id} text={this.state.question}/>
-        { this.state.options.map(function (opt, i) {
-          return <QotdOption key={i} text={opt} ans={this.state.answer} />
-        }, this)}
-        { this.state.submit ? <QotdSubmit /> : null }
-      </form>
+      <div className="row">
+        <div className="large-12 columns">
+          <form className="qotd-form" id="qotd" method="post" action="/api/qotd/play">
+            { countdownTimer > 0 ? <QotdCountdown timer={countdownTimer}/> : null }
+            <QotdQuestion id={this.state.id} text={this.state.question}/>
+            { this.state.options.map(function (opt, i) {
+              return <QotdOption key={i} text={opt} ans={this.state.answer} />
+            }, this)}
+            { this.state.submit ? <QotdSubmit /> : null }
+          </form>
+        </div>
+      </div>
     )
   }
 })
