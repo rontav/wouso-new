@@ -58,10 +58,10 @@ var QotdOption = React.createClass({
 var QotdGame = React.createClass({
   getInitialState: function() {
     return {
-      id       : '',
-      question : '',
+      id       : "",
+      question : "",
       options  : [],
-      answer   : '',
+      answer   : "",
       submit   : false,
     }
   },
@@ -70,7 +70,7 @@ var QotdGame = React.createClass({
     $.get('/api/qotd/play', function(res) {
       if (this.isMounted()) {
         this.setState({
-          id       : (res._id      ? res._id      : ''),
+          id       : (res._id      ? res._id      : ""),
           question : (res.question ? res.question : res),
           options  : (res.answers  ? res.answers  : []),
           submit   : ((!res.answer && res.question)  ? true : false),

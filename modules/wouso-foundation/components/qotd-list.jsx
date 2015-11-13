@@ -1,6 +1,6 @@
 var React         = require('react');
 var ReactDOM      = require('react-dom');
-var MsgStore      = require('../stores/messages');
+var QStore        = require('../stores/qotds');
 var DateStore     = require('../stores/datepicker');
 var AppDispatcher = require('../dispatchers/app');
 
@@ -19,21 +19,21 @@ var QotdQuestionOption = React.createClass({
       optionState = this.props.val;
     }
 
-    var default_class = 'button postfix qotd-check';
-    var optionClass   = optionState ? default_class + ' success' : default_class;
-    var value         = optionState ? 'true' : 'false';
-    var valueText     = optionState ? 'True' : 'False';
+    var default_class = "button postfix qotd-check";
+    var optionClass   = optionState ? default_class + " success" : default_class;
+    var value         = optionState ? "true" : "false";
+    var valueText     = optionState ? "True" : "False";
 
     return (
       <div className="row collapse qotd-answer">
-        <input name='valid' type='hidden' value={value} hidden></input>
+        <input name="valid" type="hidden" value={value} hidden></input>
         <div className="small-10 columns">
           <label>
-            <input name='answer' type='text' value={this.props.text}></input>
+            <input name="answer" type="text" value={this.props.text}></input>
           </label>
         </div>
         <div className="small-2 columns">
-          <a className={optionClass} href='javascript:void(0);' name='check' onClick={this.changeOptionValueTo.bind(this, !optionState)}>{valueText}</a>
+          <a className={optionClass} href="javascript:void(0);" name="check" onClick={this.changeOptionValueTo.bind(this, !optionState)}>{valueText}</a>
         </div>
       </div>
     );
@@ -50,7 +50,7 @@ var QotdQuestionOption = React.createClass({
 var QotdQuestionForm = React.createClass({
   getInitialState: function() {
     // Render datepicker
-    $.get('/api/qotd/list/dates', function(res) {
+    $.get("/api/qotd/list/dates", function(res) {
       $('#datepicker').datepicker({
         inline: true,
         beforeShowDay: function(date) {
@@ -60,15 +60,15 @@ var QotdQuestionForm = React.createClass({
         }
       }).on('changeDate', function(e) {
         AppDispatcher.handleViewAction({
-          type : 'refreshDate',
-          date :  e.format('dd/mm/yyyy'),
+          type : "refreshDate",
+          date :  e.format("dd/mm/yyyy"),
         });
       });
     }.bind(this));
 
     return {
-      question : '',
-      tags     : '',
+      question : "",
+      tags     : "",
       date     : DateStore.getDate(),
       options  : Array.apply(0, Array(noOfOptions)).map(function(j, i) { return i+1; })
     }
@@ -82,7 +82,7 @@ var QotdQuestionForm = React.createClass({
         if (this.isMounted()) {
           this.setState({
             question : res.question,
-            tags     : res.tags.join(' '),
+            tags     : res.tags.join(" "),
             date     : QotdListEntry.shortenDate(res.date),
             options  : res.choices
           });
@@ -95,7 +95,7 @@ var QotdQuestionForm = React.createClass({
     DateStore.removeChangeListener(this._onChange);
 
     this.setState({
-      question: ''
+      question: ""
     });
   },
 
@@ -103,20 +103,20 @@ var QotdQuestionForm = React.createClass({
     var modalTitle  = this.props.id ? "Edit question" : "Add question";
     var modalSubmit = this.props.id ? "Update" : "Add";
     return (
-      <form id="add-qotd-form" method='post' action='/api/qotd/add'>
+      <form id="add-qotd-form" method="post" action="/api/qotd/add">
         <div className="qotd-question">
           <div className="row">
             <div className="large-12 columns">
               <h2>{modalTitle}</h2>
                 <label>Question:</label>
-                <input name='question' type='text' value={this.state.question} onChange={this.editQuestion}></input>
-                <input name='id' type='hidden' value={this.props.id}></input>
+                <input name="question" type="text" value={this.state.question} onChange={this.editQuestion}></input>
+                <input name="id" type="hidden" value={this.props.id}></input>
             </div>
           </div>
           <div className="row">
             <div className="large-12 columns">
               <label>Tags (space separated):</label>
-              <input name='tags' type='text' id='qotd-tags' value={this.state.tags} onChange={this.editTags}></input>
+              <input name="tags" type="text" id="qotd-tags" value={this.state.tags} onChange={this.editTags}></input>
             </div>
           </div>
           <div className="row">
@@ -132,17 +132,17 @@ var QotdQuestionForm = React.createClass({
             </div>
             <div className="large-6 columns">
               <label>Date:</label>
-              <input name='date' type='text' id='qotd-date' value={this.state.date}></input>
+              <input name="date" type="text" id="qotd-date" value={this.state.date}></input>
               <div id="datepicker"></div>
             </div>
           </div>
           <div className="spacer"></div>
           <div className="row controls">
             <div className="large-10 left">
-              <input className="button small left" onClick={this.addOption} type='button' value="ADD"></input>
+              <input className="button small left" onClick={this.addOption} type="button" value="ADD"></input>
             </div>
             <div className="large-2 right">
-              <input className="button small right" type='submit' value={modalSubmit}></input>
+              <input className="button small right" type="submit" value={modalSubmit}></input>
             </div>
           </div>
         </div>
@@ -182,26 +182,26 @@ var QotdListEntry = React.createClass({
       if (!date) return null;
 
       var qdate = new Date(date);
-      var shortDate = ('0' + qdate.getDate()).slice(-2) + '/';
-      shortDate += ('0' + (qdate.getMonth()+1)).slice(-2) + '/';
+      var shortDate = ("0" + qdate.getDate()).slice(-2) + "/";
+      shortDate += ("0" + (qdate.getMonth()+1)).slice(-2) + "/";
       shortDate += qdate.getFullYear();
       return shortDate;
-    }
-  },
+    },
 
-  handleEditClick: function(id) {
-    // Mount component and reveal modal
-    ReactDOM.render(<QotdQuestionForm id={id} />, document.getElementById('qotdModal'));
-    $('#qotdModal').foundation('reveal', 'open');
+    handleEditClick: function(id) {
+      // Mount component and reveal modal
+      ReactDOM.render(<QotdQuestionForm id={id} />, document.getElementById("qotdModal"));
+      $('#qotdModal').foundation("reveal", "open");
 
-    // On modal close, unmount component
-    $(document).on('closed.fndtn.reveal', '[data-reveal]', function () {
-      ReactDOM.unmountComponentAtNode(document.getElementById('qotdModal'));
-    });
+      // On modal close, unmount component
+      $(document).on('closed.fndtn.reveal', '[data-reveal]', function () {
+        ReactDOM.unmountComponentAtNode(document.getElementById("qotdModal"));
+      });
+    },
   },
 
   render: function() {
-    var entryDate = '--/--/--';
+    var entryDate = "--/--/--";
 
     if (this.props.date)
       entryDate = QotdListEntry.shortenDate(this.props.date);
@@ -210,7 +210,7 @@ var QotdListEntry = React.createClass({
       <div>
         <div className="large-9 columns qotd-question-li">{this.props.text}</div>
         <div className="large-1 columns">
-          <a href="#" onClick={this.handleEditClick.bind(this, this.props.id)}>Edit</a>
+          <a href="#" onClick={QotdListEntry.handleEditClick.bind(this, this.props.id)}>Edit</a>
         </div>
         <div className="large-2 columns text-center">{entryDate}</div>
       </div>
@@ -222,7 +222,7 @@ var QotdListEntry = React.createClass({
 var QotdListNav = React.createClass({
   refreshList: function (page) {
     AppDispatcher.handleViewAction({
-      type : 'refreshPage',
+      type : "refreshPage",
       no   : String(this.props.no),
       page : String(page)
     });
@@ -255,16 +255,16 @@ var QotdList = React.createClass({
   },
 
   componentDidMount: function() {
-    MsgStore.addChangeListener(this._onChange);
+    QStore.addChangeListener(this._onChange);
     AppDispatcher.handleViewAction({
-      type : 'refreshPage',
+      type : "refreshPage",
       no   : String(this.props.no),
       page : String(this.props.page),
     });
   },
 
   componentWillUnmount: function() {
-    MsgStore.removeChangeListener(this._onChange);
+    QStore.removeChangeListener(this._onChange);
   },
 
   render: function() {
@@ -272,7 +272,7 @@ var QotdList = React.createClass({
       <div className="row">
         <div className="reveal-modal" id="qotdModal" data-reveal aria-hidden="true" role="dialog"></div>
         <div className="large-10 columns">
-          <a className="radius button" href="#" onClick={this.openModal}>Add qotd</a>
+          <a className="radius button" href="#" onClick={QotdListEntry.handleEditClick.bind(this, null)}>Add qotd</a>
           <h2>Qotd list:</h2>
           { this.state.total == 0 ? "No questions" : null}
           { this.state.questions.map(function (opt) {
@@ -290,19 +290,8 @@ var QotdList = React.createClass({
 
   _onChange: function() {
     this.setState({
-      questions : MsgStore.getCurrent(),
-      total     : MsgStore.getCount()
-    });
-  },
-
-  openModal: function() {
-    // Mount component and reveal modal
-    ReactDOM.render(<QotdQuestionForm />, document.getElementById('qotdModal'));
-    $('#qotdModal').foundation('reveal', 'open');
-
-    // On modal close, unmount component
-    $(document).on('closed.fndtn.reveal', '[data-reveal]', function () {
-      ReactDOM.unmountComponentAtNode(document.getElementById('qotdModal'));
+      questions : QStore.getCurrent(),
+      total     : QStore.getCount()
     });
   }
 });

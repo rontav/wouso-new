@@ -19646,7 +19646,7 @@
 
 	var React         = __webpack_require__(1);
 	var ReactDOM      = __webpack_require__(158);
-	var MsgStore      = __webpack_require__(160);
+	var QStore        = __webpack_require__(160);
 	var DateStore     = __webpack_require__(167);
 	var AppDispatcher = __webpack_require__(161);
 
@@ -19665,10 +19665,10 @@
 	      optionState = this.props.val;
 	    }
 
-	    var default_class = 'button postfix qotd-check';
-	    var optionClass   = optionState ? default_class + ' success' : default_class;
-	    var value         = optionState ? 'true' : 'false';
-	    var valueText     = optionState ? 'True' : 'False';
+	    var default_class = "button postfix qotd-check";
+	    var optionClass   = optionState ? default_class + " success" : default_class;
+	    var value         = optionState ? "true" : "false";
+	    var valueText     = optionState ? "True" : "False";
 
 	    return (
 	      React.createElement("div", {className: "row collapse qotd-answer"}, 
@@ -19696,7 +19696,7 @@
 	var QotdQuestionForm = React.createClass({displayName: "QotdQuestionForm",
 	  getInitialState: function() {
 	    // Render datepicker
-	    $.get('/api/qotd/list/dates', function(res) {
+	    $.get("/api/qotd/list/dates", function(res) {
 	      $('#datepicker').datepicker({
 	        inline: true,
 	        beforeShowDay: function(date) {
@@ -19706,15 +19706,15 @@
 	        }
 	      }).on('changeDate', function(e) {
 	        AppDispatcher.handleViewAction({
-	          type : 'refreshDate',
-	          date :  e.format('dd/mm/yyyy'),
+	          type : "refreshDate",
+	          date :  e.format("dd/mm/yyyy"),
 	        });
 	      });
 	    }.bind(this));
 
 	    return {
-	      question : '',
-	      tags     : '',
+	      question : "",
+	      tags     : "",
 	      date     : DateStore.getDate(),
 	      options  : Array.apply(0, Array(noOfOptions)).map(function(j, i) { return i+1; })
 	    }
@@ -19728,7 +19728,7 @@
 	        if (this.isMounted()) {
 	          this.setState({
 	            question : res.question,
-	            tags     : res.tags.join(' '),
+	            tags     : res.tags.join(" "),
 	            date     : QotdListEntry.shortenDate(res.date),
 	            options  : res.choices
 	          });
@@ -19741,7 +19741,7 @@
 	    DateStore.removeChangeListener(this._onChange);
 
 	    this.setState({
-	      question: ''
+	      question: ""
 	    });
 	  },
 
@@ -19828,26 +19828,26 @@
 	      if (!date) return null;
 
 	      var qdate = new Date(date);
-	      var shortDate = ('0' + qdate.getDate()).slice(-2) + '/';
-	      shortDate += ('0' + (qdate.getMonth()+1)).slice(-2) + '/';
+	      var shortDate = ("0" + qdate.getDate()).slice(-2) + "/";
+	      shortDate += ("0" + (qdate.getMonth()+1)).slice(-2) + "/";
 	      shortDate += qdate.getFullYear();
 	      return shortDate;
-	    }
-	  },
+	    },
 
-	  handleEditClick: function(id) {
-	    // Mount component and reveal modal
-	    ReactDOM.render(React.createElement(QotdQuestionForm, {id: id}), document.getElementById('qotdModal'));
-	    $('#qotdModal').foundation('reveal', 'open');
+	    handleEditClick: function(id) {
+	      // Mount component and reveal modal
+	      ReactDOM.render(React.createElement(QotdQuestionForm, {id: id}), document.getElementById("qotdModal"));
+	      $('#qotdModal').foundation("reveal", "open");
 
-	    // On modal close, unmount component
-	    $(document).on('closed.fndtn.reveal', '[data-reveal]', function () {
-	      ReactDOM.unmountComponentAtNode(document.getElementById('qotdModal'));
-	    });
+	      // On modal close, unmount component
+	      $(document).on('closed.fndtn.reveal', '[data-reveal]', function () {
+	        ReactDOM.unmountComponentAtNode(document.getElementById("qotdModal"));
+	      });
+	    },
 	  },
 
 	  render: function() {
-	    var entryDate = '--/--/--';
+	    var entryDate = "--/--/--";
 
 	    if (this.props.date)
 	      entryDate = QotdListEntry.shortenDate(this.props.date);
@@ -19856,7 +19856,7 @@
 	      React.createElement("div", null, 
 	        React.createElement("div", {className: "large-9 columns qotd-question-li"}, this.props.text), 
 	        React.createElement("div", {className: "large-1 columns"}, 
-	          React.createElement("a", {href: "#", onClick: this.handleEditClick.bind(this, this.props.id)}, "Edit")
+	          React.createElement("a", {href: "#", onClick: QotdListEntry.handleEditClick.bind(this, this.props.id)}, "Edit")
 	        ), 
 	        React.createElement("div", {className: "large-2 columns text-center"}, entryDate)
 	      )
@@ -19868,7 +19868,7 @@
 	var QotdListNav = React.createClass({displayName: "QotdListNav",
 	  refreshList: function (page) {
 	    AppDispatcher.handleViewAction({
-	      type : 'refreshPage',
+	      type : "refreshPage",
 	      no   : String(this.props.no),
 	      page : String(page)
 	    });
@@ -19901,16 +19901,16 @@
 	  },
 
 	  componentDidMount: function() {
-	    MsgStore.addChangeListener(this._onChange);
+	    QStore.addChangeListener(this._onChange);
 	    AppDispatcher.handleViewAction({
-	      type : 'refreshPage',
+	      type : "refreshPage",
 	      no   : String(this.props.no),
 	      page : String(this.props.page),
 	    });
 	  },
 
 	  componentWillUnmount: function() {
-	    MsgStore.removeChangeListener(this._onChange);
+	    QStore.removeChangeListener(this._onChange);
 	  },
 
 	  render: function() {
@@ -19918,7 +19918,7 @@
 	      React.createElement("div", {className: "row"}, 
 	        React.createElement("div", {className: "reveal-modal", id: "qotdModal", "data-reveal": true, "aria-hidden": "true", role: "dialog"}), 
 	        React.createElement("div", {className: "large-10 columns"}, 
-	          React.createElement("a", {className: "radius button", href: "#", onClick: this.openModal}, "Add qotd"), 
+	          React.createElement("a", {className: "radius button", href: "#", onClick: QotdListEntry.handleEditClick.bind(this, null)}, "Add qotd"), 
 	          React.createElement("h2", null, "Qotd list:"), 
 	           this.state.total == 0 ? "No questions" : null, 
 	           this.state.questions.map(function (opt) {
@@ -19936,21 +19936,21 @@
 
 	  _onChange: function() {
 	    this.setState({
-	      questions : MsgStore.getCurrent(),
-	      total     : MsgStore.getCount()
+	      questions : QStore.getCurrent(),
+	      total     : QStore.getCount()
 	    });
 	  },
 
-	  openModal: function() {
-	    // Mount component and reveal modal
-	    ReactDOM.render(React.createElement(QotdQuestionForm, null), document.getElementById('qotdModal'));
-	    $('#qotdModal').foundation('reveal', 'open');
-
-	    // On modal close, unmount component
-	    $(document).on('closed.fndtn.reveal', '[data-reveal]', function () {
-	      ReactDOM.unmountComponentAtNode(document.getElementById('qotdModal'));
-	    });
-	  }
+	//  openModal: function() {
+	  //   // Mount component and reveal modal
+	  //   ReactDOM.render(<QotdQuestionForm />, document.getElementById("qotdModal"));
+	  //   $('#qotdModal').foundation("reveal", "open");
+	  //
+	  //   // On modal close, unmount component
+	  //   $(document).on('closed.fndtn.reveal', '[data-reveal]', function () {
+	  //     ReactDOM.unmountComponentAtNode(document.getElementById("qotdModal"));
+	  //   });
+	  // }
 	});
 
 
@@ -19967,22 +19967,22 @@
 
 	var CHANGE_EVENT = 'change';
 
-	var _todos = [];
+	var _qlist = [];
 	var _count = null;
 
 	function getData(no, page) {
 	  var url = '/api/qotd/list/' + no + '/' + page;
 	  $.get(url, function(res) {
-	    _todos = res.questions;
+	    _qlist = res.questions;
 	    _count = res.count;
-	    MsgStore.emitChange();
+	    QStore.emitChange();
 	  });
 	}
 
-	var MsgStore = assign({}, EventEmitter.prototype, {
+	var QStore = assign({}, EventEmitter.prototype, {
 
 	  getCurrent: function() {
-	    return _todos;
+	    return _qlist;
 	  },
 
 	  getCount: function() {
@@ -20013,7 +20013,7 @@
 	  })
 	});
 
-	module.exports = MsgStore;
+	module.exports = QStore;
 
 
 /***/ },
@@ -20805,10 +20805,10 @@
 	var QotdGame = React.createClass({displayName: "QotdGame",
 	  getInitialState: function() {
 	    return {
-	      id       : '',
-	      question : '',
+	      id       : "",
+	      question : "",
 	      options  : [],
-	      answer   : '',
+	      answer   : "",
 	      submit   : false,
 	    }
 	  },
@@ -20817,7 +20817,7 @@
 	    $.get('/api/qotd/play', function(res) {
 	      if (this.isMounted()) {
 	        this.setState({
-	          id       : (res._id      ? res._id      : ''),
+	          id       : (res._id      ? res._id      : ""),
 	          question : (res.question ? res.question : res),
 	          options  : (res.answers  ? res.answers  : []),
 	          submit   : ((!res.answer && res.question)  ? true : false),

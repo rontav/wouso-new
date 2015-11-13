@@ -4,22 +4,22 @@ var assign        = require('object-assign');
 
 var CHANGE_EVENT = 'change';
 
-var _todos = [];
+var _qlist = [];
 var _count = null;
 
 function getData(no, page) {
   var url = '/api/qotd/list/' + no + '/' + page;
   $.get(url, function(res) {
-    _todos = res.questions;
+    _qlist = res.questions;
     _count = res.count;
-    MsgStore.emitChange();
+    QStore.emitChange();
   });
 }
 
-var MsgStore = assign({}, EventEmitter.prototype, {
+var QStore = assign({}, EventEmitter.prototype, {
 
   getCurrent: function() {
-    return _todos;
+    return _qlist;
   },
 
   getCount: function() {
@@ -50,4 +50,4 @@ var MsgStore = assign({}, EventEmitter.prototype, {
   })
 });
 
-module.exports = MsgStore;
+module.exports = QStore;
