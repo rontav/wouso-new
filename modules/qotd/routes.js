@@ -60,6 +60,30 @@ router.post('/api/qotd/settings', function (req, res, next) {
 })
 
 
+router.get('/api/qotd/list', function (req, res, next) {
+  if (!req.query.id) return res.send({})
+
+  _self = {}
+  qotd.findOne({_id: req.query.id}).exec(gotQotd);
+
+  function gotQotd(err, qotd) {
+    _self.qotd = qotd;
+    Tag.find({'type': 'qotd'}).exec(gotTags);
+  }
+
+  function gotTags(err, tags) {
+    // Replace tag ids with tag names
+    tags.forEach(function(tag) {
+      var i = _self.qotd.tags.indexOf(tag._id);
+      if (i > -1) {
+        _self.qotd.tags[i] = tag.name;
+      }
+    })
+    res.send(_self.qotd);
+  }
+})
+
+
 router.get('/api/qotd/list/:perPage/:page', function (req, res, next) {
   _self = {}
   show = req.params.perPage
