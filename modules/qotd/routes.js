@@ -185,31 +185,34 @@ router.get('/api/qotd/play', function (req, res, next) {
 
     if (!sent && today.length) {
       // Else, choose a random question from today's poll
-      rand = Math.floor(Math.random() * today.length)
+      var rand = Math.floor(Math.random() * today.length);
+      // Deep copy selected qotd
+      var question = JSON.parse(JSON.stringify(today[rand]));
+
       // Update question viewer
-      query  = {'_id': today[rand]._id}
+      query  = {'_id': question._id};
       update = {$push: {'answers': {
         'user' : req.user._id,
         'date' : Date.now(),
         'res'  : null
-      }}}
-      qotd.update(query, update).exec()
+      }}};
+      qotd.update(query, update).exec();
 
-      return res.send(shuffleAnswers(today[rand]))
+      return res.send(shuffleAnswers(question));
     }
   })
 
   function shuffleAnswers(question) {
     // Process question answers
-    answers = []
+    var answers = [];
     question.choices.forEach(function(ans) {
-      answers.push(ans.text)
-    })
-    // Shuffle answers
-    answers = answers.sort(function() { return 0.5 - Math.random() })
-    question.answers = answers
+      answers.push(ans.text);
+    });
 
-    return question
+    // Shuffle answers
+    question.options = answers.sort(function() { return 0.5 - Math.random() });
+
+    return question;
   }
 })
 

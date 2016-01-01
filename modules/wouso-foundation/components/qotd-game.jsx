@@ -72,7 +72,7 @@ var QotdGame = React.createClass({
         this.setState({
           id       : (res._id      ? res._id      : ""),
           question : (res.question ? res.question : res),
-          options  : (res.answers  ? res.answers  : []),
+          options  : (res.options  ? res.options  : []),
           submit   : ((!res.answer && res.question)  ? true : false),
           answer   : res.answer
         });

@@ -19939,18 +19939,7 @@
 	      questions : QStore.getCurrent(),
 	      total     : QStore.getCount()
 	    });
-	  },
-
-	//  openModal: function() {
-	  //   // Mount component and reveal modal
-	  //   ReactDOM.render(<QotdQuestionForm />, document.getElementById("qotdModal"));
-	  //   $('#qotdModal').foundation("reveal", "open");
-	  //
-	  //   // On modal close, unmount component
-	  //   $(document).on('closed.fndtn.reveal', '[data-reveal]', function () {
-	  //     ReactDOM.unmountComponentAtNode(document.getElementById("qotdModal"));
-	  //   });
-	  // }
+	  }
 	});
 
 
@@ -20819,7 +20808,7 @@
 	        this.setState({
 	          id       : (res._id      ? res._id      : ""),
 	          question : (res.question ? res.question : res),
-	          options  : (res.answers  ? res.answers  : []),
+	          options  : (res.options  ? res.options  : []),
 	          submit   : ((!res.answer && res.question)  ? true : false),
 	          answer   : res.answer
 	        });
