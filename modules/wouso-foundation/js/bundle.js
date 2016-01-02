@@ -53,7 +53,7 @@
 	if( $('#game-qotd').length )
 	  ReactDOM.render(React.createElement(QotdGame, null), document.getElementById('game-qotd'))
 	if( $('#qotd-question-list').length )
-	  ReactDOM.render(React.createElement(QotdList, {no: "3", page: "1"}), document.getElementById('qotd-question-list'));
+	  ReactDOM.render(React.createElement(QotdList, null), document.getElementById('qotd-question-list'));
 
 
 /***/ },
@@ -19884,8 +19884,30 @@
 	    return (
 	      React.createElement("div", {className: "qotd-question-pages text-center"}, 
 	         this.pages.map(function (opt, i) {
-	          return (React.createElement("a", {key: i, href: "#", onClick: this.refreshList.bind(this, opt)}, opt))
+	          if (opt == this.props.page)
+	            return (React.createElement("b", null, React.createElement("a", {key: i, href: "#", onClick: this.refreshList.bind(this, opt)}, opt)))
+	          else
+	            return (React.createElement("a", {key: i, href: "#", onClick: this.refreshList.bind(this, opt)}, opt))
 	        }, this) 
+	      )
+	    );
+	  }
+	});
+
+
+	var QotdListSearch = React.createClass({displayName: "QotdListSearch",
+	  handleChange: function(event) {
+	    AppDispatcher.handleViewAction({
+	      type : "searchQotd",
+	      term : String(event.target.value)
+	    });
+	  },
+
+	  render: function() {
+	    return (
+	      React.createElement("div", null, 
+	        "Search:", 
+	        React.createElement("input", {name: "search", type: "text", onChange: this.handleChange})
 	      )
 	    );
 	  }
@@ -19896,16 +19918,16 @@
 	  getInitialState: function() {
 	    return {
 	      questions : [],
-	      total     : null
+	      total     : null,
+	      no        : null,
+	      page      : null
 	    }
 	  },
 
 	  componentDidMount: function() {
 	    QStore.addChangeListener(this._onChange);
 	    AppDispatcher.handleViewAction({
-	      type : "refreshPage",
-	      no   : String(this.props.no),
-	      page : String(this.props.page),
+	      type : "refreshPage"
 	    });
 	  },
 
@@ -19915,20 +19937,25 @@
 
 	  render: function() {
 	    return (
-	      React.createElement("div", {className: "row"}, 
-	        React.createElement("div", {className: "reveal-modal", id: "qotdModal", "data-reveal": true, "aria-hidden": "true", role: "dialog"}), 
-	        React.createElement("div", {className: "large-10 columns"}, 
-	          React.createElement("a", {className: "radius button", href: "#", onClick: QotdListEntry.handleEditClick.bind(this, null)}, "Add qotd"), 
-	          React.createElement("h2", null, "Qotd list:"), 
-	           this.state.total == 0 ? "No questions" : null, 
-	           this.state.questions.map(function (opt) {
-	            return React.createElement(QotdListEntry, {key: opt._id, id: opt._id, text: opt.question, date: opt.date})
-	          }, this), 
-	          React.createElement("div", {className: "spacer"}), 
-	          React.createElement(QotdListNav, {key: "0", total: this.state.total, no: this.props.no, page: this.props.page})
+	      React.createElement("div", null, 
+	        React.createElement("div", {className: "row"}, 
+	          React.createElement(QotdListSearch, null)
 	        ), 
-	        React.createElement("div", {className: "large-2 columns"}, 
-	          React.createElement("h2", null, "Tags:")
+	        React.createElement("div", {className: "row"}, 
+	          React.createElement("div", {className: "reveal-modal", id: "qotdModal", "data-reveal": true, "aria-hidden": "true", role: "dialog"}), 
+	          React.createElement("div", {className: "large-10 columns"}, 
+	            React.createElement("a", {className: "radius button", href: "#", onClick: QotdListEntry.handleEditClick.bind(this, null)}, "Add qotd"), 
+	            React.createElement("h2", null, "Qotd list:"), 
+	             this.state.total == 0 ? "No questions" : null, 
+	             this.state.questions.map(function (opt) {
+	              return React.createElement(QotdListEntry, {key: opt._id, id: opt._id, text: opt.question, date: opt.date})
+	            }, this), 
+	            React.createElement("div", {className: "spacer"}), 
+	            React.createElement(QotdListNav, {key: "0", total: this.state.total, no: this.state.no, page: this.state.page})
+	          ), 
+	          React.createElement("div", {className: "large-2 columns"}, 
+	            React.createElement("h2", null, "Tags:")
+	          )
 	        )
 	      )
 	    );
@@ -19937,7 +19964,9 @@
 	  _onChange: function() {
 	    this.setState({
 	      questions : QStore.getCurrent(),
-	      total     : QStore.getCount()
+	      total     : QStore.getCount(),
+	      no        : QStore.getNumber(),
+	      page      : QStore.getPage()
 	    });
 	  }
 	});
@@ -19959,8 +19988,15 @@
 	var _qlist = [];
 	var _count = null;
 
-	function getData(no, page) {
-	  var url = '/api/qotd/list/' + no + '/' + page;
+	// Number of questions per page
+	var no = 5;
+	// Initial page Number
+	var page = 1;
+	// Search term
+	var term = '';
+
+	function getData(no, page, term) {
+	  var url = '/api/qotd/list/' + no + '/' + page + '?search=' + term;
 	  $.get(url, function(res) {
 	    _qlist = res.questions;
 	    _count = res.count;
@@ -19978,6 +20014,14 @@
 	    return _count;
 	  },
 
+	  getNumber: function() {
+	    return no;
+	  },
+
+	  getPage: function() {
+	    return page;
+	  },
+
 	  emitChange: function() {
 	    this.emit(CHANGE_EVENT);
 	  },
@@ -19993,7 +20037,19 @@
 	  dispatcherIndex: AppDispatcher.register(function(payload) {
 	    switch(payload.action.type) {
 	      case 'refreshPage':
-	        getData(payload.action.no, payload.action.page);
+	        if (typeof payload.action.no !== 'undefined')
+	          no = payload.action.no
+	        if (typeof payload.action.page !== 'undefined')
+	          page = payload.action.page
+	        getData(no, page, term);
+	        break;
+
+	      case 'searchQotd':
+	        // Reset page on each new search
+	        page = 1;
+	        if (typeof payload.action.term !== 'undefined')
+	          term = payload.action.term
+	        getData(no, page, term);
 	        break;
 	    }
 

@@ -92,6 +92,8 @@ router.get('/api/qotd/list/:perPage/:page', function (req, res, next) {
   query = {}
   if (req.query.id) query['_id'] = req.query.id
   if (req.query.tags) query['tags'] = {$in: req.query.tags.split(',')}
+  if (typeof req.query.search !== 'undefined')
+    query['question'] = { '$regex': req.query.search, '$options': 'i' }
 
   _self.query = query
   qotd.find(query).skip(skip).limit(show).exec(gotQotd)

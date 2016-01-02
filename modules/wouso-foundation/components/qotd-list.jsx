@@ -238,8 +238,30 @@ var QotdListNav = React.createClass({
     return (
       <div className="qotd-question-pages text-center">
         { this.pages.map(function (opt, i) {
-          return (<a key={i} href="#" onClick={this.refreshList.bind(this, opt)}>{opt}</a>)
+          if (opt == this.props.page)
+            return (<b><a key={i} href="#" onClick={this.refreshList.bind(this, opt)}>{opt}</a></b>)
+          else
+            return (<a key={i} href="#" onClick={this.refreshList.bind(this, opt)}>{opt}</a>)
         }, this) }
+      </div>
+    );
+  }
+});
+
+
+var QotdListSearch = React.createClass({
+  handleChange: function(event) {
+    AppDispatcher.handleViewAction({
+      type : "searchQotd",
+      term : String(event.target.value)
+    });
+  },
+
+  render: function() {
+    return (
+      <div>
+        Search:
+        <input name="search" type="text" onChange={this.handleChange}></input>
       </div>
     );
   }
@@ -250,16 +272,16 @@ var QotdList = React.createClass({
   getInitialState: function() {
     return {
       questions : [],
-      total     : null
+      total     : null,
+      no        : null,
+      page      : null
     }
   },
 
   componentDidMount: function() {
     QStore.addChangeListener(this._onChange);
     AppDispatcher.handleViewAction({
-      type : "refreshPage",
-      no   : String(this.props.no),
-      page : String(this.props.page),
+      type : "refreshPage"
     });
   },
 
@@ -269,20 +291,25 @@ var QotdList = React.createClass({
 
   render: function() {
     return (
-      <div className="row">
-        <div className="reveal-modal" id="qotdModal" data-reveal aria-hidden="true" role="dialog"></div>
-        <div className="large-10 columns">
-          <a className="radius button" href="#" onClick={QotdListEntry.handleEditClick.bind(this, null)}>Add qotd</a>
-          <h2>Qotd list:</h2>
-          { this.state.total == 0 ? "No questions" : null}
-          { this.state.questions.map(function (opt) {
-            return <QotdListEntry key={opt._id} id={opt._id} text={opt.question} date={opt.date} />
-          }, this)}
-          <div className="spacer"></div>
-          <QotdListNav key="0" total={this.state.total} no={this.props.no} page={this.props.page} />
+      <div>
+        <div className="row">
+          <QotdListSearch />
         </div>
-        <div className="large-2 columns">
-          <h2>Tags:</h2>
+        <div className="row">
+          <div className="reveal-modal" id="qotdModal" data-reveal aria-hidden="true" role="dialog"></div>
+          <div className="large-10 columns">
+            <a className="radius button" href="#" onClick={QotdListEntry.handleEditClick.bind(this, null)}>Add qotd</a>
+            <h2>Qotd list:</h2>
+            { this.state.total == 0 ? "No questions" : null}
+            { this.state.questions.map(function (opt) {
+              return <QotdListEntry key={opt._id} id={opt._id} text={opt.question} date={opt.date} />
+            }, this)}
+            <div className="spacer"></div>
+            <QotdListNav key="0" total={this.state.total} no={this.state.no} page={this.state.page} />
+          </div>
+          <div className="large-2 columns">
+            <h2>Tags:</h2>
+          </div>
         </div>
       </div>
     );
@@ -291,7 +318,9 @@ var QotdList = React.createClass({
   _onChange: function() {
     this.setState({
       questions : QStore.getCurrent(),
-      total     : QStore.getCount()
+      total     : QStore.getCount(),
+      no        : QStore.getNumber(),
+      page      : QStore.getPage()
     });
   }
 });

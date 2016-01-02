@@ -48,3 +48,7 @@ input[type="radio"] {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+.qotd-question-pages a {
+  margin-left: 5px;
+}
