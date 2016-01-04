@@ -19910,21 +19910,36 @@
 
 	var QotdListSearch = React.createClass({displayName: "QotdListSearch",
 	  handleDeleteClick: function() {
-	    var conf = confirm('Are you sure you want to permanently delete selected questions?');
-	    if (conf) {
-	      $.ajax({
-	        type    : "DELETE",
-	        url     : '/api/qotd/delete?id=' + QotdListEntry.selected_qotd.join(','),
-	        data    : null,
-	        success : gotResponse
-	      });
-	    }
+	    if (QotdListEntry.selected_qotd.length == 0) {
+	      alert('First select the questions that you need to delete.');
+	    } else {
+	      var conf = confirm('Are you sure you want to permanently delete selected questions?');
+	      if (conf) {
+	        $.ajax({
+	          type    : "DELETE",
+	          url     : '/api/qotd/delete?id=' + QotdListEntry.selected_qotd.join(','),
+	          data    : null,
+	          success : gotResponse
+	        });
+	      }
 
-	    function gotResponse(res) {
-	      AppDispatcher.handleViewAction({
-	        type : "refreshPage"
-	      });
+	      function gotResponse(res) {
+	        AppDispatcher.handleViewAction({
+	          type : "refreshPage"
+	        });
+	      }
 	    }
+	  },
+
+	  handleClearClick: function() {
+	    AppDispatcher.handleViewAction({
+	      type : "searchQotd",
+	      term : ''
+	    });
+	    AppDispatcher.handleViewAction({
+	      type : "refreshPage"
+	    });
+	    this.clearButton.value = '';
 	  },
 
 	  handleChange: function(event) {
@@ -19938,8 +19953,19 @@
 	    return (
 	      React.createElement("div", null, 
 	        React.createElement("a", {className: "radius button", href: "#", onClick: this.handleDeleteClick}, "Delete"), 
-	        React.createElement("label", null, "Search:"), 
-	        React.createElement("input", {name: "search", type: "text", onChange: this.handleChange})
+	        React.createElement("div", {className: "row"}, 
+	          React.createElement("div", {className: "large-12 columns"}, 
+	            React.createElement("div", {className: "row collapse"}, 
+	              React.createElement("div", {className: "small-4 columns"}, 
+	                React.createElement("input", {type: "text", ref: (ref) => this.clearButton = ref, onChange: this.handleChange, placeholder: "Search"})
+	              ), 
+	              React.createElement("div", {className: "small-1 columns"}, 
+	                React.createElement("a", {href: "#", className: "button postfix", onClick: this.handleClearClick}, "Clear")
+	              ), 
+	              React.createElement("div", {className: "small-7 columns"})
+	            )
+	          )
+	        )
 	      )
 	    );
 	  }
@@ -19976,20 +20002,20 @@
 	        ), 
 	        React.createElement("div", {className: "row"}, 
 	          React.createElement("div", {className: "reveal-modal", id: "qotdModal", "data-reveal": true, "aria-hidden": "true", role: "dialog"}), 
-	          React.createElement("div", {className: "large-10 columns"}, 
+	          React.createElement("div", {className: "large-12 columns"}, 
 	            React.createElement("a", {className: "radius button", href: "#", onClick: QotdListEntry.handleEditClick.bind(this, null)}, "Add qotd"), 
-	            React.createElement("h2", null, "Qotd list:"), 
+	            React.createElement("h2", null, 
+	               "Qotd list (" + this.state.total + " results" + (this.state.term != '' ? " for \"" + this.state.term + "\"": '') + ")"
+	            ), 
 	             this.state.total == 0 ? (this.state.term != '' ? "No match for \"" + this.state.term + "\"" : "No questions") : null, 
 	             this.state.questions.map(function (opt) {
 	              return React.createElement(QotdListEntry, {key: opt._id, id: opt._id, text: opt.question, date: opt.date})
 	            }, this), 
 	            React.createElement("div", {className: "spacer"}), 
 	            React.createElement(QotdListNav, {key: "0", total: this.state.total, no: this.state.no, page: this.state.page})
-	          ), 
-	          React.createElement("div", {className: "large-2 columns"}, 
-	            React.createElement("h2", null, "Tags:")
 	          )
-	        )
+	        ), 
+	        React.createElement("div", {className: "spacer"})
 	      )
 	    );
 	  },
@@ -20023,7 +20049,7 @@
 	var _count = null;
 
 	// Number of questions per page
-	var no = 5;
+	var no = 10;
 	// Initial page Number
 	var page = 1;
 	// Search term

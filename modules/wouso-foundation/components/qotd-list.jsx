@@ -264,21 +264,36 @@ var QotdListNav = React.createClass({
 
 var QotdListSearch = React.createClass({
   handleDeleteClick: function() {
-    var conf = confirm('Are you sure you want to permanently delete selected questions?');
-    if (conf) {
-      $.ajax({
-        type    : "DELETE",
-        url     : '/api/qotd/delete?id=' + QotdListEntry.selected_qotd.join(','),
-        data    : null,
-        success : gotResponse
-      });
-    }
+    if (QotdListEntry.selected_qotd.length == 0) {
+      alert('First select the questions that you need to delete.');
+    } else {
+      var conf = confirm('Are you sure you want to permanently delete selected questions?');
+      if (conf) {
+        $.ajax({
+          type    : "DELETE",
+          url     : '/api/qotd/delete?id=' + QotdListEntry.selected_qotd.join(','),
+          data    : null,
+          success : gotResponse
+        });
+      }
 
-    function gotResponse(res) {
-      AppDispatcher.handleViewAction({
-        type : "refreshPage"
-      });
+      function gotResponse(res) {
+        AppDispatcher.handleViewAction({
+          type : "refreshPage"
+        });
+      }
     }
+  },
+
+  handleClearClick: function() {
+    AppDispatcher.handleViewAction({
+      type : "searchQotd",
+      term : ''
+    });
+    AppDispatcher.handleViewAction({
+      type : "refreshPage"
+    });
+    this.clearButton.value = '';
   },
 
   handleChange: function(event) {
@@ -292,8 +307,19 @@ var QotdListSearch = React.createClass({
     return (
       <div>
         <a className="radius button" href="#" onClick={this.handleDeleteClick}>Delete</a>
-        <label>Search:</label>
-        <input name="search" type="text" onChange={this.handleChange}></input>
+        <div className="row">
+          <div className="large-12 columns">
+            <div className="row collapse">
+              <div className="small-4 columns">
+                <input type="text" ref={(ref) => this.clearButton = ref} onChange={this.handleChange} placeholder="Search"></input>
+              </div>
+              <div className="small-1 columns">
+                <a href="#" className="button postfix" onClick={this.handleClearClick}>Clear</a>
+              </div>
+              <div className="small-7 columns"></div>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
@@ -330,9 +356,11 @@ var QotdList = React.createClass({
         </div>
         <div className="row">
           <div className="reveal-modal" id="qotdModal" data-reveal aria-hidden="true" role="dialog"></div>
-          <div className="large-10 columns">
+          <div className="large-12 columns">
             <a className="radius button" href="#" onClick={QotdListEntry.handleEditClick.bind(this, null)}>Add qotd</a>
-            <h2>Qotd list:</h2>
+            <h2>
+              { "Qotd list (" + this.state.total + " results" + (this.state.term != '' ? " for \"" + this.state.term + "\"": '') + ")" }
+            </h2>
             { this.state.total == 0 ? (this.state.term != '' ? "No match for \"" + this.state.term + "\"" : "No questions") : null}
             { this.state.questions.map(function (opt) {
               return <QotdListEntry key={opt._id} id={opt._id} text={opt.question} date={opt.date} />
@@ -340,10 +368,8 @@ var QotdList = React.createClass({
             <div className="spacer"></div>
             <QotdListNav key="0" total={this.state.total} no={this.state.no} page={this.state.page} />
           </div>
-          <div className="large-2 columns">
-            <h2>Tags:</h2>
-          </div>
         </div>
+        <div className="spacer"></div>
       </div>
     );
   },

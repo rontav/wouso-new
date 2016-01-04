@@ -8,7 +8,7 @@ var _qlist = [];
 var _count = null;
 
 // Number of questions per page
-var no = 5;
+var no = 10;
 // Initial page Number
 var page = 1;
 // Search term

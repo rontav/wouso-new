@@ -50,5 +50,6 @@ input[type="radio"] {
 }
 
 .qotd-question-pages a {
+  word-wrap: break-word;
   margin-left: 5px;
 }

@@ -7,8 +7,8 @@ var fs       = require('fs')
 var mongoose = require('mongoose')
 
 // Connect to db
-var configDB = require('../config/database.js')
-mongoose.connect(configDB.url)
+var configDB = require('../config.json')
+mongoose.connect(configDB.mongo_url.dev)
 
 // Import models
 require('../modules/qotd/model.js')
