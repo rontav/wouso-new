@@ -396,4 +396,21 @@ function update_points(req, right, rightCount) {
 }
 
 
-module.exports = router
+router.delete('/api/qotd/delete', function (req, res, next) {
+  var del_list = req.query.id.split(',');
+  qotd.remove({'_id': {$in: del_list}}).exec(removedQotd);
+
+  function removedQotd(err) {
+    if (err) {
+      log.error('Could not remove qotd: ' + del_list);
+      return res.send('NOK');
+    } else {
+      log.info('Removed qotd: ' + del_list);
+      return res.send('OK');
+    }
+  }
+
+});
+
+
+module.exports = router;

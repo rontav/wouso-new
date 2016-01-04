@@ -178,6 +178,8 @@ var QotdQuestionForm = React.createClass({
 
 var QotdListEntry = React.createClass({
   statics: {
+    selected_qotd : [],
+
     shortenDate: function(date) {
       if (!date) return null;
 
@@ -200,6 +202,14 @@ var QotdListEntry = React.createClass({
     },
   },
 
+  handleChange: function(event) {
+    if (QotdListEntry.selected_qotd.indexOf(event.target.value) < 0) {
+      QotdListEntry.selected_qotd.push(event.target.value);
+    } else {
+      QotdListEntry.selected_qotd.pop(event.target.value);
+    }
+  },
+
   render: function() {
     var entryDate = "--/--/--";
 
@@ -208,7 +218,10 @@ var QotdListEntry = React.createClass({
 
     return (
       <div>
-        <div className="large-9 columns qotd-question-li">{this.props.text}</div>
+        <div className="large-9 columns qotd-question-li">
+          <input type="checkbox" name="qotd" value={this.props.id} key={this.props.id} onChange={this.handleChange}></input>
+          {this.props.text}
+        </div>
         <div className="large-1 columns">
           <a href="#" onClick={QotdListEntry.handleEditClick.bind(this, this.props.id)}>Edit</a>
         </div>
@@ -250,6 +263,24 @@ var QotdListNav = React.createClass({
 
 
 var QotdListSearch = React.createClass({
+  handleDeleteClick: function() {
+    var conf = confirm('Are you sure you want to permanently delete selected questions?');
+    if (conf) {
+      $.ajax({
+        type    : "DELETE",
+        url     : '/api/qotd/delete?id=' + QotdListEntry.selected_qotd.join(','),
+        data    : null,
+        success : gotResponse
+      });
+    }
+
+    function gotResponse(res) {
+      AppDispatcher.handleViewAction({
+        type : "refreshPage"
+      });
+    }
+  },
+
   handleChange: function(event) {
     AppDispatcher.handleViewAction({
       type : "searchQotd",
@@ -260,7 +291,8 @@ var QotdListSearch = React.createClass({
   render: function() {
     return (
       <div>
-        Search:
+        <a className="radius button" href="#" onClick={this.handleDeleteClick}>Delete</a>
+        <label>Search:</label>
         <input name="search" type="text" onChange={this.handleChange}></input>
       </div>
     );
@@ -274,7 +306,8 @@ var QotdList = React.createClass({
       questions : [],
       total     : null,
       no        : null,
-      page      : null
+      page      : null,
+      term      : ''
     }
   },
 
@@ -300,7 +333,7 @@ var QotdList = React.createClass({
           <div className="large-10 columns">
             <a className="radius button" href="#" onClick={QotdListEntry.handleEditClick.bind(this, null)}>Add qotd</a>
             <h2>Qotd list:</h2>
-            { this.state.total == 0 ? "No questions" : null}
+            { this.state.total == 0 ? (this.state.term != '' ? "No match for \"" + this.state.term + "\"" : "No questions") : null}
             { this.state.questions.map(function (opt) {
               return <QotdListEntry key={opt._id} id={opt._id} text={opt.question} date={opt.date} />
             }, this)}
@@ -320,7 +353,8 @@ var QotdList = React.createClass({
       questions : QStore.getCurrent(),
       total     : QStore.getCount(),
       no        : QStore.getNumber(),
-      page      : QStore.getPage()
+      page      : QStore.getPage(),
+      term      : QStore.getTerm()
     });
   }
 });

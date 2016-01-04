@@ -43,7 +43,7 @@ input[type="radio"] {
 }
 
 .qotd-question-li {
-  height: 20px;
+  height: 25px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;

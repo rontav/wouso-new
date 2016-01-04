@@ -19824,6 +19824,8 @@
 
 	var QotdListEntry = React.createClass({displayName: "QotdListEntry",
 	  statics: {
+	    selected_qotd : [],
+
 	    shortenDate: function(date) {
 	      if (!date) return null;
 
@@ -19846,6 +19848,14 @@
 	    },
 	  },
 
+	  handleChange: function(event) {
+	    if (QotdListEntry.selected_qotd.indexOf(event.target.value) < 0) {
+	      QotdListEntry.selected_qotd.push(event.target.value);
+	    } else {
+	      QotdListEntry.selected_qotd.pop(event.target.value);
+	    }
+	  },
+
 	  render: function() {
 	    var entryDate = "--/--/--";
 
@@ -19854,7 +19864,10 @@
 
 	    return (
 	      React.createElement("div", null, 
-	        React.createElement("div", {className: "large-9 columns qotd-question-li"}, this.props.text), 
+	        React.createElement("div", {className: "large-9 columns qotd-question-li"}, 
+	          React.createElement("input", {type: "checkbox", name: "qotd", value: this.props.id, key: this.props.id, onChange: this.handleChange}), 
+	          this.props.text
+	        ), 
 	        React.createElement("div", {className: "large-1 columns"}, 
 	          React.createElement("a", {href: "#", onClick: QotdListEntry.handleEditClick.bind(this, this.props.id)}, "Edit")
 	        ), 
@@ -19896,6 +19909,24 @@
 
 
 	var QotdListSearch = React.createClass({displayName: "QotdListSearch",
+	  handleDeleteClick: function() {
+	    var conf = confirm('Are you sure you want to permanently delete selected questions?');
+	    if (conf) {
+	      $.ajax({
+	        type    : "DELETE",
+	        url     : '/api/qotd/delete?id=' + QotdListEntry.selected_qotd.join(','),
+	        data    : null,
+	        success : gotResponse
+	      });
+	    }
+
+	    function gotResponse(res) {
+	      AppDispatcher.handleViewAction({
+	        type : "refreshPage"
+	      });
+	    }
+	  },
+
 	  handleChange: function(event) {
 	    AppDispatcher.handleViewAction({
 	      type : "searchQotd",
@@ -19906,7 +19937,8 @@
 	  render: function() {
 	    return (
 	      React.createElement("div", null, 
-	        "Search:", 
+	        React.createElement("a", {className: "radius button", href: "#", onClick: this.handleDeleteClick}, "Delete"), 
+	        React.createElement("label", null, "Search:"), 
 	        React.createElement("input", {name: "search", type: "text", onChange: this.handleChange})
 	      )
 	    );
@@ -19920,7 +19952,8 @@
 	      questions : [],
 	      total     : null,
 	      no        : null,
-	      page      : null
+	      page      : null,
+	      term      : ''
 	    }
 	  },
 
@@ -19946,7 +19979,7 @@
 	          React.createElement("div", {className: "large-10 columns"}, 
 	            React.createElement("a", {className: "radius button", href: "#", onClick: QotdListEntry.handleEditClick.bind(this, null)}, "Add qotd"), 
 	            React.createElement("h2", null, "Qotd list:"), 
-	             this.state.total == 0 ? "No questions" : null, 
+	             this.state.total == 0 ? (this.state.term != '' ? "No match for \"" + this.state.term + "\"" : "No questions") : null, 
 	             this.state.questions.map(function (opt) {
 	              return React.createElement(QotdListEntry, {key: opt._id, id: opt._id, text: opt.question, date: opt.date})
 	            }, this), 
@@ -19966,7 +19999,8 @@
 	      questions : QStore.getCurrent(),
 	      total     : QStore.getCount(),
 	      no        : QStore.getNumber(),
-	      page      : QStore.getPage()
+	      page      : QStore.getPage(),
+	      term      : QStore.getTerm()
 	    });
 	  }
 	});
@@ -20020,6 +20054,10 @@
 
 	  getPage: function() {
 	    return page;
+	  },
+
+	  getTerm: function() {
+	    return term;
 	  },
 
 	  emitChange: function() {

@@ -41,6 +41,10 @@ var QStore = assign({}, EventEmitter.prototype, {
     return page;
   },
 
+  getTerm: function() {
+    return term;
+  },
+
   emitChange: function() {
     this.emit(CHANGE_EVENT);
   },
