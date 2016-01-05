@@ -13,28 +13,19 @@ block content
     script var noOfOptions = #{mysettings['qotd-defaultNoOfAns']}
   - if (mysettings['qotd-countdownTimer'])
     script var countdownTimer = #{mysettings['qotd-countdownTimer']}
+    - if (mysettings['qotd-points'])
+      script var qotdPoints = #{mysettings['qotd-points']}
   script function do_on_timeout() { $('#qotd').submit() }
 
 
   - if (ROLE < 2)
-    .row
-      .large-12.columns
-        h3= __('qotd_title_settings')
-
-        form(method='post', action='/api/qotd/settings')
-          label= __('qotd_settings_default_ans')
-            input(name='defaultNoOfAns', type='text', value=mysettings['qotd-defaultNoOfAns'])
-          label= __('qotd_settings_timelimit')
-            input(name='countdownTimer', type='text', value=mysettings['qotd-countdownTimer'])
-          label= __('qotd_settings_points')
-            input(name='points', type='text', value=mysettings['qotd-points'])
-          input.button.small(type='submit', value=__('button_save'))
+    #qotd-admin
 
   - if (ROLE == 3 || ROLE == 2)
-    #qotd-question-list
+    #qotd-contrib
 
   - if (ROLE == 4)   
-    #game-qotd
+    #qotd-game
           
           
 block footer

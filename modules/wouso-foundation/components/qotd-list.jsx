@@ -367,7 +367,7 @@ var QotdList = React.createClass({
               return <QotdListEntry key={opt._id} id={opt._id} text={opt.question} date={opt.date} />
             }, this)}
             <div className="spacer"></div>
-            <QotdListNav key="0" total={this.state.total} no={this.state.no} page={this.state.page} />
+            <QotdListNav total={this.state.total} no={this.state.no} page={this.state.page} />
           </div>
         </div>
         <div className="spacer"></div>

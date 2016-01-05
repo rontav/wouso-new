@@ -44,12 +44,13 @@
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React    = __webpack_require__(1)
-	var ReactDOM = __webpack_require__(158)
-	var QotdList = __webpack_require__(159)
-	var QotdGame = __webpack_require__(356)
-	var locales  = __webpack_require__(357)
-	var config   = __webpack_require__(361)
+	var React     = __webpack_require__(1)
+	var ReactDOM  = __webpack_require__(158)
+	var QotdList  = __webpack_require__(159)
+	var QotdGame  = __webpack_require__(356)
+	var QotdAdmin = __webpack_require__(357)
+	var locales   = __webpack_require__(358)
+	var config    = __webpack_require__(362)
 
 
 	var intlData = {
@@ -58,10 +59,12 @@
 	};
 
 
-	if( $('#game-qotd').length )
-	  ReactDOM.render(React.createElement(QotdGame, null), document.getElementById('game-qotd'))
-	if( $('#qotd-question-list').length )
-	  ReactDOM.render(React.createElement(QotdList, React.__spread({},  intlData)), document.getElementById('qotd-question-list'));
+	if( $('#qotd-game').length )
+	  ReactDOM.render(React.createElement(QotdGame, null), document.getElementById('qotd-game'));
+	if( $('#qotd-contrib').length )
+	  ReactDOM.render(React.createElement(QotdList, React.__spread({},  intlData)), document.getElementById('qotd-contrib'));
+	if( $('#qotd-admin').length )
+	  ReactDOM.render(React.createElement(QotdAdmin, React.__spread({},  intlData)), document.getElementById('qotd-admin'));
 
 
 /***/ },
@@ -20021,7 +20024,7 @@
 	              return React.createElement(QotdListEntry, {key: opt._id, id: opt._id, text: opt.question, date: opt.date})
 	            }, this), 
 	            React.createElement("div", {className: "spacer"}), 
-	            React.createElement(QotdListNav, {key: "0", total: this.state.total, no: this.state.no, page: this.state.page})
+	            React.createElement(QotdListNav, {total: this.state.total, no: this.state.no, page: this.state.page})
 	          )
 	        ), 
 	        React.createElement("div", {className: "spacer"})
@@ -44513,8 +44516,41 @@
 /* 357 */
 /***/ function(module, exports, __webpack_require__) {
 
+	var React = __webpack_require__(1);
+
+
+	var QotdAdmin = React.createClass({displayName: "QotdAdmin",
+	  mixins: [__webpack_require__(168).IntlMixin],
+
+	  render: function () {
+	    return (
+	      React.createElement("div", {className: "row"}, 
+	        React.createElement("div", {className: "large-12 columns"}, 
+	          React.createElement("h3", null, " ",  this.getIntlMessage('qotd_title_settings'), " "), 
+	          React.createElement("form", {method: "post", action: "/api/qotd/settings"}, 
+	            React.createElement("label", null, " ",  this.getIntlMessage('qotd_settings_default_ans'), " "), 
+	            React.createElement("input", {name: "defaultNoOfAns", type: "text", defaultValue: noOfOptions}), 
+	            React.createElement("label", null, " ",  this.getIntlMessage('qotd_settings_timelimit'), " "), 
+	            React.createElement("input", {name: "countdownTimer", type: "text", defaultValue: countdownTimer}), 
+	            React.createElement("label", null, " ",  this.getIntlMessage('qotd_settings_points'), " "), 
+	            React.createElement("input", {name: "points", type: "text", defaultValue: qotdPoints}), 
+	            React.createElement("input", {className: "button small", type: "submit", defaultValue:  this.getIntlMessage('button_save') })
+	          )
+	        )
+	      )
+	    )
+	  }
+	})
+
+	module.exports = QotdAdmin;
+
+
+/***/ },
+/* 358 */
+/***/ function(module, exports, __webpack_require__) {
+
 	// This is essentially bulk require
-	var req = __webpack_require__(358);
+	var req = __webpack_require__(359);
 	var exports = {};
 
 	req.keys().forEach(function (file) {
@@ -44526,12 +44562,12 @@
 
 
 /***/ },
-/* 358 */
+/* 359 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var map = {
-		"./en.json": 359,
-		"./ro.json": 360
+		"./en.json": 360,
+		"./ro.json": 361
 	};
 	function webpackContext(req) {
 		return __webpack_require__(webpackContextResolve(req));
@@ -44544,11 +44580,11 @@
 	};
 	webpackContext.resolve = webpackContextResolve;
 	module.exports = webpackContext;
-	webpackContext.id = 358;
+	webpackContext.id = 359;
 
 
 /***/ },
-/* 359 */
+/* 360 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -44660,7 +44696,7 @@
 	};
 
 /***/ },
-/* 360 */
+/* 361 */
 /***/ function(module, exports) {
 
 	module.exports = {
@@ -44772,7 +44808,7 @@
 	};
 
 /***/ },
-/* 361 */
+/* 362 */
 /***/ function(module, exports) {
 
 	module.exports = {
