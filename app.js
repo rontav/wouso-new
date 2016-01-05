@@ -113,7 +113,7 @@ i18n.expressBind(app, {
   // set the default locale
   defaultLocale: 'en',
   // set location
-  directory: 'locales',
+  directory: './node_modules/' + used_theme + '/locales',
   extension: '.json',
   // do not automatically resolve unknown strings
   devMode: false
@@ -165,41 +165,6 @@ app.use(function (req, res, next) {
   // Transfer vars to view
   res.locals.ROLE = req.session.ROLE
   res.locals.URL = req.url.split('?')[0]
-
-  // Merge core locales with module locales, for current module page
-  var current_module = req.url.split('/')[1].split('?')[0]
-
-  // If current_module is api, get second argument
-  if (current_module == 'api') current_module = req.url.split('/')[2].split('?')[0]
-  // If current_module is not a game, skip
-  if (!(current_module in app.data.games)) return next()
-
-  if (req.app.get('games').indexOf(current_module) > -1) {
-    req.i18n.locales = mergeLocales(req.i18n.locales, current_module)
-  }
-
-  function mergeLocales(locales, module) {
-    // Stores merged locales
-    var new_locales = {}
-
-    for (var locale in locales) {
-      var module_locales_path = './modules/' + module + '/locales/' + locale + '.json'
-      var core_locales_path   = './locales/' + locale + '.json'
-
-      var module_locales = JSON.parse(fs.readFileSync(module_locales_path, 'utf8'))
-      var core_locales   = JSON.parse(fs.readFileSync(core_locales_path, 'utf8'))
-
-      // Merge module strings with core ones
-      for (var attr in module_locales)
-        // Do not overwrite core locales
-        if (!(attr in core_locales))
-          core_locales[attr] = module_locales[attr]
-
-      new_locales[locale] = core_locales
-    }
-
-    return new_locales
-  }
 
   // Set preferred locale
   req.i18n.setLocale(req.app.data.language)

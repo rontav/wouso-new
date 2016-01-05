@@ -1,6 +1,6 @@
 {
 	"hostname": "localhost:4000",
-	"language": "ro",
+	"language": "en",
 	"modules" : {
 		"wouso-social-login" : true
 	},

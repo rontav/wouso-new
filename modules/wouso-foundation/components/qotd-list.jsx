@@ -327,6 +327,7 @@ var QotdListSearch = React.createClass({
 
 
 var QotdList = React.createClass({
+  mixins: [require('react-intl').IntlMixin],
   getInitialState: function() {
     return {
       questions : [],
@@ -359,7 +360,7 @@ var QotdList = React.createClass({
           <div className="large-12 columns">
             <a className="radius button" href="#" onClick={QotdListEntry.handleEditClick.bind(this, null)}>Add qotd</a>
             <h2>
-              { "Qotd list (" + this.state.total + " results" + (this.state.term != '' ? " for \"" + this.state.term + "\"": '') + ")" }
+              { this.getIntlMessage('qotd_list_title') + " (" + this.state.total + " results" + (this.state.term != '' ? " for \"" + this.state.term + "\"": '') + ")" }
             </h2>
             { this.state.total == 0 ? (this.state.term != '' ? "No match for \"" + this.state.term + "\"" : "No questions") : null}
             { this.state.questions.map(function (opt) {

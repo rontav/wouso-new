@@ -9,6 +9,12 @@ module.exports = {
       test: /\.jsx$/,
       loader: 'jsx-loader',
       exclude: /node_modules/
+    },
+    {
+      //tell webpack to use jsx-loader for all *.jsx files
+      test: /\.json$/,
+      loader: 'json-loader',
+      exclude: /node_modules/,
     }]
   },
   resolve: {

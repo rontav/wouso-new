@@ -1,7 +1,9 @@
 var User     = require('../config/models/user')
 var fs       = require('fs')
 var express  = require('express')
+var log      = require('../core/logging')('core')
 var router   = express.Router()
+
 
 
 router.get('/', function (req, res, next) {
