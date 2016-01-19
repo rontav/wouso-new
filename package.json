@@ -35,7 +35,7 @@
     "zombie": "^4.1.0",
     "wouso-social-login": "file:./modules/wouso-social-login",
     "wouso-foundation": "file:./modules/wouso-foundation",
-    "wouso-qotd-login": "file:./modules/qotd"
+    "qotd": "file:./modules/qotd"
   },
   "engines": {
     "node": "4.0.x",
