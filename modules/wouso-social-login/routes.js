@@ -93,3 +93,4 @@ router.get('/wouso-social-login/connect/github/callback',
 
 
 module.exports = router
+module.exports.social = require('./auth')

@@ -104,5 +104,5 @@ module.exports = function(app, passport) {
 
   // Add social login if available and needed
   if ('wouso-social-login' in app.data.modules)
-    require('wouso-social-login/auth')(app, passport)
+    require('wouso-social-login').social(app, passport)
 }
