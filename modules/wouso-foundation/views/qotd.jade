@@ -21,7 +21,10 @@ block content
   - if (ROLE < 2)
     #qotd-admin
 
-  - if (ROLE == 3 || ROLE == 2)
+  - if (ROLE == 2)
+    #qotd-teacher
+
+  - if (ROLE == 3)
     #qotd-contrib
 
   - if (ROLE == 4)   

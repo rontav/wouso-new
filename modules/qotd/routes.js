@@ -94,6 +94,15 @@ router.get('/api/qotd/list/:perPage/:page', function (req, res, next) {
   if (req.query.tags) query['tags'] = {$in: req.query.tags.split(',')}
   if (typeof req.query.search !== 'undefined')
     query['question'] = { '$regex': req.query.search, '$options': 'i' }
+  if (typeof req.query.start !== 'undefined') {
+    var start = new Date(req.query.start);
+    var end = new Date();
+    // Use provided end date
+    if (typeof req.query.end !== 'undefined')
+      end = new Date(req.query.end);
+
+    query['date'] = { '$gt': start, '$lt': end }
+  }
 
   _self.query = query
   qotd.find(query).skip(skip).limit(show).exec(gotQotd)
@@ -198,7 +207,9 @@ router.get('/api/qotd/play', function (req, res, next) {
         'date' : Date.now(),
         'res'  : null
       }}};
-      qotd.update(query, update).exec();
+      qotd.update(query, update).exec(function(err, update) {
+        if (err) return next(err)
+      });
 
       return res.send(shuffleAnswers(question));
     }
