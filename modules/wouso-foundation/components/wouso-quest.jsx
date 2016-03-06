@@ -193,7 +193,7 @@ var QuestListEntry = React.createClass({
 
     return (
       <div>
-        <div className="large-9 columns qotd-question-li">
+        <div className="large-9 columns question-li">
           <input type="checkbox" name="quest" value={this.props.id} key={this.props.id} onChange={this.handleChange}></input>
           {this.props.text}
         </div>

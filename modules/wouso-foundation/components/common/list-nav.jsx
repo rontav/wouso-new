@@ -1,4 +1,5 @@
-var React = require('react');
+var React         = require('react');
+var AppDispatcher = require('../../dispatchers/app');
 
 
 var ListNav = React.createClass({
