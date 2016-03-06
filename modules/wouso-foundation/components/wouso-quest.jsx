@@ -4,8 +4,12 @@ var ReactDOM  = require('react-dom')
 var locales   = require('../locales/locales.js')
 var config    = require('../../../config.json')
 
-var QStore        = require('../stores/quests');
+var QStore        = require('../stores/questions');
 var AppDispatcher = require('../dispatchers/app');
+
+// Common components
+var ListNav    = require('./common/list-nav.jsx');
+var ListSearch = require('./common/list-search.jsx');
 
 
 var intlData = {
@@ -149,7 +153,7 @@ var QuestQuestionForm = React.createClass({
 
 var QuestListEntry = React.createClass({
   statics: {
-    selected_qotd : [],
+    selected_quests : [],
 
     shortenDate: function(date) {
       if (!date) return null;
@@ -174,10 +178,10 @@ var QuestListEntry = React.createClass({
   },
 
   handleChange: function(event) {
-    if (QuestListEntry.selected_qotd.indexOf(event.target.value) < 0) {
-      QuestListEntry.selected_qotd.push(event.target.value);
+    if (QuestListEntry.selected_quests.indexOf(event.target.value) < 0) {
+      QuestListEntry.selected_quests.push(event.target.value);
     } else {
-      QuestListEntry.selected_qotd.pop(event.target.value);
+      QuestListEntry.selected_quests.pop(event.target.value);
     }
   },
 
@@ -190,7 +194,7 @@ var QuestListEntry = React.createClass({
     return (
       <div>
         <div className="large-9 columns qotd-question-li">
-          <input type="checkbox" name="qotd" value={this.props.id} key={this.props.id} onChange={this.handleChange}></input>
+          <input type="checkbox" name="quest" value={this.props.id} key={this.props.id} onChange={this.handleChange}></input>
           {this.props.text}
         </div>
         <div className="large-1 columns">
@@ -210,100 +214,6 @@ var QuestGame = React.createClass({
 });
 
 
-var QuestListSearch = React.createClass({
-  handleDeleteClick: function() {
-    if (QuestListEntry.selected_qotd.length == 0) {
-      alert('First select the questions that you need to delete.');
-    } else {
-      var conf = confirm('Are you sure you want to permanently delete selected questions?');
-      if (conf) {
-        $.ajax({
-          type    : "DELETE",
-          url     : '/api/wouso-quest/delete?id=' + QuestListEntry.selected_qotd.join(','),
-          data    : null,
-          success : gotResponse
-        });
-      }
-
-      function gotResponse(res) {
-        AppDispatcher.handleViewAction({
-          type : "refreshPage"
-        });
-      }
-    }
-  },
-
-  handleClearClick: function() {
-    AppDispatcher.handleViewAction({
-      type : "searchQuest",
-      term : ''
-    });
-    AppDispatcher.handleViewAction({
-      type : "refreshPage"
-    });
-    this.clearButton.value = '';
-  },
-
-  handleChange: function(event) {
-    AppDispatcher.handleViewAction({
-      type : "searchQuest",
-      term : String(event.target.value)
-    });
-  },
-
-  render: function() {
-    return (
-      <div>
-        <a className="radius button" href="#" onClick={this.handleDeleteClick}>Delete</a>
-        <div className="row">
-          <div className="large-12 columns">
-            <div className="row collapse">
-              <div className="small-4 columns">
-                <input type="text" ref={(ref) => this.clearButton = ref} onChange={this.handleChange} placeholder="Search"></input>
-              </div>
-              <div className="small-1 columns">
-                <a href="#" className="button postfix" onClick={this.handleClearClick}>Clear</a>
-              </div>
-              <div className="small-7 columns"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-});
-
-
-var QuestListNav = React.createClass({
-  refreshList: function (page) {
-    AppDispatcher.handleViewAction({
-      type : "refreshPage",
-      no   : String(this.props.no),
-      page : String(page)
-    });
-  },
-
-  render: function() {
-    this.pages = [];
-    if (this.props.total) {
-      this.pages = Math.ceil(this.props.total/this.props.no);
-      this.pages = Array.apply(0, Array(this.pages)).map(function(j, i) { return i+1; });
-    }
-
-    return (
-      <div className="qotd-question-pages text-center">
-        { this.pages.map(function (opt, i) {
-          if (opt == this.props.page)
-            return (<b><a key={i} href="#" onClick={this.refreshList.bind(this, opt)}>{opt}</a></b>)
-          else
-            return (<a key={i} href="#" onClick={this.refreshList.bind(this, opt)}>{opt}</a>)
-        }, this) }
-      </div>
-    );
-  }
-});
-
-
 var QuestContrib = React.createClass({
   mixins: [require('react-intl').IntlMixin],
   getInitialState: function() {
@@ -319,7 +229,7 @@ var QuestContrib = React.createClass({
   componentDidMount: function() {
     QStore.addChangeListener(this._onChange);
     AppDispatcher.handleViewAction({
-      type : "refreshPage"
+      type : "refreshQuest"
     });
   },
 
@@ -331,7 +241,8 @@ var QuestContrib = React.createClass({
     return(
       <div>
         <div className="row">
-          <QuestListSearch />
+          <ListSearch searchType='searchQuest' refreshType='refreshQuest'
+                      selected={QuestListEntry.selected_quests} />
         </div>
         <div className="row">
           <div className="reveal-modal" id="questModal"
@@ -348,8 +259,8 @@ var QuestContrib = React.createClass({
                                      text={opt.question} date={opt.date} />
             }, this)}
             <div className="spacer"></div>
-            <QuestListNav total={this.state.total}
-                         no={this.state.no} page={this.state.page} />
+            <ListNav total={this.state.total} no={this.state.no}
+                     page={this.state.page} refreshType='refreshQuest' />
           </div>
         </div>
         <div className="spacer"></div>

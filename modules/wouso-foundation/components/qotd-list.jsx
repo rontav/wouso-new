@@ -1,6 +1,6 @@
 var React         = require('react');
 var ReactDOM      = require('react-dom');
-var QStore        = require('../stores/qotds');
+var QStore        = require('../stores/questions');
 var DateStore     = require('../stores/datepicker');
 var AppDispatcher = require('../dispatchers/app');
 
@@ -233,9 +233,9 @@ var QotdListEntry = React.createClass({
 
 
 var QotdListNav = React.createClass({
-  refreshList: function (page) {
+  refreshQotd: function (page) {
     AppDispatcher.handleViewAction({
-      type : "refreshPage",
+      type : "refreshQotd",
       no   : String(this.props.no),
       page : String(page)
     });
@@ -249,12 +249,12 @@ var QotdListNav = React.createClass({
     }
 
     return (
-      <div className="qotd-question-pages text-center">
+      <div className="questions-pages text-center">
         { this.pages.map(function (opt, i) {
           if (opt == this.props.page)
-            return (<b><a key={i} href="#" onClick={this.refreshList.bind(this, opt)}>{opt}</a></b>)
+            return (<b><a key={i} href="#" onClick={this.refreshQotd.bind(this, opt)}>{opt}</a></b>)
           else
-            return (<a key={i} href="#" onClick={this.refreshList.bind(this, opt)}>{opt}</a>)
+            return (<a key={i} href="#" onClick={this.refreshQotd.bind(this, opt)}>{opt}</a>)
         }, this) }
       </div>
     );
@@ -279,7 +279,7 @@ var QotdListSearch = React.createClass({
 
       function gotResponse(res) {
         AppDispatcher.handleViewAction({
-          type : "refreshPage"
+          type : "refreshQotd"
         });
       }
     }
@@ -291,7 +291,7 @@ var QotdListSearch = React.createClass({
       term : ''
     });
     AppDispatcher.handleViewAction({
-      type : "refreshPage"
+      type : "refreshQotd"
     });
     this.clearButton.value = '';
   },
@@ -341,7 +341,7 @@ var QotdList = React.createClass({
   componentDidMount: function() {
     QStore.addChangeListener(this._onChange);
     AppDispatcher.handleViewAction({
-      type : "refreshPage"
+      type : "refreshQotd"
     });
   },
 

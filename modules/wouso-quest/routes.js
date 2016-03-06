@@ -4,6 +4,8 @@ var mongoose = require('mongoose');
 var QuestQ = mongoose.model('QuestQ');
 var Tag    = mongoose.model('Tag');
 
+var log = require('../../core/logging')('wouso-quest');
+
 var router  = express.Router();
 
 
@@ -120,6 +122,23 @@ router.get('/api/wouso-quest/list/:perPage/:page', function (req, res, next) {
     res.send(response)
   }
 })
+
+
+router.delete('/api/wouso-quest/delete', function (req, res, next) {
+  var del_list = req.query.id.split(',');
+  QuestQ.remove({'_id': {$in: del_list}}).exec(removedQotd);
+
+  function removedQotd(err) {
+    if (err) {
+      log.error('Could not remove quest questions: ' + del_list);
+      return res.send('NOK');
+    } else {
+      log.info('Removed quest question: ' + del_list);
+      return res.send('OK');
+    }
+  }
+
+});
 
 
 module.exports = router;

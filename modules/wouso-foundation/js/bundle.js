@@ -20010,9 +20010,9 @@
 
 
 	var QotdListNav = React.createClass({displayName: "QotdListNav",
-	  refreshList: function (page) {
+	  refreshQotd: function (page) {
 	    AppDispatcher.handleViewAction({
-	      type : "refreshPage",
+	      type : "refreshQotd",
 	      no   : String(this.props.no),
 	      page : String(page)
 	    });
@@ -20026,12 +20026,12 @@
 	    }
 
 	    return (
-	      React.createElement("div", {className: "qotd-question-pages text-center"}, 
+	      React.createElement("div", {className: "questions-pages text-center"}, 
 	         this.pages.map(function (opt, i) {
 	          if (opt == this.props.page)
-	            return (React.createElement("b", null, React.createElement("a", {key: i, href: "#", onClick: this.refreshList.bind(this, opt)}, opt)))
+	            return (React.createElement("b", null, React.createElement("a", {key: i, href: "#", onClick: this.refreshQotd.bind(this, opt)}, opt)))
 	          else
-	            return (React.createElement("a", {key: i, href: "#", onClick: this.refreshList.bind(this, opt)}, opt))
+	            return (React.createElement("a", {key: i, href: "#", onClick: this.refreshQotd.bind(this, opt)}, opt))
 	        }, this) 
 	      )
 	    );
@@ -20056,7 +20056,7 @@
 
 	      function gotResponse(res) {
 	        AppDispatcher.handleViewAction({
-	          type : "refreshPage"
+	          type : "refreshQotd"
 	        });
 	      }
 	    }
@@ -20068,7 +20068,7 @@
 	      term : ''
 	    });
 	    AppDispatcher.handleViewAction({
-	      type : "refreshPage"
+	      type : "refreshQotd"
 	    });
 	    this.clearButton.value = '';
 	  },
@@ -20118,7 +20118,7 @@
 	  componentDidMount: function() {
 	    QStore.addChangeListener(this._onChange);
 	    AppDispatcher.handleViewAction({
-	      type : "refreshPage"
+	      type : "refreshQotd"
 	    });
 	  },
 
@@ -20187,8 +20187,17 @@
 	// Search term
 	var term = '';
 
-	function getData(no, page, term) {
+	function getQotdData(no, page, term) {
 	  var url = '/api/qotd/list/' + no + '/' + page + '?search=' + term;
+	  $.get(url, function(res) {
+	    _qlist = res.questions;
+	    _count = res.count;
+	    QStore.emitChange();
+	  });
+	}
+
+	function getQuestData(no, page, term) {
+	  var url = '/api/wouso-quest/list/' + no + '/' + page + '?search=' + term;
 	  $.get(url, function(res) {
 	    _qlist = res.questions;
 	    _count = res.count;
@@ -20232,12 +20241,12 @@
 
 	  dispatcherIndex: AppDispatcher.register(function(payload) {
 	    switch(payload.action.type) {
-	      case 'refreshPage':
+	      case 'refreshQotd':
 	        if (typeof payload.action.no !== 'undefined')
 	          no = payload.action.no
 	        if (typeof payload.action.page !== 'undefined')
 	          page = payload.action.page
-	        getData(no, page, term);
+	        getQotdData(no, page, term);
 	        break;
 
 	      case 'searchQotd':
@@ -20245,7 +20254,23 @@
 	        page = 1;
 	        if (typeof payload.action.term !== 'undefined')
 	          term = payload.action.term
-	        getData(no, page, term);
+	        getQotdData(no, page, term);
+	        break;
+
+	      case 'refreshQuest':
+	        if (typeof payload.action.no !== 'undefined')
+	          no = payload.action.no
+	        if (typeof payload.action.page !== 'undefined')
+	          page = payload.action.page
+	        getQuestData(no, page, term);
+	        break;
+
+	      case 'searchQuest':
+	        // Reset page on each new search
+	        page = 1;
+	        if (typeof payload.action.term !== 'undefined')
+	          term = payload.action.term
+	        getQuestData(no, page, term);
 	        break;
 	    }
 
@@ -20265,7 +20290,6 @@
 	var assign     = __webpack_require__(167);
 
 	var appDispatcher = assign(new Dispatcher(), {
-
 	  handleViewAction: function(action) {
 	    var payload = {
 	      source: 'VIEW_ACTION',
@@ -44958,8 +44982,12 @@
 	var locales   = __webpack_require__(360)
 	var config    = __webpack_require__(364)
 
-	var QStore        = __webpack_require__(366);
+	var QStore        = __webpack_require__(162);
 	var AppDispatcher = __webpack_require__(163);
+
+	// Common components
+	var ListNav    = __webpack_require__(366);
+	var ListSearch = __webpack_require__(367);
 
 
 	var intlData = {
@@ -45103,7 +45131,7 @@
 
 	var QuestListEntry = React.createClass({displayName: "QuestListEntry",
 	  statics: {
-	    selected_qotd : [],
+	    selected_quests : [],
 
 	    shortenDate: function(date) {
 	      if (!date) return null;
@@ -45128,10 +45156,10 @@
 	  },
 
 	  handleChange: function(event) {
-	    if (QuestListEntry.selected_qotd.indexOf(event.target.value) < 0) {
-	      QuestListEntry.selected_qotd.push(event.target.value);
+	    if (QuestListEntry.selected_quests.indexOf(event.target.value) < 0) {
+	      QuestListEntry.selected_quests.push(event.target.value);
 	    } else {
-	      QuestListEntry.selected_qotd.pop(event.target.value);
+	      QuestListEntry.selected_quests.pop(event.target.value);
 	    }
 	  },
 
@@ -45144,7 +45172,7 @@
 	    return (
 	      React.createElement("div", null, 
 	        React.createElement("div", {className: "large-9 columns qotd-question-li"}, 
-	          React.createElement("input", {type: "checkbox", name: "qotd", value: this.props.id, key: this.props.id, onChange: this.handleChange}), 
+	          React.createElement("input", {type: "checkbox", name: "quest", value: this.props.id, key: this.props.id, onChange: this.handleChange}), 
 	          this.props.text
 	        ), 
 	        React.createElement("div", {className: "large-1 columns"}, 
@@ -45164,100 +45192,6 @@
 	});
 
 
-	var QuestListSearch = React.createClass({displayName: "QuestListSearch",
-	  handleDeleteClick: function() {
-	    if (QuestListEntry.selected_qotd.length == 0) {
-	      alert('First select the questions that you need to delete.');
-	    } else {
-	      var conf = confirm('Are you sure you want to permanently delete selected questions?');
-	      if (conf) {
-	        $.ajax({
-	          type    : "DELETE",
-	          url     : '/api/wouso-quest/delete?id=' + QuestListEntry.selected_qotd.join(','),
-	          data    : null,
-	          success : gotResponse
-	        });
-	      }
-
-	      function gotResponse(res) {
-	        AppDispatcher.handleViewAction({
-	          type : "refreshPage"
-	        });
-	      }
-	    }
-	  },
-
-	  handleClearClick: function() {
-	    AppDispatcher.handleViewAction({
-	      type : "searchQuest",
-	      term : ''
-	    });
-	    AppDispatcher.handleViewAction({
-	      type : "refreshPage"
-	    });
-	    this.clearButton.value = '';
-	  },
-
-	  handleChange: function(event) {
-	    AppDispatcher.handleViewAction({
-	      type : "searchQuest",
-	      term : String(event.target.value)
-	    });
-	  },
-
-	  render: function() {
-	    return (
-	      React.createElement("div", null, 
-	        React.createElement("a", {className: "radius button", href: "#", onClick: this.handleDeleteClick}, "Delete"), 
-	        React.createElement("div", {className: "row"}, 
-	          React.createElement("div", {className: "large-12 columns"}, 
-	            React.createElement("div", {className: "row collapse"}, 
-	              React.createElement("div", {className: "small-4 columns"}, 
-	                React.createElement("input", {type: "text", ref: (ref) => this.clearButton = ref, onChange: this.handleChange, placeholder: "Search"})
-	              ), 
-	              React.createElement("div", {className: "small-1 columns"}, 
-	                React.createElement("a", {href: "#", className: "button postfix", onClick: this.handleClearClick}, "Clear")
-	              ), 
-	              React.createElement("div", {className: "small-7 columns"})
-	            )
-	          )
-	        )
-	      )
-	    );
-	  }
-	});
-
-
-	var QuestListNav = React.createClass({displayName: "QuestListNav",
-	  refreshList: function (page) {
-	    AppDispatcher.handleViewAction({
-	      type : "refreshPage",
-	      no   : String(this.props.no),
-	      page : String(page)
-	    });
-	  },
-
-	  render: function() {
-	    this.pages = [];
-	    if (this.props.total) {
-	      this.pages = Math.ceil(this.props.total/this.props.no);
-	      this.pages = Array.apply(0, Array(this.pages)).map(function(j, i) { return i+1; });
-	    }
-
-	    return (
-	      React.createElement("div", {className: "qotd-question-pages text-center"}, 
-	         this.pages.map(function (opt, i) {
-	          if (opt == this.props.page)
-	            return (React.createElement("b", null, React.createElement("a", {key: i, href: "#", onClick: this.refreshList.bind(this, opt)}, opt)))
-	          else
-	            return (React.createElement("a", {key: i, href: "#", onClick: this.refreshList.bind(this, opt)}, opt))
-	        }, this) 
-	      )
-	    );
-	  }
-	});
-
-
 	var QuestContrib = React.createClass({displayName: "QuestContrib",
 	  mixins: [__webpack_require__(170).IntlMixin],
 	  getInitialState: function() {
@@ -45273,7 +45207,7 @@
 	  componentDidMount: function() {
 	    QStore.addChangeListener(this._onChange);
 	    AppDispatcher.handleViewAction({
-	      type : "refreshPage"
+	      type : "refreshQuest"
 	    });
 	  },
 
@@ -45285,7 +45219,8 @@
 	    return(
 	      React.createElement("div", null, 
 	        React.createElement("div", {className: "row"}, 
-	          React.createElement(QuestListSearch, null)
+	          React.createElement(ListSearch, {searchType: "searchQuest", refreshType: "refreshQuest", 
+	                      selected: QuestListEntry.selected_quests})
 	        ), 
 	        React.createElement("div", {className: "row"}, 
 	          React.createElement("div", {className: "reveal-modal", id: "questModal", 
@@ -45302,8 +45237,8 @@
 	                                     text: opt.question, date: opt.date})
 	            }, this), 
 	            React.createElement("div", {className: "spacer"}), 
-	            React.createElement(QuestListNav, {total: this.state.total, 
-	                         no: this.state.no, page: this.state.page})
+	            React.createElement(ListNav, {total: this.state.total, no: this.state.no, 
+	                     page: this.state.page, refreshType: "refreshQuest"})
 	          )
 	        ), 
 	        React.createElement("div", {className: "spacer"})
@@ -45333,90 +45268,131 @@
 /* 366 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var AppDispatcher = __webpack_require__(163);
-	var EventEmitter  = __webpack_require__(168).EventEmitter;
-	var assign        = __webpack_require__(167);
+	var React = __webpack_require__(2);
 
-	var CHANGE_EVENT = 'change';
 
-	var _qlist = [];
-	var _count = null;
-
-	// Number of questions per page
-	var no = 10;
-	// Initial page Number
-	var page = 1;
-	// Search term
-	var term = '';
-
-	function getData(no, page, term) {
-	  var url = '/api/wouso-quest/list/' + no + '/' + page + '?search=' + term;
-	  $.get(url, function(res) {
-	    _qlist = res.questions;
-	    _count = res.count;
-	    QStore.emitChange();
-	  });
-	}
-
-	var QStore = assign({}, EventEmitter.prototype, {
-
-	  getCurrent: function() {
-	    return _qlist;
+	var ListNav = React.createClass({displayName: "ListNav",
+	  refreshList: function (page) {
+	    AppDispatcher.handleViewAction({
+	      type : this.props.refreshType,
+	      no   : String(this.props.no),
+	      page : String(page)
+	    });
 	  },
 
-	  getCount: function() {
-	    return _count;
-	  },
-
-	  getNumber: function() {
-	    return no;
-	  },
-
-	  getPage: function() {
-	    return page;
-	  },
-
-	  getTerm: function() {
-	    return term;
-	  },
-
-	  emitChange: function() {
-	    this.emit(CHANGE_EVENT);
-	  },
-
-	  addChangeListener: function(callback) {
-	    this.on(CHANGE_EVENT, callback);
-	  },
-
-	  removeChangeListener: function(callback) {
-	    this.removeListener(CHANGE_EVENT, callback);
-	  },
-
-	  dispatcherIndex: AppDispatcher.register(function(payload) {
-	    switch(payload.action.type) {
-	      case 'refreshPage':
-	        if (typeof payload.action.no !== 'undefined')
-	          no = payload.action.no
-	        if (typeof payload.action.page !== 'undefined')
-	          page = payload.action.page
-	        getData(no, page, term);
-	        break;
-
-	      case 'searchQuest':
-	        // Reset page on each new search
-	        page = 1;
-	        if (typeof payload.action.term !== 'undefined')
-	          term = payload.action.term
-	        getData(no, page, term);
-	        break;
+	  render: function() {
+	    this.pages = [];
+	    if (this.props.total) {
+	      this.pages = Math.ceil(this.props.total/this.props.no);
+	      this.pages = Array.apply(0, Array(this.pages)).map(function(j, i) {
+	        return i+1;
+	      });
 	    }
 
-	    // No errors. Needed by promise in Dispatcher.
-	    return true;
-	  })
+	    return (
+	      React.createElement("div", {className: "questions-pages text-center"}, 
+	         this.pages.map(function (opt, i) {
+	          if (opt == this.props.page) {
+	            return (
+	              React.createElement("b", {key: i}, 
+	                React.createElement("a", {key: i, href: "#", onClick: this.refreshList.bind(this, opt)}, 
+	                  opt
+	                )
+	              )
+	            );
+	          } else {
+	            return (
+	              React.createElement("a", {key: i, href: "#", onClick: this.refreshList.bind(this, opt)}, 
+	                opt
+	              )
+	            );
+	          }
+	        }, this) 
+	      )
+	    );
+	  }
 	});
 
-	module.exports = QStore;
+	module.exports = ListNav;
+
+
+/***/ },
+/* 367 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var React         = __webpack_require__(2);
+	var AppDispatcher = __webpack_require__(163);
+
+
+	var ListSearch = React.createClass({displayName: "ListSearch",
+	  handleDeleteClick: function() {
+	    if (this.props.selected.length == 0) {
+	      alert('First select the questions that you need to delete.');
+	    } else {
+	      var refreshType = this.props.refreshType;
+	      var conf = confirm('Are you sure you want to permanently delete selected questions?');
+	      if (conf) {
+	        $.ajax({
+	          type    : "DELETE",
+	          url     : '/api/wouso-quest/delete?id=' + this.props.selected.join(','),
+	          data    : null,
+	          success : gotResponse
+	        });
+	      }
+
+	      function gotResponse(res) {
+	        AppDispatcher.handleViewAction({
+	          type: refreshType
+	        });
+	      }
+	    }
+	  },
+
+	  handleClearClick: function() {
+	    AppDispatcher.handleViewAction({
+	      type : this.props.searchType,
+	      term : ''
+	    });
+	    AppDispatcher.handleViewAction({
+	      type : this.props.refreshType
+	    });
+	    this.clearButton.value = '';
+	  },
+
+	  handleChange: function(event) {
+	    AppDispatcher.handleViewAction({
+	      type : this.props.searchType,
+	      term : String(event.target.value)
+	    });
+	  },
+
+	  render: function() {
+	    return (
+	      React.createElement("div", null, 
+	        React.createElement("a", {className: "radius button", href: "#", 
+	           onClick: this.handleDeleteClick}, "Delete"), 
+	        React.createElement("div", {className: "row"}, 
+	          React.createElement("div", {className: "large-12 columns"}, 
+	            React.createElement("div", {className: "row collapse"}, 
+	              React.createElement("div", {className: "small-4 columns"}, 
+	                React.createElement("input", {type: "text", ref: (ref) => this.clearButton = ref, 
+	                       onChange: this.handleChange, placeholder: "Search"}
+	                )
+	              ), 
+	              React.createElement("div", {className: "small-1 columns"}, 
+	                React.createElement("a", {href: "#", className: "button postfix", 
+	                   onClick: this.handleClearClick}, "Clear")
+	              ), 
+	              React.createElement("div", {className: "small-7 columns"})
+	            )
+	          )
+	        )
+	      )
+	    );
+	  }
+	});
+
+	module.exports = ListSearch;
 
 
 /***/ }
