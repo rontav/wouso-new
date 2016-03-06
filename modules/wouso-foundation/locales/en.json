@@ -14,6 +14,7 @@
 
   "module_title": "GAMES",
   "module_qotd":  "QotD",
+  "module_quest":  "Quest",
 
   "role_title":   "ROLE",
   "role_root":    "Root",
@@ -121,5 +122,13 @@
 
   "qotd_tags_title": "Tags:",
 
-  "qotd_game_check": "Check"
+  "qotd_game_check": "Check",
+
+
+
+  "quest_list_modal_title_add": "Add question",
+  "quest_list_modal_title_edit": "Edit question",
+
+  "button_text_add": "Add",
+  "button_text_edit": "Edit"
 }

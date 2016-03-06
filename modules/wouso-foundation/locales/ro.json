@@ -121,5 +121,13 @@
 
   "qotd_tags_title": "Etichete:",
 
-  "qotd_game_check": "Verifică"
+  "qotd_game_check": "Verifică",
+
+
+
+  "quest_list_modal_title_add": "Adaugă întrebare",
+  "quest_list_modal_title_edit": "Modifică întrebare",
+
+  "button_text_add": "Adaugă",
+  "button_text_edit": "Modifică"
 }

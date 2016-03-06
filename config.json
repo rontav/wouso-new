@@ -5,7 +5,8 @@
 		"wouso-social-login" : true
 	},
 	"games": {
-		"qotd" : true
+		"qotd" : true,
+		"wouso-quest": true
 	},
 	"themes": {
 		"wouso-foundation": true
