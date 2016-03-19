@@ -19999,7 +19999,7 @@
 
 	    return (
 	      React.createElement("div", null, 
-	        React.createElement("div", {className: "large-9 columns qotd-question-li"}, 
+	        React.createElement("div", {className: "large-9 columns question-li"}, 
 	          React.createElement("input", {type: "checkbox", name: "qotd", value: this.props.id, key: this.props.id, onChange: this.handleChange}), 
 	          this.props.text
 	        ), 
@@ -45020,46 +45020,54 @@
 /* 367 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React     = __webpack_require__(2)
-	var ReactDOM  = __webpack_require__(159)
+	var React = __webpack_require__(2)
+	var ReactDOM = __webpack_require__(159)
 
-	var locales   = __webpack_require__(362)
-	var config    = __webpack_require__(366)
+	var locales = __webpack_require__(362)
+	var config = __webpack_require__(366)
 
-	var QStore        = __webpack_require__(162);
+	var QStore = __webpack_require__(162);
 	var AppDispatcher = __webpack_require__(163);
 
 	// Common components
-	var ListNav    = __webpack_require__(170);
+	var ListNav = __webpack_require__(170);
 	var ListSearch = __webpack_require__(171);
 
-
 	var intlData = {
-	  locales  : ['en-US'],
-	  messages : locales[config.language]
+	  locales: ['en-US'],
+	  messages: locales[config.language]
 	};
 
 	var QuestQuestionForm = React.createClass({displayName: "QuestQuestionForm",
 	  mixins: [__webpack_require__(172).IntlMixin],
 	  getInitialState: function() {
 	    return {
-	      question : "",
-	      answer   : "",
-	      tags     : "",
-	    }
+	      questList: [{name: '---', _id: '---'}],
+	      question: "",
+	      answer: "",
+	      tags: ""
+	    };
 	  },
 
 	  componentDidMount: function() {
+	    $.get('/api/wouso-quest/qlist', function(res) {
+	      if (this.isMounted()) {
+	        this.setState({
+	          questList: this.state.questList.concat(res)
+	        });
+	      }
+	    }.bind(this));
 	    if (this.props.id) {
 	      $.get('/api/wouso-quest/list?id=' + this.props.id, function(res) {
 	        if (this.isMounted()) {
 	          this.setState({
-	            question : res.question,
-	            answer   : res.answer,
-	            hint1    : res.hint1,
-	            hint2    : res.hint2,
-	            hint3    : res.hint3,
-	            tags     : res.tags.join(" "),
+	            question: res.question,
+	            quest: res.quest,
+	            answer: res.answer,
+	            hint1: res.hint1,
+	            hint2: res.hint2,
+	            hint3: res.hint3,
+	            tags: res.tags.join(" ")
 	          });
 	        }
 	      }.bind(this));
@@ -45067,14 +45075,22 @@
 	  },
 
 	  render: function() {
-	    var modalTitle  = this.getIntlMessage('quest_list_modal_title_add');
+	    var modalTitle = this.getIntlMessage('quest_list_modal_title_add');
 	    var modalSubmit = this.getIntlMessage('button_text_add');
 
 	    // Change text if we are editing an existing question
 	    if (this.props.id) {
-	      modalTitle  = this.getIntlMessage('quest_list_modal_title_edit');
+	      modalTitle = this.getIntlMessage('quest_list_modal_title_edit');
 	      modalSubmit = this.getIntlMessage('button_text_edit');
 	    }
+
+	    var defaultQuestValue = this.props.qID;
+	    if (this.state.quest) {
+	      defaultQuestValue = this.state.quest;
+	    }
+
+	    console.log('#' + this.props.qID)
+	    console.log('@' + this.state.quest)
 
 	    return (
 	      React.createElement("form", {method: "post", action: "/api/wouso-quest/add"}, 
@@ -45086,6 +45102,16 @@
 	              React.createElement("input", {name: "question", type: "text", value: this.state.question, 
 	                     onChange: this.editQuestion}), 
 	              React.createElement("input", {name: "id", type: "hidden", value: this.props.id})
+	            )
+	          ), 
+	          React.createElement("div", {className: "row"}, 
+	            React.createElement("div", {className: "large-12 columns"}, 
+	              React.createElement("label", null, "Quest"), 
+	              React.createElement("select", {name: "quest", value: defaultQuestValue, onChange: this.editQuest}, 
+	                this.state.questList.map(function(q, i) {
+	                  return (React.createElement("option", {key: i, value: q._id}, q.name));
+	                })
+	              )
 	            )
 	          ), 
 	          React.createElement("div", {className: "row"}, 
@@ -45141,6 +45167,12 @@
 	    });
 	  },
 
+	  editQuest: function(event) {
+	    this.setState({
+	      quest: event.target.value
+	    });
+	  },
+
 	  editTags: function(event) {
 	    this.setState({
 	      tags: event.target.value
@@ -45173,6 +45205,63 @@
 	});
 
 
+	var QuestManageForm = React.createClass({displayName: "QuestManageForm",
+	  mixins: [__webpack_require__(172).IntlMixin],
+	  getInitialState: function() {
+	    return {
+	      name : ""
+	    }
+	  },
+
+	  componentDidMount: function() {
+	    // if (this.props.id) {
+	    //   $.get('/api/wouso-quest/list?id=' + this.props.id, function(res) {
+	    //     if (this.isMounted()) {
+	    //       this.setState({
+	    //         question : res.question,
+	    //         answer   : res.answer,
+	    //         hint1    : res.hint1,
+	    //         hint2    : res.hint2,
+	    //         hint3    : res.hint3,
+	    //         tags     : res.tags.join(" "),
+	    //       });
+	    //     }
+	    //   }.bind(this));
+	    // }
+	  },
+
+	  render: function() {
+	    return (
+	      React.createElement("form", {method: "post", action: "/api/wouso-quest/add-quest"}, 
+	        React.createElement("div", {className: "quest-question"}, 
+	          React.createElement("div", {className: "row"}, 
+	            React.createElement("div", {className: "large-12 columns"}, 
+	              React.createElement("h2", null, "Add new quest"), 
+	              React.createElement("label", null, "Name:"), 
+	              React.createElement("input", {name: "name", type: "text", value: this.state.name, 
+	                     onChange: this.editName}), 
+	              React.createElement("input", {name: "id", type: "hidden", value: this.props.id})
+	            )
+	          ), 
+	          React.createElement("div", {className: "row"}, 
+	            React.createElement("div", {className: "large-2 right"}, 
+	              React.createElement("input", {className: "button small right", 
+	                     type: "submit", value: "Save"})
+	            )
+	          )
+	        )
+	      )
+	    );
+	  },
+
+	  editName: function(event) {
+	    this.setState({
+	      name: event.target.value
+	    });
+	  }
+	});
+
+
 	var QuestListEntry = React.createClass({displayName: "QuestListEntry",
 	  statics: {
 	    selected_quests : [],
@@ -45187,9 +45276,9 @@
 	      return shortDate;
 	    },
 
-	    handleEditClick: function(id) {
+	    handleEditClick: function(id, questID) {
 	      // Mount component and reveal modal
-	      ReactDOM.render(React.createElement(QuestQuestionForm, React.__spread({},  intlData, {id: id})), document.getElementById("questModal"));
+	      ReactDOM.render(React.createElement(QuestQuestionForm, React.__spread({},  intlData, {id: id, qID: questID})), document.getElementById("questModal"));
 	      $('#questModal').foundation("reveal", "open");
 
 	      // On modal close, unmount component
@@ -45215,7 +45304,7 @@
 
 	    return (
 	      React.createElement("div", null, 
-	        React.createElement("div", {className: "large-9 columns qotd-question-li"}, 
+	        React.createElement("div", {className: "large-9 columns question-li"}, 
 	          React.createElement("input", {type: "checkbox", name: "quest", value: this.props.id, key: this.props.id, onChange: this.handleChange}), 
 	          this.props.text
 	        ), 
@@ -45232,6 +45321,111 @@
 	var QuestGame = React.createClass({displayName: "QuestGame",
 	  render: function() {
 	    return(React.createElement("div", null, " Play Challenge gaame!"));
+	  }
+	});
+
+
+	var QuestContribManage = React.createClass({displayName: "QuestContribManage",
+	  getInitialState: function() {
+	    return {
+	      currentQuestID: null,
+	      currentQuest: null,
+	      questList: [{name: '---', _id: '---'}],
+	      questLevels: []
+	    };
+	  },
+
+	  handleAddClick: function(id) {
+	    // Mount component and reveal modal
+	    ReactDOM.render(React.createElement(QuestManageForm, React.__spread({},  intlData, {id: id})), document.getElementById("questManageModal"));
+	    $('#questManageModal').foundation("reveal", "open");
+
+	    // On modal close, unmount component
+	    $(document).on('closed.fndtn.reveal', '[data-reveal]', function () {
+	      ReactDOM.unmountComponentAtNode(document.getElementById("questManageModal"));
+	    });
+	  },
+
+	  componentDidMount: function(qID) {
+	    if (qID) {
+	      $.get('/api/wouso-quest/quest?id=' + qID, function(res) {
+	        if (this.isMounted()) {
+	          this.setState({
+	            currentQuestID: qID,
+	            currentQuest: res,
+	            questLevels: res.levels
+	          });
+	        }
+	      }.bind(this));
+	    } else {
+	      $.get('/api/wouso-quest/qlist', function(res) {
+	        if (this.isMounted()) {
+	          this.setState({
+	            questList: this.state.questList.concat(res),
+	            questLevels: this.state.questLevels
+	          });
+	        }
+	      }.bind(this));
+	    }
+	  },
+
+	  render: function() {
+	    var alert = null;
+	    if (!this.state.currentQuest) {
+	      alert = "Please select quest.";
+	    } else if (this.state.questLevels.length === 0) {
+	      alert = "Quest is empty. Start adding questions.";
+	    }
+
+	    return (React.createElement("div", null, 
+	      React.createElement("div", {className: "row"}, 
+	        React.createElement("div", {className: "large-12 columns"}, 
+	          React.createElement("div", {className: "reveal-modal", id: "questManageModal", 
+	               "data-reveal": true, "aria-hidden": "true", role: "dialog"}
+	          ), 
+	          React.createElement("a", {className: "radius button small right", href: "#", 
+	            onClick: this.handleAddClick.bind(this, null)}, 
+	            "Add quest"
+	          ), 
+	          React.createElement("h2", null, " Edit Quest"), 
+	          React.createElement("select", {onChange: this.changeQuest}, 
+	            this.state.questList.map(function(q, i) {
+	              return (React.createElement("option", {key: i, value: q._id}, q.name));
+	            })
+	          )
+	        )
+	      ), 
+	      React.createElement("div", {className: "row"}, 
+	        React.createElement("div", {id: "quest-edit", className: "large-12 columns"}, 
+	          (alert ? React.createElement("div", {id: "quest-edit-alert"}, alert) : null), 
+	          this.state.questLevels.map(function(q, i) {
+	            return (
+	              React.createElement("div", {key: i, className: "quest-edit-entry"}, 
+	                React.createElement("div", {className: "quest-edit-entry-no"}, "QUESTION #" + (i+1)), 
+	                React.createElement("div", null, q.question.question)
+	              )
+	            );
+	          }), 
+	          React.createElement("div", {id: "quest-edit-add"}, 
+	            React.createElement("a", {className: "radius button small", href: "#", 
+	               onClick: QuestListEntry.handleEditClick.bind(this, null, this.state.currentQuestID)}, 
+	              "Add new question"
+	            )
+	          )
+	        )
+	      )
+	    ));
+	  },
+
+	  changeQuest: function(event) {
+	    // Reload component for values different from default
+	    if (event.target.value !== this.state.questList[0]._id) {
+	      this.componentDidMount(event.target.value);
+	    } else {
+	      // No quest selected, clear state.
+	      this.setState(this.getInitialState());
+	      this.componentDidMount();
+	    }
 	  }
 	});
 
@@ -45262,6 +45456,8 @@
 	  render: function() {
 	    return(
 	      React.createElement("div", null, 
+	        React.createElement(QuestContribManage, React.__spread({},  intlData)), 
+	        React.createElement("div", {className: "spacer"}), 
 	        React.createElement("div", {className: "row"}, 
 	          React.createElement(ListSearch, {searchType: "searchQuest", refreshType: "refreshQuest", 
 	                      selected: QuestListEntry.selected_quests})
@@ -45274,6 +45470,12 @@
 	            React.createElement("a", {className: "radius button", href: "#", 
 	              onClick: QuestListEntry.handleEditClick.bind(this, null)}, 
 	              "Add question"
+	            ), 
+
+	            React.createElement("h2", null, 
+	               this.getIntlMessage('qotd_list_title') + " (" + this.state.total
+	                + " results" + (this.state.term != '' ? " for \""
+	                + this.state.term + "\"": '') + ")"
 	            ), 
 
 	             this.state.questions.map(function (opt) {
@@ -45305,7 +45507,7 @@
 	// if( $('#quest-game').length )
 	//   ReactDOM.render(<ChallengeGame />, document.getElementById('quest-game'));
 	if( $('#quest-contrib').length )
-	  ReactDOM.render(React.createElement(QuestContrib, null), document.getElementById('quest-contrib'));
+	  ReactDOM.render(React.createElement(QuestContrib, React.__spread({},  intlData)), document.getElementById('quest-contrib'));
 
 
 /***/ }

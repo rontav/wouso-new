@@ -53,3 +53,28 @@ input[type="radio"] {
   word-wrap: break-word;
   margin-left: 5px;
 }
+
+#quest-edit {
+  min-height: 400px;
+  border-top: 2px solid #D3D3D3;
+  border-bottom: 2px solid #D3D3D3;
+}
+
+#quest-edit-add {
+  padding-top: 10px;
+  text-align: center;
+}
+
+#quest-edit-alert {
+  color: #D3D3D3;
+  text-align: center;
+  padding-top: 150px;
+}
+
+.quest-edit-entry {
+  border-bottom: 1px solid #D3D3D3;
+}
+
+.quest-edit-entry-no {
+  color: #D3D3D3;
+}
