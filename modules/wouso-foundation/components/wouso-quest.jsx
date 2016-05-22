@@ -5,11 +5,16 @@ var locales = require('../locales/locales.js')
 var config = require('../../../config.json')
 
 var QStore = require('../stores/questions');
+var QuestStore = require('../stores/quest');
 var AppDispatcher = require('../dispatchers/app');
 
 // Common components
 var ListNav = require('./common/list-nav.jsx');
 var ListSearch = require('./common/list-search.jsx');
+
+// Drag and Drop components
+var ReactDnD = require('react-dnd');
+var HTML5Backend = require('react-dnd-html5-backend');
 
 var intlData = {
   locales: ['en-US'],
@@ -302,9 +307,10 @@ var QuestGame = React.createClass({
   }
 });
 
-
-var QuestContribManage = React.createClass({
+var QuestContribManage = ReactDnD.DragDropContext(HTML5Backend)(React.createClass({
   getInitialState: function() {
+    QuestStore.addChangeListener(this.updateQuestionOrder);
+
     return {
       currentQuestID: null,
       currentQuest: null,
@@ -347,12 +353,38 @@ var QuestContribManage = React.createClass({
     }
   },
 
+  compareCards: function(card1, card2) {
+    return card1.order - card2.order;
+  },
+
+  swapCards: function(id1, id2) {
+    var cards = this.state.questLevels;
+
+    // Swap cards
+    var card1 = cards.filter(function(c){return c._id === id1})[0];
+    var card2 = cards.filter(function(c){return c._id === id2})[0];
+    var card1Order = card1.order;
+    card1.order = card2.order;
+    card2.order = card1Order;
+
+    // Sort cards by 'order' attr
+    cards.sort(this.compareCards);
+
+    // Update list
+    this.setState({questLevels: cards});
+  },
+
   render: function() {
     var alert = null;
     if (!this.state.currentQuest) {
       alert = "Please select quest.";
     } else if (this.state.questLevels.length === 0) {
       alert = "Quest is empty. Start adding questions.";
+    }
+
+    // Add order number to questions in quest
+    for (var i in this.state.questLevels) {
+      this.state.questLevels[i].order = i++;
     }
 
     return (<div>
@@ -373,17 +405,16 @@ var QuestContribManage = React.createClass({
           </select>
         </div>
       </div>
+
       <div className="row">
         <div id="quest-edit" className="large-12 columns">
           {(alert ? <div id="quest-edit-alert">{alert}</div> : null)}
-          {this.state.questLevels.map(function(q, i) {
+          {this.state.questLevels.map(function(card) {
             return (
-              <div key={i} className="quest-edit-entry">
-                <div className="quest-edit-entry-no">{"QUESTION #" + (i+1)}</div>
-                <div>{q.question.question}</div>
-              </div>
+              <QuestContribManageItem key={card._id} id={card._id} card={card}
+                                      swapCards={this.swapCards} />
             );
-          })}
+          }, this)}
           <div id="quest-edit-add">
             <a className="radius button small" href="#"
                onClick={QuestListEntry.handleEditClick.bind(this, null, this.state.currentQuestID)}>
@@ -404,9 +435,75 @@ var QuestContribManage = React.createClass({
       this.setState(this.getInitialState());
       this.componentDidMount();
     }
+  },
+
+  updateQuestionOrder: function() {
+    // Get list of IDs in order
+    var ids = [];
+    for (var i in this.state.questLevels) {
+      ids.push(this.state.questLevels[i]._id);
+    }
+
+    // Send request
+    var params = 'id=' + this.state.currentQuestID + '&levels=' + ids.join(',');
+    $.get('/api/wouso-quest/reorder?' + params);
   }
+}));
+
+var cardSource = {
+  beginDrag: function(props) {
+    return {id: props.id};
+  },
+  endDrag: function(props) {
+    // Save new item order
+    AppDispatcher.handleViewAction({
+      type: "updateQuestionOrder"
+    });
+
+    return {id: props.id};
+  }
+};
+
+var cardTarget = {
+  hover: function(props, monitor) {
+    var draggedId = monitor.getItem().id;
+
+    if (draggedId !== props.id) {
+      props.swapCards(draggedId, props.id);
+    }
+  }
+};
+
+var DragSourceDecorator = ReactDnD.DragSource('card', cardSource,
+  function(connect, monitor) {
+    return {
+      connectDragSource: connect.dragSource(),
+      isDragging: monitor.isDragging()
+    };
 });
 
+var DropTargetDecorator = ReactDnD.DropTarget('card', cardTarget,
+  function(connect) {
+    return {
+      connectDropTarget: connect.dropTarget()
+    };
+});
+
+var QuestContribManageItem = DropTargetDecorator(DragSourceDecorator(React.createClass({
+  render: function() {
+    var style = {
+      cursor: 'move',
+      opacity: this.props.isDragging ? 0 : 1
+    };
+
+    return this.props.connectDragSource(this.props.connectDropTarget(
+      <div key={this.props.card._id} className="quest-edit-entry" style={style}>
+        <div className="quest-edit-entry-no">{"QUESTION #" + this.props.card.order}</div>
+        <div>{this.props.card.question.question}</div>
+      </div>
+    ));
+  }
+})));
 
 var QuestContrib = React.createClass({
   mixins: [require('react-intl').IntlMixin],

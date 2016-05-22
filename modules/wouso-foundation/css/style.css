@@ -72,7 +72,10 @@ input[type="radio"] {
 }
 
 .quest-edit-entry {
-  border-bottom: 1px solid #D3D3D3;
+  margin-bottom: 0.5rem;
+  border: 1px dashed gray;
+  padding: 0.5rem 1rem;
+  margin: 5px;
 }
 
 .quest-edit-entry-no {

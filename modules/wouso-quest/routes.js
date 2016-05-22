@@ -311,4 +311,44 @@ router.delete('/api/wouso-quest/delete', function(req, res) {
   }
 });
 
+router.get('/api/wouso-quest/reorder', function(req, res) {
+  var levels = req.query.levels.split(',');
+  Quest.findOne({_id: req.query.id}).exec(gotQuest);
+
+  /**
+  * Handle Quest query.
+  * @param {int} err Request error.
+  * @param {quest} quest object.
+  * @return {void}
+  */
+  function gotQuest(err, quest) {
+    if (err) {
+      log.error('Could not get quest: ' + req.query.id);
+    } else {
+      // Reorder questions in quest
+      var newQuestionOrder = [];
+      levels.forEach(function(level) {
+        // Search current level in question list
+        var cLevel = quest.levels.filter(function(l) {
+          return l._id.toString() === level;
+        })[0];
+        newQuestionOrder.push(cLevel);
+      });
+
+      Quest.update({_id: req.query.id}, {levels: newQuestionOrder}).exec(updatedQuest);
+    }
+
+    /**
+    * Handle Quest update.
+    * @param {int} err Request error.
+    * @return {void}
+    */
+    function updatedQuest(err) {
+      if (err) {
+        log.error('Could not reorder question of quest: ' + req.query.id);
+      }
+    }
+  }
+});
+
 module.exports = router;
