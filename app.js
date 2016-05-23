@@ -155,7 +155,7 @@ app.use(function (req, res, next) {
 })
 
 app.use(function (req, res, next) {
-  log.debug(req.url)
+  log.debug(req.method + ' ' + req.url)
 
   // Save selected role to session
   if (req.query.role) {

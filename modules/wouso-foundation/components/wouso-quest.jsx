@@ -445,8 +445,11 @@ var QuestContribManage = ReactDnD.DragDropContext(HTML5Backend)(React.createClas
     }
 
     // Send request
-    var params = 'id=' + this.state.currentQuestID + '&levels=' + ids.join(',');
-    $.get('/api/wouso-quest/reorder?' + params);
+    var params = {
+      id: this.state.currentQuestID,
+      levels: ids.join(',')
+    };
+    $.post('/api/wouso-quest/reorder', params);
   }
 }));
 

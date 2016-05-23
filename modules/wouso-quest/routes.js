@@ -311,9 +311,9 @@ router.delete('/api/wouso-quest/delete', function(req, res) {
   }
 });
 
-router.get('/api/wouso-quest/reorder', function(req, res) {
-  var levels = req.query.levels.split(',');
-  Quest.findOne({_id: req.query.id}).exec(gotQuest);
+router.post('/api/wouso-quest/reorder', function(req, res) {
+  var levels = req.body.levels.split(',');
+  Quest.findOne({_id: req.body.id}).exec(gotQuest);
 
   /**
   * Handle Quest query.
@@ -323,7 +323,7 @@ router.get('/api/wouso-quest/reorder', function(req, res) {
   */
   function gotQuest(err, quest) {
     if (err) {
-      log.error('Could not get quest: ' + req.query.id);
+      log.error('Could not get quest: ' + req.body.id);
     } else {
       // Reorder questions in quest
       var newQuestionOrder = [];
@@ -335,7 +335,7 @@ router.get('/api/wouso-quest/reorder', function(req, res) {
         newQuestionOrder.push(cLevel);
       });
 
-      Quest.update({_id: req.query.id}, {levels: newQuestionOrder}).exec(updatedQuest);
+      Quest.update({_id: req.body.id}, {levels: newQuestionOrder}).exec(updatedQuest);
     }
 
     /**
@@ -345,7 +345,7 @@ router.get('/api/wouso-quest/reorder', function(req, res) {
     */
     function updatedQuest(err) {
       if (err) {
-        log.error('Could not reorder question of quest: ' + req.query.id);
+        log.error('Could not reorder question of quest: ' + req.body.id);
       }
     }
   }
