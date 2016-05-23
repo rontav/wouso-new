@@ -76,7 +76,7 @@ router.post('/api/wouso-quest/add', function(req, res, next) {
 
     // Find newly added question and update quest question list
     var query = {_id: req.body.quest};
-    var update = {$push: {levels: {question: qID}}};
+    var update = {$push: {levels: {_id: qID}}};
     Quest.update(query, update).exec(function(err) {
       if (err) {
         return next(err);
@@ -189,7 +189,7 @@ router.get('/api/wouso-quest/quest', function(req, res, next) {
     if (quest.levels) {
       var questQuestions = [];
       quest.levels.forEach(function(level) {
-        questQuestions.push(level.question);
+        questQuestions.push(level._id);
       });
 
       QuestQ.find({_id: {$in: questQuestions}}).exec(gotQuestions);
@@ -210,7 +210,7 @@ router.get('/api/wouso-quest/quest', function(req, res, next) {
     // Go through each quest level and add qestion details
     for (var i=0; i<_self.quest.levels.length; i++) {
       questions.forEach(function(question) {
-        var qID = _self.quest.levels[i].question.toString();
+        var qID = _self.quest.levels[i]._id.toString();
         if (qID === question._id.toString()) {
           _self.quest.levels[i].question = question;
         }
