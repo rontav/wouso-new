@@ -3,6 +3,15 @@ extends layout
 block content
   .row
     .large-12.columns
-      #quest-admin
-      #quest-contrib
-      #quest-game
+
+  - if (ROLE < 2)
+    #quest-admin
+
+  - if (ROLE == 2)
+    #quest-teacher
+
+  - if (ROLE == 3)
+    #quest-contrib
+
+  - if (ROLE == 4)   
+    #quest-game

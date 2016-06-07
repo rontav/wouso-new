@@ -10,7 +10,9 @@ var log = require('../../core/logging')('wouso-quest');
 var router = express.Router();
 
 router.get('/wouso-quest', function(req, res) {
-  res.render('wouso-quest', {});
+  res.render('wouso-quest', {
+    user: req.user
+  });
 });
 
 router.post('/api/wouso-quest/add', function(req, res, next) {
@@ -108,6 +110,28 @@ router.post('/api/wouso-quest/add-quest', function(req, res, next) {
   }
 });
 
+/*
+* List quests if more than one or redirect to the active one.
+*/
+router.get('/api/wouso-quest/play', function(req, res, next) {
+  // Check if user is logged in
+  if (!req.user) {
+    return res.redirect('/login');
+  }
+
+  var time = new Date();
+  var query = {start: {$lt: time}, end: {$gt: time}};
+
+  Quest.find().exec(gotQuests);
+
+  function gotQuests(err, quests) {
+    if (err) {
+      return next(err);
+    }
+
+    res.send(quests);
+  }
+});
 
 router.get('/api/wouso-quest/list', function (req, res, next) {
   if (!req.query.id) return res.send({})

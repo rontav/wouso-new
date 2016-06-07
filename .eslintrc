@@ -2,7 +2,8 @@
     "parser": "babel-eslint",
     "env": {
         "browser": true,
-        "node": true
+        "node": true,
+        "jquery": true
     },
 
     "globals": {
@@ -14,7 +15,8 @@
             "jsx": true,
             "arrowFunctions": true,
             "blockBindings": true,
-            "generators": true
+            "generators": true,
+            "require-jsdoc": false
         }
     },
 

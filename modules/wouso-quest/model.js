@@ -15,7 +15,10 @@ var QuestQ = new Schema({
 
 var QuestLevel = new Schema({
   question: ObjectId,
-  users: [ObjectId]
+  users: [{
+    id: ObjectId,
+    levelIndex: Number
+  }]
 });
 
 var Quest = new Schema({

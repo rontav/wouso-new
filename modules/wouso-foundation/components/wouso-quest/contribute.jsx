@@ -1,16 +1,16 @@
 var React = require('react')
 var ReactDOM = require('react-dom')
 
-var locales = require('../locales/locales.js')
-var config = require('../../../config.json')
+var locales = require('../../locales/locales.js')
+var config = require('../../../../config.json')
 
-var QStore = require('../stores/questions');
-var QuestStore = require('../stores/quest');
-var AppDispatcher = require('../dispatchers/app');
+var QStore = require('../../stores/questions');
+var QuestStore = require('../../stores/quest');
+var AppDispatcher = require('../../dispatchers/app');
 
 // Common components
-var ListNav = require('./common/list-nav.jsx');
-var ListSearch = require('./common/list-search.jsx');
+var ListNav = require('../common/list-nav.jsx');
+var ListSearch = require('../common/list-search.jsx');
 
 // Drag and Drop components
 var ReactDnD = require('react-dnd');
@@ -581,8 +581,4 @@ var QuestContrib = React.createClass({
   }
 });
 
-
-// if( $('#quest-game').length )
-//   ReactDOM.render(<ChallengeGame />, document.getElementById('quest-game'));
-if( $('#quest-contrib').length )
-  ReactDOM.render(<QuestContrib {...intlData} />, document.getElementById('quest-contrib'));
+module.exports = QuestContrib;
