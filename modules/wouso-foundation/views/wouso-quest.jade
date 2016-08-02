@@ -4,14 +4,13 @@ block content
   .row
     .large-12.columns
 
-  - if (ROLE < 2)
+  - if (ROLE == 5)
     #quest-admin
 
-  - if (ROLE == 2)
+  - if (ROLE == 5)
     #quest-teacher
 
-  - if (ROLE == 3)
-    #quest-contrib
+  #quest-contrib
 
-  - if (ROLE == 4)   
+  - if (ROLE == 5)   
     #quest-game

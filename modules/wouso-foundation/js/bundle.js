@@ -44755,7 +44755,7 @@
 		"index_title_users": "Registered users",
 		"module_title": "GAMES",
 		"module_qotd": "QotD",
-		"module_quest": "Quest",
+		"module_wouso-quest": "Quest",
 		"role_title": "ROLE",
 		"role_root": "Root",
 		"role_admin": "Admin",
@@ -44872,6 +44872,7 @@
 		"index_title_users": "Utilizatori înregistrați",
 		"module_title": "JOCURI",
 		"module_qotd": "Întrebarea zilei",
+		"module_wouso-quest": "Quest",
 		"role_title": "ROL",
 		"role_root": "Superutilizator",
 		"role_admin": "Administrator",
@@ -44983,7 +44984,7 @@
 		},
 		"games": {
 			"qotd": true,
-			"wouso-quest": true
+			"wouso-quest": false
 		},
 		"themes": {
 			"wouso-foundation": true
