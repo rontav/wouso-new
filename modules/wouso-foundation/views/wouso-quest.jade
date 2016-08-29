@@ -10,7 +10,8 @@ block content
   - if (ROLE == 5)
     #quest-teacher
 
-  #quest-contrib
+  - if (ROLE < 4)
+    #quest-contrib
 
-  - if (ROLE == 5)   
+  - if (ROLE == 4)   
     #quest-game

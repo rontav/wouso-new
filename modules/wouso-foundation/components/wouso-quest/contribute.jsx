@@ -16,6 +16,8 @@ var ListSearch = require('../common/list-search.jsx');
 var ReactDnD = require('react-dnd');
 var HTML5Backend = require('react-dnd-html5-backend');
 
+var Datetime = require('react-datetime');
+
 var intlData = {
   locales: ['en-US'],
   messages: locales[config.language]
@@ -71,9 +73,6 @@ var QuestQuestionForm = React.createClass({
     if (this.state.quest) {
       defaultQuestValue = this.state.quest;
     }
-
-    console.log('#' + this.props.qID)
-    console.log('@' + this.state.quest)
 
     return (
       <form method="post" action="/api/wouso-quest/add">
@@ -192,8 +191,8 @@ var QuestManageForm = React.createClass({
   mixins: [require('react-intl').IntlMixin],
   getInitialState: function() {
     return {
-      name : ""
-    }
+      name: ""
+    };
   },
 
   componentDidMount: function() {
@@ -300,13 +299,6 @@ var QuestListEntry = React.createClass({
   }
 });
 
-
-var QuestGame = React.createClass({
-  render: function() {
-    return(<div> Play Challenge gaame!</div>);
-  }
-});
-
 var QuestContribManage = ReactDnD.DragDropContext(HTML5Backend)(React.createClass({
   getInitialState: function() {
     QuestStore.addChangeListener(this.updateQuestionOrder);
@@ -317,6 +309,32 @@ var QuestContribManage = ReactDnD.DragDropContext(HTML5Backend)(React.createClas
       questList: [{name: '---', _id: '---'}],
       questLevels: []
     };
+  },
+
+  handleStartDateClick: function(e) {
+    // Send request; remove TZ info
+    var params = {
+      id: this.state.currentQuestID,
+      start: e.toString()
+    };
+    $.post('/api/wouso-quest/edit', params);
+    // Update state
+    var q = this.state.currentQuest
+    q.start = e._d.toString().substring(0, 24);
+    this.setState({currentQuest: q});
+  },
+
+  handleEndDateClick: function(e) {
+    // Send request; remove TZ info
+    var params = {
+      id: this.state.currentQuestID,
+      end: e.toString()
+    };
+    $.post('/api/wouso-quest/edit', params);
+    // Update state
+    var q = this.state.currentQuest
+    q.end = e._d.toString().substring(0, 24);
+    this.setState({currentQuest: q});
   },
 
   handleAddClick: function(id) {
@@ -387,6 +405,15 @@ var QuestContribManage = ReactDnD.DragDropContext(HTML5Backend)(React.createClas
       this.state.questLevels[i].order = i++;
     }
 
+    // Set quest times
+    questStartTime = '---';
+    questEndTime = '---';
+
+    if (this.state.currentQuest) {
+      questStartTime = this.state.currentQuest.start;
+      questEndTime = this.state.currentQuest.end;
+    }
+
     return (<div>
       <div className="row">
         <div className="large-12 columns">
@@ -403,6 +430,15 @@ var QuestContribManage = ReactDnD.DragDropContext(HTML5Backend)(React.createClas
               return (<option key={i} value={q._id}>{q.name}</option>);
             })}
           </select>
+        </div>
+      </div>
+
+      <div className="row" id="quest-time">
+        <div className="large-6 columns">
+          <Datetime value={questStartTime} onChange={this.handleStartDateClick}/>
+        </div>
+        <div className="large-6 columns">
+          <Datetime value={questEndTime} onChange={this.handleEndDateClick}/>
         </div>
       </div>
 
@@ -512,18 +548,18 @@ var QuestContrib = React.createClass({
   mixins: [require('react-intl').IntlMixin],
   getInitialState: function() {
     return {
-      questions : [],
-      total     : null,
-      no        : null,
-      page      : null,
-      term      : ''
-    }
+      questions: [],
+      total: null,
+      no: null,
+      page: null,
+      term: ''
+    };
   },
 
   componentDidMount: function() {
     QStore.addChangeListener(this._onChange);
     AppDispatcher.handleViewAction({
-      type : "refreshQuest"
+      type: "refreshQuest"
     });
   },
 
@@ -532,7 +568,7 @@ var QuestContrib = React.createClass({
   },
 
   render: function() {
-    return(
+    return (
       <div>
         {<QuestContribManage {...intlData} />}
         <div className="spacer"></div>

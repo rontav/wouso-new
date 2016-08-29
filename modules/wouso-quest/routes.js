@@ -111,7 +111,7 @@ router.post('/api/wouso-quest/add-quest', function(req, res, next) {
 });
 
 /*
-* List quests if more than one or redirect to the active one.
+* List quests or get one if id is specified.
 */
 router.get('/api/wouso-quest/play', function(req, res, next) {
   // Check if user is logged in
@@ -119,17 +119,103 @@ router.get('/api/wouso-quest/play', function(req, res, next) {
     return res.redirect('/login');
   }
 
-  var time = new Date();
-  var query = {start: {$lt: time}, end: {$gt: time}};
+  var _self = {};
+  var query = {};
 
-  Quest.find().exec(gotQuests);
+  if (req.query.id) {
+    query._id = req.query.id;
+    Quest.findOne(query).exec(gotQuest);
+  } else {
+    Quest.find().exec(gotQuests);
+  }
+
+  /* Handle a single quest. */
+  function gotQuest(err, quest) {
+    if (err) {
+      return next(err);
+    }
+
+    _self.quest = quest;
+    _self.finished = false;
+
+    // Check if user has finished the quest
+    if (quest.finishers.indexOf(req.user._id) > -1) {
+      _self.finished = true;
+    } else {
+      // Gather current level info
+      quest.levels.forEach(function(level, i) {
+        if (level.users.indexOf(req.user._id) > -1) {
+          _self.levelNo = i;
+          _self.levelID = level._id;
+        }
+      });
+
+      // No level found, send 1 level of quest
+      if (!('levelNo' in _self)) {
+        if (quest.levels.length === 0) {
+          _self.levelNo = null;
+          _self.levelID = null;
+          log.warning('Quest [' + quest._id + '] with no levels being used.');
+        } else {
+          _self.levelNo = 0;
+          _self.levelID = quest.levels[_self.levelNo]._id;
+        }
+
+        // Save current level
+        var query = {'_id': req.query.id, 'levels._id': _self.levelID};
+        var update = {$push: {'levels.$.users': req.user._id}};
+        Quest.update(query, update).exec(function(err, update) {
+          console.log(err);
+          console.log(update);
+        });
+      }
+    }
+
+    // Get questions with corresponding IDs
+    QuestQ.findOne({_id: _self.levelID}).exec(gotQuestQuestion);
+  }
+
+  function gotQuestQuestion(err, question) {
+    if (err) {
+      return next(err);
+    }
+
+    var level = {};
+    if (question) {
+      level.id = question._id;
+      level.question = question.question;
+    }
+
+    // Explicetly build response
+    res.send({
+      id: _self.quest._id,
+      name: _self.quest.name,
+      startTime: _self.quest.start,
+      endTime: _self.quest.end,
+      levelCount: _self.quest.levels.length,
+      levelNumber: _self.levelNo + 1,
+      finished: _self.finished,
+      level: level
+    });
+  }
 
   function gotQuests(err, quests) {
     if (err) {
       return next(err);
     }
 
-    res.send(quests);
+    // Explicetly build response
+    var response = [];
+    quests.forEach(function(quest) {
+      response.push({
+        id: quest._id,
+        name: quest.name,
+        startTime: quest.start,
+        endTime: quest.end,
+        levelCount: quest.levels.length
+      });
+    });
+    res.send(response);
   }
 });
 
@@ -372,6 +458,100 @@ router.post('/api/wouso-quest/reorder', function(req, res) {
         log.error('Could not reorder question of quest: ' + req.body.id);
       }
     }
+  }
+});
+
+// TODO: limit access to this route
+router.post('/api/wouso-quest/edit', function(req, res) {
+
+  var update = {};
+  if (req.body.start) {
+    update.start = new Date(req.body.start);
+  }
+  if (req.body.end) {
+    update.end = new Date(req.body.end);
+  }
+  Quest.update({_id: req.body.id}, update).exec(updatedQuest);
+
+  /**
+  * Handle Quest update.
+  * @param {int} err Request error.
+  * @return {void}
+  */
+  function updatedQuest(err) {
+    if (err) {
+      log.error('Could not update quest times: ' + req.body.id);
+    }
+  }
+});
+
+// TODO: limit access to this route
+router.get('/api/wouso-quest/respond', function(req, res, next) {
+  // Check if user is logged in
+  if (!req.user) {
+    return res.redirect('/login');
+  }
+
+  var _self = {};
+  var query = {};
+
+  if (req.query.id) {
+    query._id = req.query.id;
+    Quest.findOne(query).exec(gotQuest);
+  }
+
+  /* Handle a single quest. */
+  function gotQuest(err, quest) {
+    if (err) {
+      return next(err);
+    }
+
+    _self.quest = quest;
+    // Gather current level info
+    quest.levels.forEach(function(level, i) {
+      if (level.users.indexOf(req.user._id) > -1) {
+        _self.levelNo = i;
+        _self.levelID = level._id;
+      }
+    });
+
+    // No level found, send 1 level of quest
+    if (!('levelNo' in _self)) {
+      return res.send('ERR: you did not register for this quest');
+    }
+
+    // Get questions with corresponding IDs
+    QuestQ.findOne({_id: _self.levelID}).exec(gotQuestQuestion);
+  }
+
+  function gotQuestQuestion(err, question) {
+    if (question.answer === req.query.response) {
+
+      // Build query attributes
+      var pullKey = 'levels.' + _self.levelNo + '.users';
+      var pushKey = 'levels.' + (_self.levelNo+1) + '.users';
+
+      // Move user to next level
+      var ObjectId = mongoose.Types.ObjectId;
+      var query = {_id: ObjectId(req.query.id)};
+      var update = { $pull: {}, $push: {}};
+
+      // If user finished last level, add him to finishers
+      if ((_self.levelNo + 1) === _self.quest.levels.length) {
+        update.$pull[pullKey] = req.user._id;
+        update.$push.finishers = req.user._id;
+      } else {
+        update.$pull[pullKey] = req.user._id;
+        update.$push[pushKey] = req.user._id;
+      }
+      Quest.update(query, update).exec(moveUser);
+    } else {
+      return res.send('NOK');
+    }
+  }
+
+  function moveUser(err, update) {
+    return res.send('OK');
   }
 });
 

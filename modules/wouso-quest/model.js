@@ -25,7 +25,8 @@ var Quest = new Schema({
   name: String,
   start: Date,
   end: Date,
-  levels: [QuestLevel]
+  levels: [QuestLevel],
+  finishers: [String]
 });
 
 mongoose.model('QuestQ', QuestQ);
