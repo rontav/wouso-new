@@ -7,7 +7,8 @@ var Tag    = mongoose.model('Tag');
 
 var log = require('../../core/logging')('wouso-quest');
 
-var router = express.Router();
+var router   = express.Router();
+var ObjectId = mongoose.Types.ObjectId;
 
 router.get('/wouso-quest', function(req, res) {
   res.render('wouso-quest', {
@@ -139,15 +140,21 @@ router.get('/api/wouso-quest/play', function(req, res, next) {
     _self.finished = false;
 
     // Check if user has finished the quest
-    if (quest.finishers.indexOf(req.user._id) > -1) {
-      _self.finished = true;
-    } else {
+    quest.finishers.forEach(function(finisher) {
+      if (finisher._id.toString() === req.user._id.toString()) {
+        _self.finished = true;
+      }
+    });
+
+    if (!_self.finished) {
       // Gather current level info
       quest.levels.forEach(function(level, i) {
-        if (level.users.indexOf(req.user._id) > -1) {
-          _self.levelNo = i;
-          _self.levelID = level._id;
-        }
+        level.users.forEach(function(user) {
+          if (user._id.toString() === req.user._id.toString()) {
+            _self.levelNo = i;
+            _self.levelID = level._id;
+          }
+        });
       });
 
       // No level found, send 1 level of quest
@@ -163,7 +170,12 @@ router.get('/api/wouso-quest/play', function(req, res, next) {
 
         // Save current level
         var query = {'_id': req.query.id, 'levels._id': _self.levelID};
-        var update = {$push: {'levels.$.users': req.user._id}};
+        var update = {$push: {
+          'levels.$.users': {
+            _id: ObjectId(req.user._id),
+            startTime: Date.now()
+          }
+        }};
         Quest.update(query, update).exec(function(err, update) {
           console.log(err);
           console.log(update);
@@ -207,12 +219,20 @@ router.get('/api/wouso-quest/play', function(req, res, next) {
     // Explicetly build response
     var response = [];
     quests.forEach(function(quest) {
+      var finished = false;
+      var currentLevel = null;
+
+      if (quest.finishers.indexOf(req.user._id) > -1) {
+        finished = true;
+      }
+
       response.push({
         id: quest._id,
         name: quest.name,
         startTime: quest.start,
         endTime: quest.end,
-        levelCount: quest.levels.length
+        levelCount: quest.levels.length,
+        finished: finished
       });
     });
     res.send(response);
@@ -509,10 +529,12 @@ router.get('/api/wouso-quest/respond', function(req, res, next) {
     _self.quest = quest;
     // Gather current level info
     quest.levels.forEach(function(level, i) {
-      if (level.users.indexOf(req.user._id) > -1) {
-        _self.levelNo = i;
-        _self.levelID = level._id;
-      }
+      level.users.forEach(function(user) {
+        if (user._id.toString() === req.user._id.toString()) {
+          _self.levelNo = i;
+          _self.levelID = level._id;
+        }
+      });
     });
 
     // No level found, send 1 level of quest
@@ -525,24 +547,28 @@ router.get('/api/wouso-quest/respond', function(req, res, next) {
   }
 
   function gotQuestQuestion(err, question) {
+    log.debug('Given answer: ' + req.query.response);
+    log.debug('Expected answer: ' + question.answer);
+
     if (question.answer === req.query.response) {
 
       // Build query attributes
-      var pullKey = 'levels.' + _self.levelNo + '.users';
       var pushKey = 'levels.' + (_self.levelNo+1) + '.users';
 
       // Move user to next level
-      var ObjectId = mongoose.Types.ObjectId;
       var query = {_id: ObjectId(req.query.id)};
-      var update = { $pull: {}, $push: {}};
+      var update = {$push: {}};
+      var value = {
+        _id: ObjectId(req.user._id),
+        startTime: Date.now()
+      };
 
       // If user finished last level, add him to finishers
       if ((_self.levelNo + 1) === _self.quest.levels.length) {
-        update.$pull[pullKey] = req.user._id;
-        update.$push.finishers = req.user._id;
+        update.$push.finishers = value;
+      // Else advance to next level
       } else {
-        update.$pull[pullKey] = req.user._id;
-        update.$push[pushKey] = req.user._id;
+        update.$push[pushKey] = value;
       }
       Quest.update(query, update).exec(moveUser);
     } else {

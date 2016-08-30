@@ -16,8 +16,8 @@ var QuestQ = new Schema({
 var QuestLevel = new Schema({
   question: ObjectId,
   users: [{
-    id: ObjectId,
-    levelIndex: Number
+    _id: ObjectId,
+    startTime: Date
   }]
 });
 
@@ -26,7 +26,10 @@ var Quest = new Schema({
   start: Date,
   end: Date,
   levels: [QuestLevel],
-  finishers: [String]
+  finishers: [{
+    _id: ObjectId,
+    startTime: Date
+  }]
 });
 
 mongoose.model('QuestQ', QuestQ);

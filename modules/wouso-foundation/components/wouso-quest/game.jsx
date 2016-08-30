@@ -60,7 +60,8 @@ var QuestGame = React.createClass({
                   <a onClick={this.handleQuestSelect.bind(this, q.id)}>
                     {q.name}
                   </a>
-                  <p> ({q.id}) - {q.startTime} - {q.endTIme}</p>
+                  <p> {q.levelCount} LEVELS. {q.finished ? 'Completed' : 'Currently at level TODO'}</p>
+                  <p>Start: {q.startTime} - End: {q.endTIme}</p>
                 </div>
               );
             }, this)}
@@ -88,6 +89,8 @@ var QuestGameLevel = React.createClass({
   handleKeyPress: function(event) {
     if (event.key === 'Enter') {
       this.handleResponseSend();
+    } else {
+      this.setState({message: ''});
     }
   },
 
@@ -97,11 +100,14 @@ var QuestGameLevel = React.createClass({
 
     $.get(url, function(res) {
       if (res === 'OK') {
-        // Update level
+        // Clear response and advance level
+        this.setState({response: ''});
         this.props.next();
       } else {
+        // Clear response and show message
         this.setState({
-          message: 'Wrong answer. Please try again.'
+          message: 'Wrong answer. Please try again.',
+          response: ''
         });
       }
     }.bind(this));
@@ -124,6 +130,7 @@ var QuestGameLevel = React.createClass({
             <p>#Level {this.props.quest.levelNumber}/{this.props.quest.levelCount}</p>
             <h4>{this.props.quest.level.question}</h4>
             <input name="answer" type="text" autoComplete="off"
+                   value={this.state.response}
                    onKeyPress={this.handleKeyPress}
                    onChange={this.handleInput}></input>
             <p>{this.state.message}</p>

@@ -131,7 +131,7 @@ views = ['views', './node_modules/' + used_theme + '/views']
 app.use(function (req, res, next) {
   if (req.app.get('env') == 'development' && process.argv[2] == 'login') {
     req.user = {
-      '_id':  0,
+      '_id':  '000000000000000000000000',
       'role': 0,
       'facebook': {
         'id': 0

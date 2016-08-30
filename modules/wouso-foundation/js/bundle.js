@@ -45110,7 +45110,8 @@
 	                  React.createElement("a", {onClick: this.handleQuestSelect.bind(this, q.id)}, 
 	                    q.name
 	                  ), 
-	                  React.createElement("p", null, " (", q.id, ") - ", q.startTime, " - ", q.endTIme)
+	                  React.createElement("p", null, " ", q.levelCount, " LEVELS. ", q.finished ? 'Completed' : 'Currently at level TODO'), 
+	                  React.createElement("p", null, "Start: ", q.startTime, " - End: ", q.endTIme)
 	                )
 	              );
 	            }, this)
@@ -45138,6 +45139,8 @@
 	  handleKeyPress: function(event) {
 	    if (event.key === 'Enter') {
 	      this.handleResponseSend();
+	    } else {
+	      this.setState({message: ''});
 	    }
 	  },
 
@@ -45151,7 +45154,8 @@
 	        this.props.next();
 	      } else {
 	        this.setState({
-	          message: 'Wrong answer. Please try again.'
+	          message: 'Wrong answer. Please try again.',
+	          response: ''
 	        });
 	      }
 	    }.bind(this));
@@ -45174,6 +45178,7 @@
 	            React.createElement("p", null, "#Level ", this.props.quest.levelNumber, "/", this.props.quest.levelCount), 
 	            React.createElement("h4", null, this.props.quest.level.question), 
 	            React.createElement("input", {name: "answer", type: "text", autoComplete: "off", 
+	                   value: this.state.response, 
 	                   onKeyPress: this.handleKeyPress, 
 	                   onChange: this.handleInput}), 
 	            React.createElement("p", null, this.state.message), 
