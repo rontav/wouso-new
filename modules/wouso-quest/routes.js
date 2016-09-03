@@ -151,21 +151,22 @@ router.get('/api/wouso-quest/play', function(req, res, next) {
       quest.levels.forEach(function(level, i) {
         level.users.forEach(function(user) {
           if (user._id.toString() === req.user._id.toString()) {
-            _self.levelNo = i;
+            _self.levelIndex = i;
             _self.levelID = level._id;
+            _self.levelStartTime = user.startTime;
           }
         });
       });
 
-      // No level found, send 1 level of quest
-      if (!('levelNo' in _self)) {
+      // No level found, send 1st level of quest
+      if (!('levelIndex' in _self)) {
         if (quest.levels.length === 0) {
-          _self.levelNo = null;
+          _self.levelIndex = null;
           _self.levelID = null;
           log.warning('Quest [' + quest._id + '] with no levels being used.');
         } else {
-          _self.levelNo = 0;
-          _self.levelID = quest.levels[_self.levelNo]._id;
+          _self.levelIndex = 0;
+          _self.levelID = quest.levels[_self.levelIndex]._id;
         }
 
         // Save current level
@@ -205,7 +206,8 @@ router.get('/api/wouso-quest/play', function(req, res, next) {
       startTime: _self.quest.start,
       endTime: _self.quest.end,
       levelCount: _self.quest.levels.length,
-      levelNumber: _self.levelNo + 1,
+      levelNumber: _self.levelIndex + 1,
+      levelStartTime: _self.levelStartTime,
       finished: _self.finished,
       level: level
     });
@@ -219,12 +221,23 @@ router.get('/api/wouso-quest/play', function(req, res, next) {
     // Explicetly build response
     var response = [];
     quests.forEach(function(quest) {
+      // Check if user has finished the quest
       var finished = false;
-      var currentLevel = null;
+      quest.finishers.forEach(function(finisher) {
+        if (finisher._id.toString() === req.user._id.toString()) {
+          finished = true;
+        }
+      });
 
-      if (quest.finishers.indexOf(req.user._id) > -1) {
-        finished = true;
-      }
+      // Get level reached by user for quest
+      var levelIndex = null;
+      quest.levels.forEach(function(level, i) {
+        level.users.forEach(function(user) {
+          if (user._id.toString() === req.user._id.toString()) {
+            levelIndex = i;
+          }
+        });
+      });
 
       response.push({
         id: quest._id,
@@ -232,6 +245,7 @@ router.get('/api/wouso-quest/play', function(req, res, next) {
         startTime: quest.start,
         endTime: quest.end,
         levelCount: quest.levels.length,
+        levelNumber: levelIndex + 1,
         finished: finished
       });
     });

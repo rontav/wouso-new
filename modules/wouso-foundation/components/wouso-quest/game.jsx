@@ -8,6 +8,10 @@ var intlData = {
   messages: locales[config.language]
 };
 
+/*
+* Main Quest Game component. Loads active quest list initially and
+* a single quest when one is selected.
+*/
 var QuestGame = React.createClass({
   mixins: [require('react-intl').IntlMixin],
 
@@ -21,7 +25,8 @@ var QuestGame = React.createClass({
 
   componentDidMount: function() {
     if (this.state.currentQuestID) {
-      $.get('/api/wouso-quest/play?id=' + this.state.currentQuestID, function(res) {
+      var url = '/api/wouso-quest/play?id=' + this.state.currentQuestID;
+      $.get(url, function(res) {
         if (this.isMounted()) {
           this.setState({
             currentQuest: res
@@ -48,31 +53,66 @@ var QuestGame = React.createClass({
 
   render: function() {
     if (this.state.currentQuestID) {
-      return (<QuestGameLevel quest={this.state.currentQuest} next={this.handleQuestSelect}/>);
+      return (
+        <QuestGameLevel quest={this.state.currentQuest}
+          next={this.handleQuestSelect} />
+      );
     } else {
       return (
-        <div className="row">
-          <div className="large-12 columns">
-            {this.state.questList.length === 0 ? 'No quests available.' : null}
-            {this.state.questList.map(function(q, i) {
-              return (
-                <div key={i}>
-                  <a onClick={this.handleQuestSelect.bind(this, q.id)}>
-                    {q.name}
-                  </a>
-                  <p> {q.levelCount} LEVELS. {q.finished ? 'Completed' : 'Currently at level TODO'}</p>
-                  <p>Start: {q.startTime} - End: {q.endTIme}</p>
-                </div>
-              );
-            }, this)}
-          </div>
-        </div>
+        <QuestGameList questList={this.state.questList}
+          onQuestClick={this.handleQuestSelect} />
       );
     }
   }
 });
 
+/*
+* Loads active quests list with some stats for each one.
+*/
+var QuestGameList = React.createClass({
+  mixins: [require('react-intl').IntlMixin],
+
+  render: function() {
+    var noQuest = null;
+    if (this.props.questList.length === 0) {
+      noQuest = this.getIntlMessage('quest_game_no_quests');
+    }
+
+    return (
+      <div className='row'>
+        <div className='large-12 columns'>
+          <h2>{noQuest}</h2>
+
+          {this.props.questList.map(function(q, i) {
+            // Build quest status message
+            var questStatus = this.getIntlMessage('quest_game_status_progress');
+            questStatus += ' ' + q.levelNumber + '/' + q.levelCount;
+            if (q.finished) {
+              questStatus = this.getIntlMessage('quest_game_status_complete');
+            }
+
+            return (
+              <div key={i}>
+                <a onClick={this.props.onQuestClick.bind(null, q.id)}>
+                  {q.name}
+                </a>
+                <p> {q.levelCount} LEVELS. {questStatus}</p>
+                <p>Start: {q.startTime} - End: {q.endTIme}</p>
+              </div>
+            );
+          }, this)}
+        </div>
+      </div>
+    );
+  }
+});
+
+/*
+* Quest game logic.
+*/
 var QuestGameLevel = React.createClass({
+  mixins: [require('react-intl').IntlMixin],
+
   getInitialState: function() {
     return {
       response: '',
@@ -106,7 +146,7 @@ var QuestGameLevel = React.createClass({
       } else {
         // Clear response and show message
         this.setState({
-          message: 'Wrong answer. Please try again.',
+          message: this.getIntlMessage('quest_game_wrong_answer'),
           response: ''
         });
       }
@@ -116,25 +156,31 @@ var QuestGameLevel = React.createClass({
   render: function() {
     if (this.props.quest.finished) {
       return (
-        <div className="row">
-          <div className="large-12 columns">
-            <h2> You have finished this quest. </h2>
+        <div className='row'>
+          <div className='large-12 columns'>
+            <h2>{this.getIntlMessage('quest_game_finish')}</h2>
           </div>
         </div>
       );
     } else {
+      var questProgess = this.props.quest.levelNumber + '/';
+      questProgess += this.props.quest.levelCount;
+
       return (
-        <div className="row">
-          <div className="large-12 columns">
+        <div className='row'>
+          <div className='large-12 columns'>
             <h1>{this.props.quest.name}</h1>
-            <p>#Level {this.props.quest.levelNumber}/{this.props.quest.levelCount}</p>
+            <p>#Level {questProgess}</p>
+            <p>Start time: {this.props.quest.levelStartTime}</p>
             <h4>{this.props.quest.level.question}</h4>
-            <input name="answer" type="text" autoComplete="off"
-                   value={this.state.response}
-                   onKeyPress={this.handleKeyPress}
-                   onChange={this.handleInput}></input>
+            <input name='answer' type='text' autoComplete='off'
+              value={this.state.response}
+              onKeyPress={this.handleKeyPress}
+              onChange={this.handleInput}></input>
             <p>{this.state.message}</p>
-            <button onClick={this.handleResponseSend}>Check</button>
+            <button onClick={this.handleResponseSend}>
+              {this.getIntlMessage('button_check')}
+            </button>
           </div>
         </div>
       );

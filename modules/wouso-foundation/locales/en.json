@@ -98,6 +98,7 @@
   "text_from": "from",
   "link_here": "here",
   "button_save": "Save",
+  "button_check": "Check",
 
 
   "qotd_title":            "Question of the day",
@@ -122,12 +123,15 @@
 
   "qotd_tags_title": "Tags:",
 
-  "qotd_game_check": "Check",
-
-
 
   "quest_list_modal_title_add": "Add question",
   "quest_list_modal_title_edit": "Edit question",
+
+  "quest_game_wrong_answer": "Wrong answer. Please try again.",
+  "quest_game_finish": "You have finished this quest.",
+  "quest_game_no_quests": "No quests available.",
+  "quest_game_status_complete": "Quest complete!",
+  "quest_game_status_progress": "Currently at level",
 
   "button_text_add": "Add",
   "button_text_edit": "Edit"

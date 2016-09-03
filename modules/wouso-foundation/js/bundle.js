@@ -44831,6 +44831,7 @@
 		"text_from": "from",
 		"link_here": "here",
 		"button_save": "Save",
+		"button_check": "Check",
 		"qotd_title": "Question of the day",
 		"qotd_alert_login": "You need to login to play this game",
 		"qotd_alert_noquestion": "No question for today.",
@@ -44848,9 +44849,13 @@
 		"qotd_add_answer": "Add answer",
 		"qotd_list_title": "List of questions",
 		"qotd_tags_title": "Tags:",
-		"qotd_game_check": "Check",
 		"quest_list_modal_title_add": "Add question",
 		"quest_list_modal_title_edit": "Edit question",
+		"quest_game_wrong_answer": "Wrong answer. Please try again.",
+		"quest_game_finish": "You have finished this quest.",
+		"quest_game_no_quests": "No quests available.",
+		"quest_game_status_complete": "Quest complete!",
+		"quest_game_status_progress": "Currently at level",
 		"button_text_add": "Add",
 		"button_text_edit": "Edit"
 	};
@@ -44948,6 +44953,7 @@
 		"text_from": "de la",
 		"link_here": "aici",
 		"button_save": "Salvează",
+		"button_check": "Verifică",
 		"qotd_title": "Întrebarea zilei",
 		"qotd_alert_login": "Trebuie să te autentifici pentru a putea juca.",
 		"qotd_alert_noquestion": "Nici o întrebare astăzi.",
@@ -44965,9 +44971,13 @@
 		"qotd_add_answer": "Adaugă variantă",
 		"qotd_list_title": "Lista cu întrebări",
 		"qotd_tags_title": "Etichete:",
-		"qotd_game_check": "Verifică",
 		"quest_list_modal_title_add": "Adaugă întrebare",
 		"quest_list_modal_title_edit": "Modifică întrebare",
+		"quest_game_wrong_answer": "Răspuns greșit. Mai încearcă.",
+		"quest_game_finish": "Ai terminat acest quest.",
+		"quest_game_no_quests": "Nici un quest disponibil momentan.",
+		"quest_game_status_complete": "Quest complet!",
+		"quest_game_status_progress": "Ajuns la nivelul",
 		"button_text_add": "Adaugă",
 		"button_text_edit": "Modifică"
 	};
@@ -45058,6 +45068,10 @@
 	  messages: locales[config.language]
 	};
 
+	/*
+	* Main Quest Game component. Loads active quest list initially and
+	* a single quest when one is selected.
+	*/
 	var QuestGame = React.createClass({displayName: "QuestGame",
 	  mixins: [__webpack_require__(172).IntlMixin],
 
@@ -45071,7 +45085,8 @@
 
 	  componentDidMount: function() {
 	    if (this.state.currentQuestID) {
-	      $.get('/api/wouso-quest/play?id=' + this.state.currentQuestID, function(res) {
+	      var url = '/api/wouso-quest/play?id=' + this.state.currentQuestID;
+	      $.get(url, function(res) {
 	        if (this.isMounted()) {
 	          this.setState({
 	            currentQuest: res
@@ -45098,31 +45113,66 @@
 
 	  render: function() {
 	    if (this.state.currentQuestID) {
-	      return (React.createElement(QuestGameLevel, {quest: this.state.currentQuest, next: this.handleQuestSelect}));
+	      return (
+	        React.createElement(QuestGameLevel, {quest: this.state.currentQuest, 
+	          next: this.handleQuestSelect})
+	      );
 	    } else {
 	      return (
-	        React.createElement("div", {className: "row"}, 
-	          React.createElement("div", {className: "large-12 columns"}, 
-	            this.state.questList.length === 0 ? 'No quests available.' : null, 
-	            this.state.questList.map(function(q, i) {
-	              return (
-	                React.createElement("div", {key: i}, 
-	                  React.createElement("a", {onClick: this.handleQuestSelect.bind(this, q.id)}, 
-	                    q.name
-	                  ), 
-	                  React.createElement("p", null, " ", q.levelCount, " LEVELS. ", q.finished ? 'Completed' : 'Currently at level TODO'), 
-	                  React.createElement("p", null, "Start: ", q.startTime, " - End: ", q.endTIme)
-	                )
-	              );
-	            }, this)
-	          )
-	        )
+	        React.createElement(QuestGameList, {questList: this.state.questList, 
+	          onQuestClick: this.handleQuestSelect})
 	      );
 	    }
 	  }
 	});
 
+	/*
+	* Loads active quests list with some stats for each one.
+	*/
+	var QuestGameList = React.createClass({displayName: "QuestGameList",
+	  mixins: [__webpack_require__(172).IntlMixin],
+
+	  render: function() {
+	    var noQuest = null;
+	    if (this.props.questList.length === 0) {
+	      noQuest = this.getIntlMessage('quest_game_no_quests');
+	    }
+
+	    return (
+	      React.createElement("div", {className: "row"}, 
+	        React.createElement("div", {className: "large-12 columns"}, 
+	          React.createElement("h2", null, noQuest), 
+
+	          this.props.questList.map(function(q, i) {
+	            // Build quest status message
+	            var questStatus = this.getIntlMessage('quest_game_status_progress');
+	            questStatus += ' ' + q.levelNumber + '/' + q.levelCount;
+	            if (q.finished) {
+	              questStatus = this.getIntlMessage('quest_game_status_complete');
+	            }
+
+	            return (
+	              React.createElement("div", {key: i}, 
+	                React.createElement("a", {onClick: this.props.onQuestClick.bind(null, q.id)}, 
+	                  q.name
+	                ), 
+	                React.createElement("p", null, " ", q.levelCount, " LEVELS. ", questStatus), 
+	                React.createElement("p", null, "Start: ", q.startTime, " - End: ", q.endTIme)
+	              )
+	            );
+	          }, this)
+	        )
+	      )
+	    );
+	  }
+	});
+
+	/*
+	* Quest game logic.
+	*/
 	var QuestGameLevel = React.createClass({displayName: "QuestGameLevel",
+	  mixins: [__webpack_require__(172).IntlMixin],
+
 	  getInitialState: function() {
 	    return {
 	      response: '',
@@ -45150,11 +45200,13 @@
 
 	    $.get(url, function(res) {
 	      if (res === 'OK') {
-	        // Update level
+	        // Clear response and advance level
+	        this.setState({response: ''});
 	        this.props.next();
 	      } else {
+	        // Clear response and show message
 	        this.setState({
-	          message: 'Wrong answer. Please try again.',
+	          message: this.getIntlMessage('quest_game_wrong_answer'),
 	          response: ''
 	        });
 	      }
@@ -45166,23 +45218,31 @@
 	      return (
 	        React.createElement("div", {className: "row"}, 
 	          React.createElement("div", {className: "large-12 columns"}, 
-	            React.createElement("h2", null, " You have finished this quest. ")
+	            React.createElement("h2", null, this.getIntlMessage('quest_game_finish'))
 	          )
 	        )
 	      );
 	    } else {
+	      var questProgess = this.props.quest.levelNumber + '/';
+	      questProgess += this.props.quest.levelCount;
+
+	      console.log(this.props.quest.levelStartTime)
+
 	      return (
 	        React.createElement("div", {className: "row"}, 
 	          React.createElement("div", {className: "large-12 columns"}, 
 	            React.createElement("h1", null, this.props.quest.name), 
-	            React.createElement("p", null, "#Level ", this.props.quest.levelNumber, "/", this.props.quest.levelCount), 
+	            React.createElement("p", null, "#Level ", questProgess), 
+	            React.createElement("p", null, "Start time: ", this.props.quest.levelStartTime), 
 	            React.createElement("h4", null, this.props.quest.level.question), 
 	            React.createElement("input", {name: "answer", type: "text", autoComplete: "off", 
-	                   value: this.state.response, 
-	                   onKeyPress: this.handleKeyPress, 
-	                   onChange: this.handleInput}), 
+	              value: this.state.response, 
+	              onKeyPress: this.handleKeyPress, 
+	              onChange: this.handleInput}), 
 	            React.createElement("p", null, this.state.message), 
-	            React.createElement("button", {onClick: this.handleResponseSend}, "Check")
+	            React.createElement("button", {onClick: this.handleResponseSend}, 
+	              this.getIntlMessage('button_check')
+	            )
 	          )
 	        )
 	      );
