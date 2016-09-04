@@ -1,10 +1,11 @@
 var express  = require('express');
 var mongoose = require('mongoose');
+var util     = require('util');
 
 var QuestQ   = mongoose.model('QuestQ');
 var Quest    = mongoose.model('Quest');
 var Tag      = mongoose.model('Tag');
-var Settings = mongoose.model('Settings')
+var Settings = mongoose.model('Settings');
 
 var log = require('../../core/logging')('wouso-quest');
 
@@ -36,12 +37,6 @@ router.post('/api/wouso-quest/add', function(req, res, next) {
   var tags = req.body.tags.split(' ');
   Tag.find({name: {$in: tags}, type: 'wouso-quest'}).exec(gotTags);
 
-  /**
-  * Add Tags query response.
-  * @param {int} err Request error.
-  * @param {int} all Response.
-  * @return {void}
-  */
   function gotTags(err, all) {
     if (err) {
       return next(err);
@@ -80,11 +75,6 @@ router.post('/api/wouso-quest/add', function(req, res, next) {
     }
   }
 
-  /**
-  * Add new Quest Question response.
-  * @param {int} err Request error.
-  * @return {void}
-  */
   function questqSaved(err, questQ) {
     var qID = req.body.id || questQ._id;
 
@@ -113,11 +103,6 @@ router.post('/api/wouso-quest/add-quest', function(req, res, next) {
 
   new Quest(newQuest).save(questSaved);
 
-  /**
-  * Add new Quest response.
-  * @param {int} err Request error.
-  * @return {void}
-  */
   function questSaved(err) {
     if (err) {
       return next(err);
@@ -131,27 +116,22 @@ router.post('/api/wouso-quest/add-quest', function(req, res, next) {
 */
 router.get('/api/wouso-quest/play', function(req, res, next) {
   // Check if user is logged in
-  if (!req.user) {
-    return res.redirect('/login');
-  }
+  if (!req.user) return res.redirect('/login');
 
   var _self = {};
-  var query = {};
 
+  // Get all quest or just one if ID query is available
   if (req.query.id) {
-    query._id = req.query.id;
-    Quest.findOne(query).exec(gotQuest);
+    Quest.findOne({_id: req.query.id}).exec(gotQuest);
   } else {
     Quest.find().exec(gotQuests);
   }
 
-  /* Handle a single quest. */
+  // Handle a single quest
   function gotQuest(err, quest) {
-    if (err) {
-      return next(err);
-    }
+    if (err) return next(err)
 
-    _self.quest = quest;
+    _self.quest    = quest;
     _self.finished = false;
 
     // Check if user has finished the quest
@@ -166,8 +146,8 @@ router.get('/api/wouso-quest/play', function(req, res, next) {
       quest.levels.forEach(function(level, i) {
         level.users.forEach(function(user) {
           if (user._id.toString() === req.user._id.toString()) {
-            _self.levelIndex = i;
-            _self.levelID = level._id;
+            _self.levelIndex     = i;
+            _self.levelID        = level._id;
             _self.levelStartTime = user.startTime;
           }
         });
@@ -177,24 +157,31 @@ router.get('/api/wouso-quest/play', function(req, res, next) {
       if (!('levelIndex' in _self)) {
         if (quest.levels.length === 0) {
           _self.levelIndex = null;
-          _self.levelID = null;
-          log.warning('Quest [' + quest._id + '] with no levels being used.');
+          _self.levelID    = null;
+
+          var msg = 'Quest (%s) with no levels is being used.'
+          log.warning(util.format(msg, quest._id));
         } else {
           _self.levelIndex = 0;
-          _self.levelID = quest.levels[_self.levelIndex]._id;
+          _self.levelID    = quest.levels[_self.levelIndex]._id;
         }
 
         // Save current level
-        var query = {'_id': req.query.id, 'levels._id': _self.levelID};
+        var query = {
+          '_id'        : req.query.id,
+          'levels._id' : _self.levelID
+        };
         var update = {$push: {
           'levels.$.users': {
-            _id: ObjectId(req.user._id),
-            startTime: Date.now()
+            _id       : ObjectId(req.user._id),
+            startTime : Date.now()
           }
         }};
-        Quest.update(query, update).exec(function(err, update) {
-          console.log(err);
-          console.log(update);
+        Quest.update(query, update).exec(function(err) {
+          if (err) {
+            var msg = 'Cannot set user (%s) to level (%s) in quest (%s)';
+            log.error(util.format(msg, req.user._id, _self.levelID, req.query.id));
+          }
         });
       }
     }
@@ -204,21 +191,21 @@ router.get('/api/wouso-quest/play', function(req, res, next) {
   }
 
   function gotQuestQuestion(err, question) {
-    if (err) {
-      return next(err);
-    }
+    if (err) return next(err);
 
     _self.level = {};
     _self.hints = [];
+
     if (question) {
-      _self.level.id = question._id;
+      _self.level.id       = question._id;
       _self.level.question = question.question;
-      _self.hints[0] = question.hint1;
-      _self.hints[1] = question.hint2;
-      _self.hints[2] = question.hint3;
+      _self.hints[0]       = question.hint1;
+      _self.hints[1]       = question.hint2;
+      _self.hints[2]       = question.hint3;
     }
 
-    Settings.find().exec(gotSettings)
+    // Get quest settings
+    Settings.find().exec(gotSettings);
   }
 
   function gotSettings(err, settings) {
@@ -249,23 +236,21 @@ router.get('/api/wouso-quest/play', function(req, res, next) {
 
     // Explicetly build response
     res.send({
-      id: _self.quest._id,
-      name: _self.quest.name,
-      startTime: _self.quest.start,
-      endTime: _self.quest.end,
-      levelCount: _self.quest.levels.length,
-      levelNumber: _self.levelIndex + 1,
-      levelStartTime: _self.levelStartTime,
-      levelHints: _self.levelHints,
-      finished: _self.finished,
-      level: _self.level
+      id             : _self.quest._id,
+      name           : _self.quest.name,
+      startTime      : _self.quest.start,
+      endTime        : _self.quest.end,
+      levelCount     : _self.quest.levels.length,
+      levelNumber    : _self.levelIndex + 1,
+      levelStartTime : _self.levelStartTime,
+      levelHints     : _self.levelHints,
+      finished       : _self.finished,
+      level          : _self.level
     });
   }
 
   function gotQuests(err, quests) {
-    if (err) {
-      return next(err);
-    }
+    if (err) return next(err);
 
     // Explicetly build response
     var response = [];
@@ -289,20 +274,20 @@ router.get('/api/wouso-quest/play', function(req, res, next) {
       });
 
       response.push({
-        id: quest._id,
-        name: quest.name,
-        startTime: quest.start,
-        endTime: quest.end,
-        levelCount: quest.levels.length,
-        levelNumber: levelIndex + 1,
-        finished: finished
+        id          : quest._id,
+        name        : quest.name,
+        startTime   : quest.start,
+        endTime     : quest.end,
+        levelCount  : quest.levels.length,
+        levelNumber : levelIndex + 1,
+        finished    : finished
       });
     });
     res.send(response);
   }
 });
 
-router.get('/api/wouso-quest/list', function (req, res, next) {
+router.get('/api/wouso-quest/list', function (req, res) {
   if (!req.query.id) return res.send({})
 
   var _self = {}
@@ -338,9 +323,7 @@ router.get('/api/wouso-quest/qlist', function(req, res, next) {
   Quest.find(query, fields).exec(gotQuest);
 
   function gotQuest(err, questNames) {
-    if (err) {
-      return next(err);
-    }
+    if (err) return next(err);
 
     res.send(questNames);
   }
@@ -362,9 +345,7 @@ router.get('/api/wouso-quest/quest', function(req, res, next) {
   Quest.findOne(query).lean().exec(gotQuest);
 
   function gotQuest(err, quest) {
-    if (err) {
-      return next(err);
-    }
+    if (err) return next(err);
 
     _self.quest = quest;
     if (quest.levels) {
@@ -378,9 +359,7 @@ router.get('/api/wouso-quest/quest', function(req, res, next) {
   }
 
   function gotQuestions(err, questions) {
-    if (err) {
-      return next(err);
-    }
+    if (err) return next(err);
 
     // Go through each quest level and add qestion details
     for (var i=0; i<_self.quest.levels.length; i++) {
@@ -411,18 +390,14 @@ router.get('/api/wouso-quest/list/:perPage/:page', function(req, res, next) {
   QuestQ.find(query).skip(skip).limit(show).exec(gotQuestQ);
 
   function gotQuestQ(err, all) {
-    if (err) {
-      return next(err);
-    }
+    if (err) return next(err);
 
     _self.questions = all;
     Tag.find({type: 'wouso-quest'}).exec(gotTags);
   }
 
   function gotTags(err, tags) {
-    if (err) {
-      return next(err);
-    }
+    if (err) return next(err);
 
     // Replace tag ids with tag names
     _self.questions.forEach(function(q) {
@@ -438,14 +413,12 @@ router.get('/api/wouso-quest/list/:perPage/:page', function(req, res, next) {
   }
 
   function gotCount(err, count) {
-    if (err) {
-      return next(err);
-    }
+    if (err) return next(err);
 
-    var response = {};
-    response.questions = _self.questions;
-    response.count = count;
-    res.send(response);
+    res.send({
+      questions : _self.questions,
+      count     : count
+    });
   }
 });
 
@@ -486,7 +459,8 @@ router.post('/api/wouso-quest/reorder', function(req, res) {
 
     function updatedQuest(err) {
       if (err) {
-        log.error('Could not reorder question of quest: ' + req.body.id);
+        var msg = 'Could not reorder question of quest: %s';
+        log.error(util.format(msg, req.body.id));
       }
     }
   }
@@ -504,14 +478,10 @@ router.post('/api/wouso-quest/edit', function(req, res) {
   }
   Quest.update({_id: req.body.id}, update).exec(updatedQuest);
 
-  /**
-  * Handle Quest update.
-  * @param {int} err Request error.
-  * @return {void}
-  */
   function updatedQuest(err) {
     if (err) {
-      log.error('Could not update quest times: ' + req.body.id);
+      var msg = 'Could not update quest times: %s';
+      log.error(util.format(msg, req.body.id));
     }
   }
 });
@@ -519,9 +489,7 @@ router.post('/api/wouso-quest/edit', function(req, res) {
 // TODO: limit access to this route
 router.get('/api/wouso-quest/respond', function(req, res, next) {
   // Check if user is logged in
-  if (!req.user) {
-    return res.redirect('/login');
-  }
+  if (!req.user) return res.redirect('/login');
 
   var _self = {};
   var query = {};
@@ -533,9 +501,7 @@ router.get('/api/wouso-quest/respond', function(req, res, next) {
 
   /* Handle a single quest. */
   function gotQuest(err, quest) {
-    if (err) {
-      return next(err);
-    }
+    if (err) return next(err);
 
     _self.quest = quest;
     // Gather current level info
@@ -570,8 +536,8 @@ router.get('/api/wouso-quest/respond', function(req, res, next) {
       var query = {_id: ObjectId(req.query.id)};
       var update = {$push: {}};
       var value = {
-        _id: ObjectId(req.user._id),
-        startTime: Date.now()
+        _id       : ObjectId(req.user._id),
+        startTime : Date.now()
       };
 
       // If user finished last level, add him to finishers
@@ -597,9 +563,7 @@ router.post('/api/wouso-quest/settings', function (req, res, next) {
     var query = {'key': 'quest-' + key}
     var update = {$set: {'val': req.body[key]}}
     Settings.update(query, update, {upsert: true}).exec(function (err) {
-      if (err) {
-        return next(err);
-      }
+      if (err) return next(err);
     });
   }
 

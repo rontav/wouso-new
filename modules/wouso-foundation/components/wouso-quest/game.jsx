@@ -171,9 +171,6 @@ var QuestGameLevel = React.createClass({
           <div className='large-12 columns'>
             <h1>{this.props.quest.name}</h1>
             <p>#Level {questProgess}</p>
-            <p> Start time: {this.props.quest.levelStartTime} ({new Date(this.props.quest.levelStartTime).getTime()})</p>
-            <p> TTH: {timeToHint} </p>
-            <p> Now: {(new Date()).toString()} ({Date.now()}) </p>
             <h4>{this.props.quest.level.question}</h4>
             <input name='answer' type='text' autoComplete='off'
               value={this.state.response}

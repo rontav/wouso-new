@@ -70927,7 +70927,6 @@
 	    if (this.state.currentQuestID) {
 	      var url = '/api/wouso-quest/play?id=' + this.state.currentQuestID;
 	      $.get(url, function(res) {
-	        console.log(res)
 	        if (this.isMounted()) {
 	          this.setState({ currentQuest: res });
 	        }
@@ -71018,7 +71017,6 @@
 	  },
 
 	  componentDidMount: function() {
-	    console.log('refreshing...')
 	    setInterval(this.props.next, 5000);
 	  },
 
