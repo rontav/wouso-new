@@ -21,8 +21,13 @@
     },
 
     "plugins": [
+        "node",
         "react"
     ],
 
-    "extends": "standard-jsx"
+    "extends": [
+        "standard-jsx",
+        "eslint:recommended",
+        "plugin:node/recommended"
+    ]
 }

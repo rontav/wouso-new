@@ -44856,6 +44856,8 @@
 		"quest_game_no_quests": "No quests available.",
 		"quest_game_status_complete": "Quest complete!",
 		"quest_game_status_progress": "Currently at level",
+		"quest_title_settings": "Settings",
+		"quest_settings_tth": "Time to hint",
 		"button_text_add": "Add",
 		"button_text_edit": "Edit"
 	};
@@ -44978,6 +44980,8 @@
 		"quest_game_no_quests": "Nici un quest disponibil momentan.",
 		"quest_game_status_complete": "Quest complet!",
 		"quest_game_status_progress": "Ajuns la nivelul",
+		"quest_title_settings": "Setări",
+		"quest_settings_tth": "Timp până la indiciu",
 		"button_text_add": "Adaugă",
 		"button_text_edit": "Modifică"
 	};
@@ -45034,8 +45038,9 @@
 	var React = __webpack_require__(2);
 	var ReactDOM = __webpack_require__(159);
 
-	var QuestGame = __webpack_require__(368);
+	var QuestAdmin = __webpack_require__(368);
 	var QuestContrib = __webpack_require__(369);
+	var QuestGame = __webpack_require__(696);
 
 	var locales   = __webpack_require__(362)
 	var config    = __webpack_require__(366)
@@ -45045,12 +45050,23 @@
 	  messages: locales[config.language]
 	};
 
-	if ( $('#quest-game').length ) {
-	  ReactDOM.render(React.createElement(QuestGame, React.__spread({},  intlData)), document.getElementById('quest-game'));
+
+	if ($('#quest-admin').length) {
+	  ReactDOM.render(
+	    React.createElement(QuestAdmin, React.__spread({},  intlData)), document.getElementById('quest-admin')
+	  );
 	}
 
 	if ($('#quest-contrib').length) {
-	  ReactDOM.render(React.createElement(QuestContrib, React.__spread({},  intlData)), document.getElementById('quest-contrib'));
+	  ReactDOM.render(
+	    React.createElement(QuestContrib, React.__spread({},  intlData)), document.getElementById('quest-contrib')
+	  );
+	}
+
+	if ( $('#quest-game').length ) {
+	  ReactDOM.render(
+	    React.createElement(QuestGame, React.__spread({},  intlData)), document.getElementById('quest-game')
+	  );
 	}
 
 
@@ -45060,197 +45076,29 @@
 
 	var React = __webpack_require__(2);
 
-	var locales = __webpack_require__(362);
-	var config = __webpack_require__(366);
 
-	var intlData = {
-	  locales: ['en-US'],
-	  messages: locales[config.language]
-	};
-
-	/*
-	* Main Quest Game component. Loads active quest list initially and
-	* a single quest when one is selected.
-	*/
-	var QuestGame = React.createClass({displayName: "QuestGame",
+	var QuestAdmin = React.createClass({displayName: "QuestAdmin",
 	  mixins: [__webpack_require__(172).IntlMixin],
 
-	  getInitialState: function() {
-	    return {
-	      questList: [],
-	      currentQuest: null,
-	      currentQuestID: null
-	    };
-	  },
-
-	  componentDidMount: function() {
-	    if (this.state.currentQuestID) {
-	      var url = '/api/wouso-quest/play?id=' + this.state.currentQuestID;
-	      $.get(url, function(res) {
-	        if (this.isMounted()) {
-	          this.setState({
-	            currentQuest: res
-	          });
-	        }
-	      }.bind(this));
-	    } else {
-	      $.get('/api/wouso-quest/play', function(res) {
-	        if (this.isMounted()) {
-	          this.setState({
-	            questList: res
-	          });
-	        }
-	      }.bind(this));
-	    }
-	  },
-
-	  handleQuestSelect: function(id) {
-	    if (typeof id !== 'undefined') {
-	      this.state.currentQuestID = id;
-	    }
-	    this.componentDidMount();
-	  },
-
-	  render: function() {
-	    if (this.state.currentQuestID) {
-	      return (
-	        React.createElement(QuestGameLevel, {quest: this.state.currentQuest, 
-	          next: this.handleQuestSelect})
-	      );
-	    } else {
-	      return (
-	        React.createElement(QuestGameList, {questList: this.state.questList, 
-	          onQuestClick: this.handleQuestSelect})
-	      );
-	    }
-	  }
-	});
-
-	/*
-	* Loads active quests list with some stats for each one.
-	*/
-	var QuestGameList = React.createClass({displayName: "QuestGameList",
-	  mixins: [__webpack_require__(172).IntlMixin],
-
-	  render: function() {
-	    var noQuest = null;
-	    if (this.props.questList.length === 0) {
-	      noQuest = this.getIntlMessage('quest_game_no_quests');
-	    }
-
+	  render: function () {
 	    return (
 	      React.createElement("div", {className: "row"}, 
 	        React.createElement("div", {className: "large-12 columns"}, 
-	          React.createElement("h2", null, noQuest), 
+	          React.createElement("h3", null, " ",  this.getIntlMessage('quest_title_settings'), " "), 
+	          React.createElement("form", {method: "post", action: "/api/wouso-quest/settings"}, 
+	            React.createElement("label", null, " ",  this.getIntlMessage('quest_settings_tth'), " "), 
+	            React.createElement("input", {name: "timeToHint", type: "text", defaultValue: timeToHint}), 
 
-	          this.props.questList.map(function(q, i) {
-	            // Build quest status message
-	            var questStatus = this.getIntlMessage('quest_game_status_progress');
-	            questStatus += ' ' + q.levelNumber + '/' + q.levelCount;
-	            if (q.finished) {
-	              questStatus = this.getIntlMessage('quest_game_status_complete');
-	            }
-
-	            return (
-	              React.createElement("div", {key: i}, 
-	                React.createElement("a", {onClick: this.props.onQuestClick.bind(null, q.id)}, 
-	                  q.name
-	                ), 
-	                React.createElement("p", null, " ", q.levelCount, " LEVELS. ", questStatus), 
-	                React.createElement("p", null, "Start: ", q.startTime, " - End: ", q.endTIme)
-	              )
-	            );
-	          }, this)
+	            React.createElement("input", {className: "button small", type: "submit", 
+	              defaultValue:  this.getIntlMessage('button_save') })
+	          )
 	        )
 	      )
-	    );
+	    )
 	  }
-	});
+	})
 
-	/*
-	* Quest game logic.
-	*/
-	var QuestGameLevel = React.createClass({displayName: "QuestGameLevel",
-	  mixins: [__webpack_require__(172).IntlMixin],
-
-	  getInitialState: function() {
-	    return {
-	      response: '',
-	      message: ''
-	    };
-	  },
-
-	  handleInput: function(event) {
-	    this.setState({
-	      response: event.target.value
-	    });
-	  },
-
-	  handleKeyPress: function(event) {
-	    if (event.key === 'Enter') {
-	      this.handleResponseSend();
-	    } else {
-	      this.setState({message: ''});
-	    }
-	  },
-
-	  handleResponseSend: function() {
-	    var url = '/api/wouso-quest/respond';
-	    url += '?id=' + this.props.quest.id + '&response=' + this.state.response;
-
-	    $.get(url, function(res) {
-	      if (res === 'OK') {
-	        // Clear response and advance level
-	        this.setState({response: ''});
-	        this.props.next();
-	      } else {
-	        // Clear response and show message
-	        this.setState({
-	          message: this.getIntlMessage('quest_game_wrong_answer'),
-	          response: ''
-	        });
-	      }
-	    }.bind(this));
-	  },
-
-	  render: function() {
-	    if (this.props.quest.finished) {
-	      return (
-	        React.createElement("div", {className: "row"}, 
-	          React.createElement("div", {className: "large-12 columns"}, 
-	            React.createElement("h2", null, this.getIntlMessage('quest_game_finish'))
-	          )
-	        )
-	      );
-	    } else {
-	      var questProgess = this.props.quest.levelNumber + '/';
-	      questProgess += this.props.quest.levelCount;
-
-	      console.log(this.props.quest.levelStartTime)
-
-	      return (
-	        React.createElement("div", {className: "row"}, 
-	          React.createElement("div", {className: "large-12 columns"}, 
-	            React.createElement("h1", null, this.props.quest.name), 
-	            React.createElement("p", null, "#Level ", questProgess), 
-	            React.createElement("p", null, "Start time: ", this.props.quest.levelStartTime), 
-	            React.createElement("h4", null, this.props.quest.level.question), 
-	            React.createElement("input", {name: "answer", type: "text", autoComplete: "off", 
-	              value: this.state.response, 
-	              onKeyPress: this.handleKeyPress, 
-	              onChange: this.handleInput}), 
-	            React.createElement("p", null, this.state.message), 
-	            React.createElement("button", {onClick: this.handleResponseSend}, 
-	              this.getIntlMessage('button_check')
-	            )
-	          )
-	        )
-	      );
-	    }
-	  }
-	});
-
-	module.exports = QuestGame;
+	module.exports = QuestAdmin;
 
 
 /***/ },
@@ -71044,6 +70892,216 @@
 	   document.removeEventListener('touchstart', fn);
 	 }
 	};
+
+
+/***/ },
+/* 696 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var React = __webpack_require__(2);
+
+	var locales = __webpack_require__(362);
+	var config = __webpack_require__(366);
+
+	var intlData = {
+	  locales: ['en-US'],
+	  messages: locales[config.language]
+	};
+
+	/*
+	* Main Quest Game component. Loads active quest list initially and
+	* a single quest when one is selected.
+	*/
+	var QuestGame = React.createClass({displayName: "QuestGame",
+	  mixins: [__webpack_require__(172).IntlMixin],
+
+	  getInitialState: function() {
+	    return {
+	      questList: [],
+	      currentQuest: null,
+	      currentQuestID: null
+	    };
+	  },
+
+	  componentDidMount: function() {
+	    if (this.state.currentQuestID) {
+	      var url = '/api/wouso-quest/play?id=' + this.state.currentQuestID;
+	      $.get(url, function(res) {
+	        console.log(res)
+	        if (this.isMounted()) {
+	          this.setState({ currentQuest: res });
+	        }
+	      }.bind(this));
+	    } else {
+	      $.get('/api/wouso-quest/play', function(res) {
+	        if (this.isMounted()) {
+	          this.setState({ questList: res });
+	        }
+	      }.bind(this));
+	    }
+	  },
+
+	  handleQuestSelect: function(id) {
+	    if (typeof id !== 'undefined') {
+	      this.state.currentQuestID = id;
+	    }
+	    this.componentDidMount();
+	  },
+
+	  render: function() {
+	    if (this.state.currentQuestID) {
+	      return (
+	        React.createElement(QuestGameLevel, {quest: this.state.currentQuest, 
+	          next: this.handleQuestSelect})
+	      );
+	    } else {
+	      return (
+	        React.createElement(QuestGameList, {questList: this.state.questList, 
+	          onQuestClick: this.handleQuestSelect})
+	      );
+	    }
+	  }
+	});
+
+	/*
+	* Loads active quests list with some stats for each one.
+	*/
+	var QuestGameList = React.createClass({displayName: "QuestGameList",
+	  mixins: [__webpack_require__(172).IntlMixin],
+
+	  render: function() {
+	    var noQuest = null;
+	    if (this.props.questList.length === 0) {
+	      noQuest = this.getIntlMessage('quest_game_no_quests');
+	    }
+
+	    return (
+	      React.createElement("div", {className: "row"}, 
+	        React.createElement("div", {className: "large-12 columns"}, 
+	          React.createElement("h2", null, noQuest), 
+
+	          this.props.questList.map(function(q, i) {
+	            // Build quest status message
+	            var questStatus = this.getIntlMessage('quest_game_status_progress');
+	            questStatus += ' ' + q.levelNumber + '/' + q.levelCount;
+	            if (q.finished) {
+	              questStatus = this.getIntlMessage('quest_game_status_complete');
+	            }
+
+	            return (
+	              React.createElement("div", {key: i}, 
+	                React.createElement("a", {onClick: this.props.onQuestClick.bind(null, q.id)}, 
+	                  q.name
+	                ), 
+	                React.createElement("p", null, " ", q.levelCount, " LEVELS. ", questStatus), 
+	                React.createElement("p", null, "Start: ", q.startTime, " - End: ", q.endTIme)
+	              )
+	            );
+	          }, this)
+	        )
+	      )
+	    );
+	  }
+	});
+
+	/*
+	* Quest game logic.
+	*/
+	var QuestGameLevel = React.createClass({displayName: "QuestGameLevel",
+	  mixins: [__webpack_require__(172).IntlMixin],
+
+	  getInitialState: function() {
+	    return {
+	      response: '',
+	      message: ''
+	    };
+	  },
+
+	  componentDidMount: function() {
+	    console.log('refreshing...')
+	    setInterval(this.props.next, 5000);
+	  },
+
+	  handleInput: function(event) {
+	    this.setState({
+	      response: event.target.value
+	    });
+	  },
+
+	  handleKeyPress: function(event) {
+	    if (event.key === 'Enter') {
+	      this.handleResponseSend();
+	    } else {
+	      this.setState({message: ''});
+	    }
+	  },
+
+	  handleResponseSend: function() {
+	    var url = '/api/wouso-quest/respond';
+	    url += '?id=' + this.props.quest.id + '&response=' + this.state.response;
+
+	    $.get(url, function(res) {
+	      if (res === 'OK') {
+	        // Clear response and advance level
+	        this.setState({response: ''});
+	        this.props.next();
+	      } else {
+	        // Clear response and show message
+	        this.setState({
+	          message: this.getIntlMessage('quest_game_wrong_answer'),
+	          response: ''
+	        });
+	      }
+	    }.bind(this));
+	  },
+
+	  render: function() {
+	    if (this.props.quest.finished) {
+	      return (
+	        React.createElement("div", {className: "row"}, 
+	          React.createElement("div", {className: "large-12 columns"}, 
+	            React.createElement("h2", null, this.getIntlMessage('quest_game_finish'))
+	          )
+	        )
+	      );
+	    } else {
+	      var questProgess = this.props.quest.levelNumber + '/';
+	      questProgess += this.props.quest.levelCount;
+
+	      return (
+	        React.createElement("div", {className: "row"}, 
+	          React.createElement("div", {className: "large-12 columns"}, 
+	            React.createElement("h1", null, this.props.quest.name), 
+	            React.createElement("p", null, "#Level ", questProgess), 
+	            React.createElement("p", null, " Start time: ", this.props.quest.levelStartTime, " (", new Date(this.props.quest.levelStartTime).getTime(), ")"), 
+	            React.createElement("p", null, " TTH: ", timeToHint, " "), 
+	            React.createElement("p", null, " Now: ", (new Date()).toString(), " (", Date.now(), ") "), 
+	            React.createElement("h4", null, this.props.quest.level.question), 
+	            React.createElement("input", {name: "answer", type: "text", autoComplete: "off", 
+	              value: this.state.response, 
+	              onKeyPress: this.handleKeyPress, 
+	              onChange: this.handleInput}), 
+	            React.createElement("p", null, this.state.message), 
+	            React.createElement("button", {onClick: this.handleResponseSend}, 
+	              this.getIntlMessage('button_check')
+	            ), 
+	            React.createElement("h4", null, "Hints"), 
+	            this.props.quest.levelHints.map(function(hint, i) {
+	              return(
+	                React.createElement("div", {key: i}, 
+	                  React.createElement("h5", null, "Hint ", i+1), 
+	                  React.createElement("p", null, hint)
+	                )
+	              );
+	            })
+	          )
+	        )
+	      );
+	    }
+	  }
+	});
+
+	module.exports = QuestGame;
 
 
 /***/ }

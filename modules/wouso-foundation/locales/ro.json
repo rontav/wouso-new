@@ -133,6 +133,9 @@
   "quest_game_status_complete": "Quest complet!",
   "quest_game_status_progress": "Ajuns la nivelul",
 
+  "quest_title_settings": "Setări",
+  "quest_settings_tth": "Timp până la indiciu",
+
   "button_text_add": "Adaugă",
   "button_text_edit": "Modifică"
 }

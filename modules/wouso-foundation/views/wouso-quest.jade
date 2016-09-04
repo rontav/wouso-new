@@ -3,14 +3,17 @@ extends layout
 block content
   .row
     .large-12.columns
+    
+  - if (mysettings['quest-timeToHint'])
+    script var timeToHint = #{mysettings['quest-timeToHint']}
 
-  - if (ROLE == 5)
+  - if (ROLE < 2)
     #quest-admin
 
-  - if (ROLE == 5)
+  - if (ROLE == 2)
     #quest-teacher
 
-  - if (ROLE < 4)
+  - if (ROLE == 3)
     #quest-contrib
 
   - if (ROLE == 4)   

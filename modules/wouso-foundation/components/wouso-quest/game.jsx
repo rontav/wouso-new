@@ -28,17 +28,13 @@ var QuestGame = React.createClass({
       var url = '/api/wouso-quest/play?id=' + this.state.currentQuestID;
       $.get(url, function(res) {
         if (this.isMounted()) {
-          this.setState({
-            currentQuest: res
-          });
+          this.setState({ currentQuest: res });
         }
       }.bind(this));
     } else {
       $.get('/api/wouso-quest/play', function(res) {
         if (this.isMounted()) {
-          this.setState({
-            questList: res
-          });
+          this.setState({ questList: res });
         }
       }.bind(this));
     }
@@ -120,6 +116,10 @@ var QuestGameLevel = React.createClass({
     };
   },
 
+  componentDidMount: function() {
+    setInterval(this.props.next, 5000);
+  },
+
   handleInput: function(event) {
     this.setState({
       response: event.target.value
@@ -171,7 +171,9 @@ var QuestGameLevel = React.createClass({
           <div className='large-12 columns'>
             <h1>{this.props.quest.name}</h1>
             <p>#Level {questProgess}</p>
-            <p>Start time: {this.props.quest.levelStartTime}</p>
+            <p> Start time: {this.props.quest.levelStartTime} ({new Date(this.props.quest.levelStartTime).getTime()})</p>
+            <p> TTH: {timeToHint} </p>
+            <p> Now: {(new Date()).toString()} ({Date.now()}) </p>
             <h4>{this.props.quest.level.question}</h4>
             <input name='answer' type='text' autoComplete='off'
               value={this.state.response}
@@ -181,6 +183,15 @@ var QuestGameLevel = React.createClass({
             <button onClick={this.handleResponseSend}>
               {this.getIntlMessage('button_check')}
             </button>
+            <h4>Hints</h4>
+            {this.props.quest.levelHints.map(function(hint, i) {
+              return(
+                <div key={i}>
+                  <h5>Hint {i+1}</h5>
+                  <p>{hint}</p>
+                </div>
+              );
+            })}
           </div>
         </div>
       );

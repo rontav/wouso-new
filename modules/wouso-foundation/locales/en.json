@@ -133,6 +133,10 @@
   "quest_game_status_complete": "Quest complete!",
   "quest_game_status_progress": "Currently at level",
 
+  "quest_title_settings": "Settings",
+  "quest_settings_tth": "Time to hint",
+
+
   "button_text_add": "Add",
   "button_text_edit": "Edit"
 }

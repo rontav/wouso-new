@@ -1,19 +1,34 @@
 var express  = require('express');
 var mongoose = require('mongoose');
 
-var QuestQ = mongoose.model('QuestQ');
-var Quest  = mongoose.model('Quest');
-var Tag    = mongoose.model('Tag');
+var QuestQ   = mongoose.model('QuestQ');
+var Quest    = mongoose.model('Quest');
+var Tag      = mongoose.model('Tag');
+var Settings = mongoose.model('Settings')
 
 var log = require('../../core/logging')('wouso-quest');
 
 var router   = express.Router();
 var ObjectId = mongoose.Types.ObjectId;
 
-router.get('/wouso-quest', function(req, res) {
-  res.render('wouso-quest', {
-    user: req.user
-  });
+router.get('/wouso-quest', function(req, res, next) {
+
+  Settings.find().exec(gotSettings)
+
+  function gotSettings(err, settings) {
+    if (err) return next(err)
+
+    var mysettings = {}
+    settings.forEach(function(option) {
+      mysettings[option.key] = option.val;
+    });
+
+    res.render('wouso-quest', {
+      user: req.user,
+      mysettings: mysettings
+    });
+  }
+
 });
 
 router.post('/api/wouso-quest/add', function(req, res, next) {
@@ -184,7 +199,7 @@ router.get('/api/wouso-quest/play', function(req, res, next) {
       }
     }
 
-    // Get questions with corresponding IDs
+    // Get question with corresponding ID
     QuestQ.findOne({_id: _self.levelID}).exec(gotQuestQuestion);
   }
 
@@ -193,11 +208,44 @@ router.get('/api/wouso-quest/play', function(req, res, next) {
       return next(err);
     }
 
-    var level = {};
+    _self.level = {};
+    _self.hints = [];
     if (question) {
-      level.id = question._id;
-      level.question = question.question;
+      _self.level.id = question._id;
+      _self.level.question = question.question;
+      _self.hints[0] = question.hint1;
+      _self.hints[1] = question.hint2;
+      _self.hints[2] = question.hint3;
     }
+
+    Settings.find().exec(gotSettings)
+  }
+
+  function gotSettings(err, settings) {
+    if (err) return next(err)
+
+    var mysettings = {}
+    settings.forEach(function(option) {
+      mysettings[option.key] = option.val;
+    });
+
+    // Add hints
+    var questStartTime = new Date(_self.levelStartTime).getTime();
+    var nowUTC = new Date()
+    // Convert current date to GMT+0
+    nowUTC = new Date(nowUTC.valueOf() + nowUTC.getTimezoneOffset() * 60000);
+    // Compute time diff
+    var questTimeDiff = (Date.now() - questStartTime) / 1000 / 60;
+    // Number of hints to show
+    var hintsNumber = questTimeDiff / mysettings['quest-timeToHint'];
+
+    // Decide which hints to show
+    _self.levelHints = [];
+    _self.hints.forEach(function(hint, i) {
+      if ((i+1) <= hintsNumber) {
+        _self.levelHints[i] = hint;
+      }
+    });
 
     // Explicetly build response
     res.send({
@@ -208,8 +256,9 @@ router.get('/api/wouso-quest/play', function(req, res, next) {
       levelCount: _self.quest.levels.length,
       levelNumber: _self.levelIndex + 1,
       levelStartTime: _self.levelStartTime,
+      levelHints: _self.levelHints,
       finished: _self.finished,
-      level: level
+      level: _self.level
     });
   }
 
@@ -256,7 +305,7 @@ router.get('/api/wouso-quest/play', function(req, res, next) {
 router.get('/api/wouso-quest/list', function (req, res, next) {
   if (!req.query.id) return res.send({})
 
-  _self = {}
+  var _self = {}
   QuestQ.findOne({_id: req.query.id}).exec(gotQuestQ);
 
   function gotQuestQ(err, quest) {
@@ -288,12 +337,6 @@ router.get('/api/wouso-quest/qlist', function(req, res, next) {
 
   Quest.find(query, fields).exec(gotQuest);
 
- /**
- * Handle Quest response.
- * @param {int} err Request error.
- * @param {int} questNames Response.
- * @return {void}
- */
   function gotQuest(err, questNames) {
     if (err) {
       return next(err);
@@ -318,12 +361,6 @@ router.get('/api/wouso-quest/quest', function(req, res, next) {
   // question info.
   Quest.findOne(query).lean().exec(gotQuest);
 
- /**
- * Handle Quest response.
- * @param {int} err Request error.
- * @param {Quest} quest Response.
- * @return {void}
- */
   function gotQuest(err, quest) {
     if (err) {
       return next(err);
@@ -340,12 +377,6 @@ router.get('/api/wouso-quest/quest', function(req, res, next) {
     }
   }
 
-  /**
-  * Handle Quest Questions response.
-  * @param {int} err Request error.
-  * @param {[QuestQ]} all Response.
-  * @return {void}
-  */
   function gotQuestions(err, questions) {
     if (err) {
       return next(err);
@@ -379,12 +410,6 @@ router.get('/api/wouso-quest/list/:perPage/:page', function(req, res, next) {
   _self.query = query;
   QuestQ.find(query).skip(skip).limit(show).exec(gotQuestQ);
 
-  /**
-  * Handle Quest Question response.
-  * @param {int} err Request error.
-  * @param {int} all Response.
-  * @return {void}
-  */
   function gotQuestQ(err, all) {
     if (err) {
       return next(err);
@@ -394,12 +419,6 @@ router.get('/api/wouso-quest/list/:perPage/:page', function(req, res, next) {
     Tag.find({type: 'wouso-quest'}).exec(gotTags);
   }
 
-  /**
-  * Handle Tags query response.
-  * @param {int} err Request error.
-  * @param {int} tags Response.
-  * @return {void}
-  */
   function gotTags(err, tags) {
     if (err) {
       return next(err);
@@ -418,12 +437,6 @@ router.get('/api/wouso-quest/list/:perPage/:page', function(req, res, next) {
     QuestQ.count(_self.query).exec(gotCount);
   }
 
-  /**
-  * Handle Quest Question count response.
-  * @param {int} err Request error.
-  * @param {int} count Response.
-  * @return {void}
-  */
   function gotCount(err, count) {
     if (err) {
       return next(err);
@@ -440,11 +453,6 @@ router.delete('/api/wouso-quest/delete', function(req, res) {
   var delList = req.query.id.split(',');
   QuestQ.remove({_id: {$in: delList}}).exec(removedQotd);
 
-  /**
-  * Handle Quest delete response.
-  * @param {int} err Request error.
-  * @return {void}
-  */
   function removedQotd(err) {
     if (err) {
       log.error('Could not remove quest questions: ' + delList);
@@ -459,12 +467,6 @@ router.post('/api/wouso-quest/reorder', function(req, res) {
   var levels = req.body.levels.split(',');
   Quest.findOne({_id: req.body.id}).exec(gotQuest);
 
-  /**
-  * Handle Quest query.
-  * @param {int} err Request error.
-  * @param {quest} quest object.
-  * @return {void}
-  */
   function gotQuest(err, quest) {
     if (err) {
       log.error('Could not get quest: ' + req.body.id);
@@ -482,11 +484,6 @@ router.post('/api/wouso-quest/reorder', function(req, res) {
       Quest.update({_id: req.body.id}, {levels: newQuestionOrder}).exec(updatedQuest);
     }
 
-    /**
-    * Handle Quest update.
-    * @param {int} err Request error.
-    * @return {void}
-    */
     function updatedQuest(err) {
       if (err) {
         log.error('Could not reorder question of quest: ' + req.body.id);
@@ -590,9 +587,23 @@ router.get('/api/wouso-quest/respond', function(req, res, next) {
     }
   }
 
-  function moveUser(err, update) {
+  function moveUser(err) {
     return res.send('OK');
   }
 });
+
+router.post('/api/wouso-quest/settings', function (req, res, next) {
+  for (var key in req.body) {
+    var query = {'key': 'quest-' + key}
+    var update = {$set: {'val': req.body[key]}}
+    Settings.update(query, update, {upsert: true}).exec(function (err) {
+      if (err) {
+        return next(err);
+      }
+    });
+  }
+
+  res.redirect('/wouso-quest')
+})
 
 module.exports = router;
