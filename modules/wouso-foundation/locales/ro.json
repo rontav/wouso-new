@@ -14,6 +14,7 @@
 
   "module_title": "JOCURI",
   "module_qotd":  "Întrebarea zilei",
+  "module_wouso-quest":  "Quest",
 
   "role_title":   "ROL",
   "role_root":    "Superutilizator",
@@ -97,6 +98,7 @@
   "text_from": "de la",
   "link_here": "aici",
   "button_save": "Salvează",
+  "button_check": "Verifică",
 
 
   "qotd_title":            "Întrebarea zilei",
@@ -121,5 +123,19 @@
 
   "qotd_tags_title": "Etichete:",
 
-  "qotd_game_check": "Verifică"
+
+  "quest_list_modal_title_add": "Adaugă întrebare",
+  "quest_list_modal_title_edit": "Modifică întrebare",
+
+  "quest_game_wrong_answer": "Răspuns greșit. Mai încearcă.",
+  "quest_game_finish": "Ai terminat acest quest.",
+  "quest_game_no_quests": "Nici un quest disponibil momentan.",
+  "quest_game_status_complete": "Quest complet!",
+  "quest_game_status_progress": "Ajuns la nivelul",
+
+  "quest_title_settings": "Setări",
+  "quest_settings_tth": "Timp până la indiciu",
+
+  "button_text_add": "Adaugă",
+  "button_text_edit": "Modifică"
 }

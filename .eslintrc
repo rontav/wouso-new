@@ -1,0 +1,33 @@
+{
+    "parser": "babel-eslint",
+    "env": {
+        "browser": true,
+        "node": true,
+        "jquery": true
+    },
+
+    "globals": {
+        "React": true
+    },
+
+    "parserOptions": {
+        "ecmaFeatures": {
+            "jsx": true,
+            "arrowFunctions": true,
+            "blockBindings": true,
+            "generators": true,
+            "require-jsdoc": false
+        }
+    },
+
+    "plugins": [
+        "node",
+        "react"
+    ],
+
+    "extends": [
+        "standard-jsx",
+        "eslint:recommended",
+        "plugin:node/recommended"
+    ]
+}

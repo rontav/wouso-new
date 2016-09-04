@@ -1,8 +1,12 @@
 var React         = require('react');
 var ReactDOM      = require('react-dom');
-var QStore        = require('../stores/qotds');
+var QStore        = require('../stores/questions');
 var DateStore     = require('../stores/datepicker');
 var AppDispatcher = require('../dispatchers/app');
+
+// Common components
+var ListNav    = require('./common/list-nav.jsx');
+var ListSearch = require('./common/list-search.jsx');
 
 
 var QotdQuestionOption = React.createClass({
@@ -218,7 +222,7 @@ var QotdListEntry = React.createClass({
 
     return (
       <div>
-        <div className="large-9 columns qotd-question-li">
+        <div className="large-9 columns question-li">
           <input type="checkbox" name="qotd" value={this.props.id} key={this.props.id} onChange={this.handleChange}></input>
           {this.props.text}
         </div>
@@ -226,100 +230,6 @@ var QotdListEntry = React.createClass({
           <a href="#" onClick={QotdListEntry.handleEditClick.bind(this, this.props.id)}>Edit</a>
         </div>
         <div className="large-2 columns text-center">{entryDate}</div>
-      </div>
-    );
-  }
-});
-
-
-var QotdListNav = React.createClass({
-  refreshList: function (page) {
-    AppDispatcher.handleViewAction({
-      type : "refreshPage",
-      no   : String(this.props.no),
-      page : String(page)
-    });
-  },
-
-  render: function() {
-    this.pages = [];
-    if (this.props.total) {
-      this.pages = Math.ceil(this.props.total/this.props.no);
-      this.pages = Array.apply(0, Array(this.pages)).map(function(j, i) { return i+1; });
-    }
-
-    return (
-      <div className="qotd-question-pages text-center">
-        { this.pages.map(function (opt, i) {
-          if (opt == this.props.page)
-            return (<b><a key={i} href="#" onClick={this.refreshList.bind(this, opt)}>{opt}</a></b>)
-          else
-            return (<a key={i} href="#" onClick={this.refreshList.bind(this, opt)}>{opt}</a>)
-        }, this) }
-      </div>
-    );
-  }
-});
-
-
-var QotdListSearch = React.createClass({
-  handleDeleteClick: function() {
-    if (QotdListEntry.selected_qotd.length == 0) {
-      alert('First select the questions that you need to delete.');
-    } else {
-      var conf = confirm('Are you sure you want to permanently delete selected questions?');
-      if (conf) {
-        $.ajax({
-          type    : "DELETE",
-          url     : '/api/qotd/delete?id=' + QotdListEntry.selected_qotd.join(','),
-          data    : null,
-          success : gotResponse
-        });
-      }
-
-      function gotResponse(res) {
-        AppDispatcher.handleViewAction({
-          type : "refreshPage"
-        });
-      }
-    }
-  },
-
-  handleClearClick: function() {
-    AppDispatcher.handleViewAction({
-      type : "searchQotd",
-      term : ''
-    });
-    AppDispatcher.handleViewAction({
-      type : "refreshPage"
-    });
-    this.clearButton.value = '';
-  },
-
-  handleChange: function(event) {
-    AppDispatcher.handleViewAction({
-      type : "searchQotd",
-      term : String(event.target.value)
-    });
-  },
-
-  render: function() {
-    return (
-      <div>
-        <a className="radius button" href="#" onClick={this.handleDeleteClick}>Delete</a>
-        <div className="row">
-          <div className="large-12 columns">
-            <div className="row collapse">
-              <div className="small-4 columns">
-                <input type="text" ref={(ref) => this.clearButton = ref} onChange={this.handleChange} placeholder="Search"></input>
-              </div>
-              <div className="small-1 columns">
-                <a href="#" className="button postfix" onClick={this.handleClearClick}>Clear</a>
-              </div>
-              <div className="small-7 columns"></div>
-            </div>
-          </div>
-        </div>
       </div>
     );
   }
@@ -341,7 +251,7 @@ var QotdList = React.createClass({
   componentDidMount: function() {
     QStore.addChangeListener(this._onChange);
     AppDispatcher.handleViewAction({
-      type : "refreshPage"
+      type : "refreshQotd"
     });
   },
 
@@ -353,7 +263,8 @@ var QotdList = React.createClass({
     return (
       <div>
         <div className="row">
-          <QotdListSearch />
+          <ListSearch searchType='searchQotd' refreshType='refreshQotd'
+                      selected={QotdListEntry.selected_qotd} />
         </div>
         <div className="row">
           <div className="reveal-modal" id="qotdModal" data-reveal aria-hidden="true" role="dialog"></div>
@@ -367,7 +278,8 @@ var QotdList = React.createClass({
               return <QotdListEntry key={opt._id} id={opt._id} text={opt.question} date={opt.date} />
             }, this)}
             <div className="spacer"></div>
-            <QotdListNav total={this.state.total} no={this.state.no} page={this.state.page} />
+            <ListNav total={this.state.total} no={this.state.no}
+                     page={this.state.page} refreshType='refreshQotd' />
           </div>
         </div>
         <div className="spacer"></div>

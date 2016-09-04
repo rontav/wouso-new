@@ -1,5 +1,8 @@
 module.exports = {
-  entry: './node_modules/wouso-foundation/components/qotd.jsx',
+  entry: [
+    './node_modules/wouso-foundation/components/qotd.jsx',
+    './node_modules/wouso-foundation/components/wouso-quest/main.jsx'
+  ],
   output: {
     filename: './node_modules/wouso-foundation/js/bundle.js'
   },

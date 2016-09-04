@@ -1,9 +1,11 @@
 var React     = require('react')
 var ReactDOM  = require('react-dom')
+
 var QotdGame  = require('./qotd-game')
 var QotdList  = require('./qotd-list')
 var QotdTeach = require('./qotd-teacher')
 var QotdAdmin = require('./qotd-admin')
+
 var locales   = require('../locales/locales.js')
 var config    = require('../../../config.json')
 

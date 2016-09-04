@@ -1,0 +1,11 @@
+{
+  "name": "wouso-quest",
+  "version": "0.0.0",
+  "description": "Quest game for wouso-new",
+  "main": "routes.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "MIT"
+}
