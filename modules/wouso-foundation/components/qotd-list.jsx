@@ -1,5 +1,7 @@
-var React         = require('react');
-var ReactDOM      = require('react-dom');
+var React            = require('react');
+var ReactDOM         = require('react-dom');
+var ReactIntl        = require('react-intl');
+
 var QStore        = require('../stores/questions');
 var DateStore     = require('../stores/datepicker');
 var AppDispatcher = require('../dispatchers/app');
@@ -237,7 +239,6 @@ var QotdListEntry = React.createClass({
 
 
 var QotdList = React.createClass({
-  mixins: [require('react-intl').IntlMixin],
   getInitialState: function() {
     return {
       questions : [],
@@ -271,7 +272,7 @@ var QotdList = React.createClass({
           <div className="large-12 columns">
             <a className="radius button" href="#" onClick={QotdListEntry.handleEditClick.bind(this, null)}>Add qotd</a>
             <h2>
-              { this.getIntlMessage('qotd_list_title') + " (" + this.state.total + " results" + (this.state.term != '' ? " for \"" + this.state.term + "\"": '') + ")" }
+              { this.props.intl.formatMessage({id: 'qotd_list_title'}) + " (" + this.state.total + " results" + (this.state.term != '' ? " for \"" + this.state.term + "\"": '') + ")" }
             </h2>
             { this.state.total == 0 ? (this.state.term != '' ? "No match for \"" + this.state.term + "\"" : "No questions") : null}
             { this.state.questions.map(function (opt) {
@@ -299,4 +300,4 @@ var QotdList = React.createClass({
 });
 
 
-module.exports = QotdList;
+module.exports = ReactIntl.injectIntl(QotdList);
