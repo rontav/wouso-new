@@ -4,7 +4,8 @@
   "scripts": {
     "start": "./node_modules/nodemon/bin/nodemon.js app.js",
     "login": "./node_modules/nodemon/bin/nodemon.js app.js login",
-    "test": "./node_modules/mocha/bin/mocha tests/"
+    "test": "./node_modules/mocha/bin/mocha tests/",
+    "postinstall": "npm link ./modules/*"
   },
   "dependencies": {
     "bcrypt-nodejs": "0.0.3",
