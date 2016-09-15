@@ -4,8 +4,7 @@
   "scripts": {
     "start": "./node_modules/nodemon/bin/nodemon.js app.js",
     "login": "./node_modules/nodemon/bin/nodemon.js app.js login",
-    "test": "./node_modules/mocha/bin/mocha tests/",
-    "heroku-postbuild": "npm link ./modules/*"
+    "test": "./node_modules/mocha/bin/mocha tests/"
   },
   "dependencies": {
     "bcrypt-nodejs": "0.0.3",
