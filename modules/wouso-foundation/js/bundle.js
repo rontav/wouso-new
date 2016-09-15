@@ -26437,6 +26437,8 @@
 	  messages : locales[config.language]
 	};
 
+	// We need to inject intl data again because parent object has statics and
+	// there is a bug: https://github.com/yahoo/react-intl/issues/196
 	var QuestQuestionForm = ReactIntl.injectIntl(React.createClass({
 	  getInitialState: function() {
 	    return {
