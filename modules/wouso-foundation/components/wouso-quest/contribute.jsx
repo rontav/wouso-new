@@ -30,10 +30,13 @@ var intlData = {
 var QuestQuestionForm = ReactIntl.injectIntl(React.createClass({
   getInitialState: function() {
     return {
-      questList: [{name: '---', _id: '---'}],
-      question: "",
-      answer: "",
-      tags: ""
+      questList : [{name: '---', _id: '---'}],
+      question  : "",
+      answer    : "",
+      tags      : "",
+      hint1     : "",
+      hint2     : "",
+      hint3     : ""
     };
   },
 
@@ -49,13 +52,13 @@ var QuestQuestionForm = ReactIntl.injectIntl(React.createClass({
       $.get('/api/wouso-quest/list?id=' + this.props.id, function(res) {
         if (this.isMounted()) {
           this.setState({
-            question: res.question,
-            quest: res.quest,
-            answer: res.answer,
-            hint1: res.hint1,
-            hint2: res.hint2,
-            hint3: res.hint3,
-            tags: res.tags.join(" ")
+            question : res.question,
+            quest    : res.quest,
+            answer   : res.answer,
+            hint1    : res.hint1,
+            hint2    : res.hint2,
+            hint3    : res.hint3,
+            tags     : res.tags.join(" ")
           });
         }
       }.bind(this));
@@ -85,8 +88,8 @@ var QuestQuestionForm = ReactIntl.injectIntl(React.createClass({
               <h2>{modalTitle}</h2>
               <label>Question:</label>
               <input name="question" type="text" value={this.state.question}
-                     onChange={this.editQuestion}></input>
-              <input name="id" type="hidden" value={this.props.id}></input>
+                onChange={this.editQuestion} />
+              <input name="id" type="hidden" value={this.props.id} />
             </div>
           </div>
           <div className="row">
@@ -103,42 +106,42 @@ var QuestQuestionForm = ReactIntl.injectIntl(React.createClass({
             <div className="large-12 columns">
               <label>Tags (space separated):</label>
               <input name="tags" type="text" value={this.state.tags}
-                     onChange={this.editTags}></input>
+                onChange={this.editTags} />
             </div>
           </div>
           <div className="row">
             <div className="large-12 columns">
               <label>Answer:</label>
               <input name="answer" type="text" value={this.state.answer}
-                     onChange={this.editAnswer}></input>
+                onChange={this.editAnswer} />
             </div>
           </div>
-          <div className="spacer"></div>
+          <div className="spacer" />
           <div className="row">
             <div className="large-12 columns">
               <label>Hint #1:</label>
               <input name="hint1" type="text" value={this.state.hint1}
-                     onChange={this.editHint1}></input>
+                onChange={this.editHint1} />
             </div>
           </div>
           <div className="row">
             <div className="large-12 columns">
               <label>Hint #2:</label>
               <input name="hint2" type="text" value={this.state.hint2}
-                     onChange={this.editHint2}></input>
+                onChange={this.editHint2} />
             </div>
           </div>
           <div className="row">
             <div className="large-12 columns">
               <label>Hint #3:</label>
               <input name="hint3" type="text" value={this.state.hint3}
-                     onChange={this.editHint3}></input>
+                onChange={this.editHint3} />
             </div>
           </div>
           <div className="row">
             <div className="large-2 right">
               <input className="button small right"
-                     type="submit" value={modalSubmit}></input>
+                type="submit" value={modalSubmit} />
             </div>
           </div>
         </div>
