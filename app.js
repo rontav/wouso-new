@@ -230,7 +230,7 @@ app.use(require('./routes/base'))
 
 // Set app settings
 app.set('views', views)
-app.set('view engine', 'jade')
+app.set('view engine', 'pug')
 app.set('modules', available_modules)
 app.set('games', available_games)
 app.set('theme', used_theme)

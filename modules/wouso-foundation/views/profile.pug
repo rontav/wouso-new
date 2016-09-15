@@ -31,7 +31,7 @@ block content
       br
       h3= __('profile_title_badges')
       - if (badges.length)
-        - each badge in badges
+        each badge in badges
           .profile-badge
             .profile-badge-img
               img(src='/public/img/#{badge.name}.png', width='30px', height='30px')

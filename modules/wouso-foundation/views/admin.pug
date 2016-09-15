@@ -20,17 +20,17 @@ block content
         = __('admin_platform_language') + ' ' + app_data.language
         br
         = __('admin_platform_superuser')
-        - each pass, user in app_data.superuser
+        each pass, user in app_data.superuser
           = "  " + user
         br
         = __('admin_platform_theme')
-        - each enable, name in app_data.themes
+        each enable, name in app_data.themes
           - if (enable == true)
             = ' ' + name
         br
         = __('admin_platform_modules')
         br
-        - each enable, name in app_data.modules
+        each enable, name in app_data.modules
            = '* ' + name + ' (' + enable + ')'
         br
         br
@@ -42,7 +42,7 @@ block content
         h1= __('admin_users_title')
 
         .spacer
-        - each user in people
+        each user in people
           .profile-card
             = 'ID: ' + user._id
             br
@@ -61,7 +61,7 @@ block content
 
             br
             select.role-select(id=user._id)
-              - each role, i in roles
+              each role, i in roles
                 - if (user.role == i)
                   option(value=i, selected)= __('role_' + role.toLowerCase())
                 - else
@@ -85,7 +85,7 @@ block content
       .large-12.columns
         h4= __('admin_tags_title_list')
 
-    - each tag in mytags
+    each tag in mytags
       .row
         .large-4.columns= tag.name
         .large-4.columns= tag.type
@@ -103,7 +103,7 @@ block content
       .large-6.columns
         label(for='login-level')= __('admin_app_login_level')
         select.login-level-select(id='login-level')
-          - each role, i in roles
+          each role, i in roles
             - if (mysettings['login-level'] == i)
               option(value=i, selected)= __('role_' + role.toLowerCase())
             - else
