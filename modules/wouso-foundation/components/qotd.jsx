@@ -12,8 +12,8 @@ var config    = require('../../../config.json');
 
 
 var intlData = {
-    locale   : 'en-US',
-    messages : locales[config.language]
+  locale   : 'en-US',
+  messages : locales[config.language]
 };
 
 
