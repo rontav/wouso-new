@@ -38,6 +38,7 @@
     "webpack": "^1.12.3",
     "winston": "^2.0.0",
     "wouso-foundation": "file:./modules/wouso-foundation",
+    "wouso-quest": "file:./modules/wouso-quest",
     "wouso-social-login": "file:./modules/wouso-social-login",
     "zombie": "^4.1.0"
   },
