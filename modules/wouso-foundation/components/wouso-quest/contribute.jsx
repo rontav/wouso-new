@@ -1,36 +1,42 @@
-var React = require('react')
-var ReactDOM = require('react-dom')
+var React        = require('react');
+var ReactDOM     = require('react-dom');
+var ReactIntl    = require('react-intl');
+var Datetime     = require('react-datetime');
+var IntlProvider = require('react-intl').IntlProvider;
 
-var locales = require('../../locales/locales.js')
-var config = require('../../../../config.json')
+var locales = require('../../locales/locales.js');
+var config  = require('../../../../config.json');
 
-var QStore = require('../../stores/questions');
-var QuestStore = require('../../stores/quest');
+var QStore        = require('../../stores/questions');
+var QuestStore    = require('../../stores/quest');
 var AppDispatcher = require('../../dispatchers/app');
 
 // Common components
-var ListNav = require('../common/list-nav.jsx');
+var ListNav    = require('../common/list-nav.jsx');
 var ListSearch = require('../common/list-search.jsx');
 
 // Drag and Drop components
-var ReactDnD = require('react-dnd');
+var ReactDnD     = require('react-dnd');
 var HTML5Backend = require('react-dnd-html5-backend');
 
-var Datetime = require('react-datetime');
 
 var intlData = {
-  locales: ['en-US'],
-  messages: locales[config.language]
+  locale   : 'en-US',
+  messages : locales[config.language]
 };
 
-var QuestQuestionForm = React.createClass({
-  mixins: [require('react-intl').IntlMixin],
+// We need to inject intl data again because parent object has statics and
+// there is a bug: https://github.com/yahoo/react-intl/issues/196
+var QuestQuestionForm = ReactIntl.injectIntl(React.createClass({
   getInitialState: function() {
     return {
-      questList: [{name: '---', _id: '---'}],
-      question: "",
-      answer: "",
-      tags: ""
+      questList : [{name: '---', _id: '---'}],
+      question  : "",
+      answer    : "",
+      tags      : "",
+      hint1     : "",
+      hint2     : "",
+      hint3     : ""
     };
   },
 
@@ -46,13 +52,13 @@ var QuestQuestionForm = React.createClass({
       $.get('/api/wouso-quest/list?id=' + this.props.id, function(res) {
         if (this.isMounted()) {
           this.setState({
-            question: res.question,
-            quest: res.quest,
-            answer: res.answer,
-            hint1: res.hint1,
-            hint2: res.hint2,
-            hint3: res.hint3,
-            tags: res.tags.join(" ")
+            question : res.question,
+            quest    : res.quest,
+            answer   : res.answer,
+            hint1    : res.hint1,
+            hint2    : res.hint2,
+            hint3    : res.hint3,
+            tags     : res.tags.join(" ")
           });
         }
       }.bind(this));
@@ -60,13 +66,13 @@ var QuestQuestionForm = React.createClass({
   },
 
   render: function() {
-    var modalTitle = this.getIntlMessage('quest_list_modal_title_add');
-    var modalSubmit = this.getIntlMessage('button_text_add');
+    var modalTitle = this.props.intl.formatMessage({id: 'quest_list_modal_title_add'});
+    var modalSubmit = this.props.intl.formatMessage({id: 'button_text_add'});
 
     // Change text if we are editing an existing question
     if (this.props.id) {
-      modalTitle = this.getIntlMessage('quest_list_modal_title_edit');
-      modalSubmit = this.getIntlMessage('button_text_edit');
+      modalTitle = this.props.intl.formatMessage({id: 'quest_list_modal_title_edit'});
+      modalSubmit = this.props.intl.formatMessage({id: 'button_text_edit'});
     }
 
     var defaultQuestValue = this.props.qID;
@@ -82,8 +88,8 @@ var QuestQuestionForm = React.createClass({
               <h2>{modalTitle}</h2>
               <label>Question:</label>
               <input name="question" type="text" value={this.state.question}
-                     onChange={this.editQuestion}></input>
-              <input name="id" type="hidden" value={this.props.id}></input>
+                onChange={this.editQuestion} />
+              <input name="id" type="hidden" value={this.props.id} />
             </div>
           </div>
           <div className="row">
@@ -100,42 +106,42 @@ var QuestQuestionForm = React.createClass({
             <div className="large-12 columns">
               <label>Tags (space separated):</label>
               <input name="tags" type="text" value={this.state.tags}
-                     onChange={this.editTags}></input>
+                onChange={this.editTags} />
             </div>
           </div>
           <div className="row">
             <div className="large-12 columns">
               <label>Answer:</label>
               <input name="answer" type="text" value={this.state.answer}
-                     onChange={this.editAnswer}></input>
+                onChange={this.editAnswer} />
             </div>
           </div>
-          <div className="spacer"></div>
+          <div className="spacer" />
           <div className="row">
             <div className="large-12 columns">
               <label>Hint #1:</label>
               <input name="hint1" type="text" value={this.state.hint1}
-                     onChange={this.editHint1}></input>
+                onChange={this.editHint1} />
             </div>
           </div>
           <div className="row">
             <div className="large-12 columns">
               <label>Hint #2:</label>
               <input name="hint2" type="text" value={this.state.hint2}
-                     onChange={this.editHint2}></input>
+                onChange={this.editHint2} />
             </div>
           </div>
           <div className="row">
             <div className="large-12 columns">
               <label>Hint #3:</label>
               <input name="hint3" type="text" value={this.state.hint3}
-                     onChange={this.editHint3}></input>
+                onChange={this.editHint3} />
             </div>
           </div>
           <div className="row">
             <div className="large-2 right">
               <input className="button small right"
-                     type="submit" value={modalSubmit}></input>
+                type="submit" value={modalSubmit} />
             </div>
           </div>
         </div>
@@ -184,32 +190,14 @@ var QuestQuestionForm = React.createClass({
       hint3: event.target.value
     });
   }
-});
+}));
 
 
 var QuestManageForm = React.createClass({
-  mixins: [require('react-intl').IntlMixin],
   getInitialState: function() {
     return {
       name: ""
     };
-  },
-
-  componentDidMount: function() {
-    // if (this.props.id) {
-    //   $.get('/api/wouso-quest/list?id=' + this.props.id, function(res) {
-    //     if (this.isMounted()) {
-    //       this.setState({
-    //         question : res.question,
-    //         answer   : res.answer,
-    //         hint1    : res.hint1,
-    //         hint2    : res.hint2,
-    //         hint3    : res.hint3,
-    //         tags     : res.tags.join(" "),
-    //       });
-    //     }
-    //   }.bind(this));
-    // }
   },
 
   render: function() {
@@ -221,14 +209,13 @@ var QuestManageForm = React.createClass({
               <h2>Add new quest</h2>
               <label>Name:</label>
               <input name="name" type="text" value={this.state.name}
-                     onChange={this.editName}></input>
-              <input name="id" type="hidden" value={this.props.id}></input>
+                onChange={this.editName} />
+              <input name="id" type="hidden" value={this.props.id} />
             </div>
           </div>
           <div className="row">
             <div className="large-2 right">
-              <input className="button small right"
-                     type="submit" value="Save"></input>
+              <input className="button small right" type="submit" value="Save" />
             </div>
           </div>
         </div>
@@ -260,7 +247,12 @@ var QuestListEntry = React.createClass({
 
     handleEditClick: function(id, questID) {
       // Mount component and reveal modal
-      ReactDOM.render(<QuestQuestionForm {...intlData} id={id} qID={questID}/>, document.getElementById("questModal"));
+      ReactDOM.render(
+        <IntlProvider locale={intlData.locale} messages={intlData.messages}>
+          <QuestQuestionForm id={id} qID={questID} />
+        </IntlProvider>
+      , document.getElementById("questModal"));
+
       $('#questModal').foundation("reveal", "open");
 
       // On modal close, unmount component
@@ -287,7 +279,8 @@ var QuestListEntry = React.createClass({
     return (
       <div>
         <div className="large-9 columns question-li">
-          <input type="checkbox" name="quest" value={this.props.id} key={this.props.id} onChange={this.handleChange}></input>
+          <input type="checkbox" name="quest" value={this.props.id}
+            key={this.props.id} onChange={this.handleChange} />
           {this.props.text}
         </div>
         <div className="large-1 columns">
@@ -406,8 +399,8 @@ var QuestContribManage = ReactDnD.DragDropContext(HTML5Backend)(React.createClas
     }
 
     // Set quest times
-    questStartTime = '---';
-    questEndTime = '---';
+    var questStartTime = '---';
+    var questEndTime = '---';
 
     if (this.state.currentQuest) {
       questStartTime = this.state.currentQuest.start;
@@ -418,8 +411,8 @@ var QuestContribManage = ReactDnD.DragDropContext(HTML5Backend)(React.createClas
       <div className="row">
         <div className="large-12 columns">
           <div className="reveal-modal" id="questManageModal"
-               data-reveal aria-hidden="true" role="dialog">
-          </div>
+            data-reveal aria-hidden="true" role="dialog" />
+
           <a className="radius button small right" href="#"
             onClick={this.handleAddClick.bind(this, null)}>
             Add quest
@@ -435,10 +428,10 @@ var QuestContribManage = ReactDnD.DragDropContext(HTML5Backend)(React.createClas
 
       <div className="row" id="quest-time">
         <div className="large-6 columns">
-          <Datetime value={questStartTime} onChange={this.handleStartDateClick}/>
+          <Datetime value={questStartTime} onChange={this.handleStartDateClick} />
         </div>
         <div className="large-6 columns">
-          <Datetime value={questEndTime} onChange={this.handleEndDateClick}/>
+          <Datetime value={questEndTime} onChange={this.handleEndDateClick} />
         </div>
       </div>
 
@@ -448,12 +441,12 @@ var QuestContribManage = ReactDnD.DragDropContext(HTML5Backend)(React.createClas
           {this.state.questLevels.map(function(card) {
             return (
               <QuestContribManageItem key={card._id} id={card._id} card={card}
-                                      swapCards={this.swapCards} />
+                swapCards={this.swapCards} />
             );
           }, this)}
           <div id="quest-edit-add">
             <a className="radius button small" href="#"
-               onClick={QuestListEntry.handleEditClick.bind(this, null, this.state.currentQuestID)}>
+              onClick={QuestListEntry.handleEditClick.bind(this, null, this.state.currentQuestID)}>
               Add new question
             </a>
           </div>
@@ -545,7 +538,6 @@ var QuestContribManageItem = DropTargetDecorator(DragSourceDecorator(React.creat
 })));
 
 var QuestContrib = React.createClass({
-  mixins: [require('react-intl').IntlMixin],
   getInitialState: function() {
     return {
       questions: [],
@@ -571,15 +563,15 @@ var QuestContrib = React.createClass({
     return (
       <div>
         {<QuestContribManage {...intlData} />}
-        <div className="spacer"></div>
+        <div className="spacer" />
         <div className="row">
           <ListSearch searchType='searchQuest' refreshType='refreshQuest'
-                      selected={QuestListEntry.selected_quests} />
+            selected={QuestListEntry.selected_quests} />
         </div>
         <div className="row">
           <div className="reveal-modal" id="questModal"
-               data-reveal aria-hidden="true" role="dialog">
-          </div>
+            data-reveal aria-hidden="true" role="dialog" />
+
           <div className="large-12 columns">
             <a className="radius button" href="#"
               onClick={QuestListEntry.handleEditClick.bind(this, null)}>
@@ -587,21 +579,21 @@ var QuestContrib = React.createClass({
             </a>
 
             <h2>
-              { this.getIntlMessage('qotd_list_title') + " (" + this.state.total
+              { this.props.intl.formatMessage({id: 'qotd_list_title'}) + " (" + this.state.total
                 + " results" + (this.state.term != '' ? " for \""
                 + this.state.term + "\"": '') + ")" }
             </h2>
 
             { this.state.questions.map(function (opt) {
-              return <QuestListEntry key={opt._id} id={opt._id}
-                                     text={opt.question} date={opt.date} />
+              return (<QuestListEntry key={opt._id} id={opt._id}
+                       text={opt.question} date={opt.date} />);
             }, this)}
-            <div className="spacer"></div>
+            <div className="spacer" />
             <ListNav total={this.state.total} no={this.state.no}
-                     page={this.state.page} refreshType='refreshQuest' />
+              page={this.state.page} refreshType='refreshQuest' />
           </div>
         </div>
-        <div className="spacer"></div>
+        <div className="spacer" />
       </div>
     );
   },
@@ -617,4 +609,4 @@ var QuestContrib = React.createClass({
   }
 });
 
-module.exports = QuestContrib;
+module.exports = ReactIntl.injectIntl(QuestContrib);

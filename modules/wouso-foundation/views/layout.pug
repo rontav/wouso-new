@@ -28,8 +28,8 @@ html
     // Load socket.io and noty.js
     script(type="text/javascript", src="/socket.io/socket.io.js")
     script(type="text/javascript", src="https://cdnjs.cloudflare.com/ajax/libs/jquery-noty/2.3.5/packaged/jquery.noty.packaged.js")
-    
-    
+
+
   body
     nav.top-bar(data-topbar, role='navigation', data-options="is_hover:false,dropdown_autoclose:false")
       ul.title-area
@@ -93,7 +93,7 @@ html
       .row
         .large-12.columns
           dt= __('module_title') + ':'
-          - each mod in settings.games
+          each mod in settings.games
             dd.active
               a(href='/' + mod)= __('module_' + mod)
 

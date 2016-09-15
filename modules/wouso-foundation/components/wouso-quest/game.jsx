@@ -1,20 +1,12 @@
-var React = require('react');
+var React     = require('react');
+var ReactIntl = require('react-intl');
 
-var locales = require('../../locales/locales.js');
-var config = require('../../../../config.json');
-
-var intlData = {
-  locales: ['en-US'],
-  messages: locales[config.language]
-};
 
 /*
 * Main Quest Game component. Loads active quest list initially and
 * a single quest when one is selected.
 */
 var QuestGame = React.createClass({
-  mixins: [require('react-intl').IntlMixin],
-
   getInitialState: function() {
     return {
       questList: [],
@@ -50,12 +42,12 @@ var QuestGame = React.createClass({
   render: function() {
     if (this.state.currentQuestID) {
       return (
-        <QuestGameLevel quest={this.state.currentQuest}
+        <QuestGameLevel intl={this.props.intl} quest={this.state.currentQuest}
           next={this.handleQuestSelect} />
       );
     } else {
       return (
-        <QuestGameList questList={this.state.questList}
+        <QuestGameList intl={this.props.intl} questList={this.state.questList}
           onQuestClick={this.handleQuestSelect} />
       );
     }
@@ -66,12 +58,10 @@ var QuestGame = React.createClass({
 * Loads active quests list with some stats for each one.
 */
 var QuestGameList = React.createClass({
-  mixins: [require('react-intl').IntlMixin],
-
   render: function() {
     var noQuest = null;
     if (this.props.questList.length === 0) {
-      noQuest = this.getIntlMessage('quest_game_no_quests');
+      noQuest = this.props.intl.formatMessage({id: 'quest_game_no_quests'});
     }
 
     return (
@@ -81,10 +71,10 @@ var QuestGameList = React.createClass({
 
           {this.props.questList.map(function(q, i) {
             // Build quest status message
-            var questStatus = this.getIntlMessage('quest_game_status_progress');
+            var questStatus = this.props.intl.formatMessage({id: 'quest_game_status_progress'});
             questStatus += ' ' + q.levelNumber + '/' + q.levelCount;
             if (q.finished) {
-              questStatus = this.getIntlMessage('quest_game_status_complete');
+              questStatus = this.props.intl.formatMessage({id: 'quest_game_status_complete'});
             }
 
             return (
@@ -107,8 +97,6 @@ var QuestGameList = React.createClass({
 * Quest game logic.
 */
 var QuestGameLevel = React.createClass({
-  mixins: [require('react-intl').IntlMixin],
-
   getInitialState: function() {
     return {
       response: '',
@@ -146,7 +134,7 @@ var QuestGameLevel = React.createClass({
       } else {
         // Clear response and show message
         this.setState({
-          message: this.getIntlMessage('quest_game_wrong_answer'),
+          message: this.props.intl.formatMessage({id: 'quest_game_wrong_answer'}),
           response: ''
         });
       }
@@ -158,7 +146,7 @@ var QuestGameLevel = React.createClass({
       return (
         <div className='row'>
           <div className='large-12 columns'>
-            <h2>{this.getIntlMessage('quest_game_finish')}</h2>
+            <h2>{this.props.intl.formatMessage({id: 'quest_game_finish'})}</h2>
           </div>
         </div>
       );
@@ -175,10 +163,10 @@ var QuestGameLevel = React.createClass({
             <input name='answer' type='text' autoComplete='off'
               value={this.state.response}
               onKeyPress={this.handleKeyPress}
-              onChange={this.handleInput}></input>
+              onChange={this.handleInput} />
             <p>{this.state.message}</p>
             <button onClick={this.handleResponseSend}>
-              {this.getIntlMessage('button_check')}
+              {this.props.intl.formatMessage({id: 'button_check'})}
             </button>
             <h4>Hints</h4>
             {this.props.quest.levelHints.map(function(hint, i) {
@@ -196,4 +184,4 @@ var QuestGameLevel = React.createClass({
   }
 });
 
-module.exports = QuestGame;
+module.exports = ReactIntl.injectIntl(QuestGame);

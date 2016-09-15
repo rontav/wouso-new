@@ -17,7 +17,7 @@ block content
       h3= __('messages_title_list')
       .spacer
       - if (messages.length)
-        - each message in messages
+        each message in messages
           .message
             | <b>#{message.source} --> #{message.destination}:</b> #{message.message}
 

@@ -10,8 +10,11 @@ module.exports = {
     loaders: [{
       //tell webpack to use jsx-loader for all *.jsx files
       test: /\.jsx$/,
-      loader: 'jsx-loader',
-      exclude: /node_modules/
+      loader: 'babel-loader',
+      exclude: /node_modules/,
+      query: {
+        presets:['react']
+      }
     },
     {
       //tell webpack to use jsx-loader for all *.jsx files

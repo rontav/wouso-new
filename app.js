@@ -1,12 +1,12 @@
-var fs            = require('fs')
-var express       = require('express')
-var bodyParser    = require('body-parser')
-var cookieParser  = require('cookie-parser')
-var cookieSession = require('cookie-session')
-var exprSession   = require('express-session')
-var passport      = require('passport')
-var favicon       = require('serve-favicon')
-var flash         = require('connect-flash')
+var fs            = require('fs');
+var express       = require('express');
+var bodyParser    = require('body-parser');
+var exprSession   = require('express-session');
+var mongoose      = require('mongoose');
+var passport      = require('passport');
+var favicon       = require('serve-favicon');
+var flash         = require('connect-flash');
+
 var log           = require('./core/logging')('core')
 var app = module.exports = express()
 
@@ -26,16 +26,19 @@ for (theme in app.data.themes) {
 }
 
 // Init db connection
-var Mongoose = require('mongoose')
 var configDB = require('./config/database.js')
-Mongoose.connection.on('error', configDB.check)
+// Skip mongoose deprication warning on startup:
+// Mongoose: mpromise (mongoose's default promise library) is deprecated, plug
+// in your own promise library instead: http://mongoosejs.com/docs/promises.html
+mongoose.Promise = global.Promise;
+mongoose.connection.on('error', configDB.check);
 // Connect to proper db
 if (process.env.NODE_ENV == 'production') {
-  Mongoose.connect(app.data.mongo_url.prod)
+  mongoose.connect(app.data.mongo_url.prod)
 } else if (process.env.NODE_ENV == 'testing'){
-  Mongoose.connect(app.data.mongo_url.test)
+  mongoose.connect(app.data.mongo_url.test)
 } else {
-  Mongoose.connect(app.data.mongo_url.dev)
+  mongoose.connect(app.data.mongo_url.dev)
 }
 
 
@@ -227,7 +230,7 @@ app.use(require('./routes/base'))
 
 // Set app settings
 app.set('views', views)
-app.set('view engine', 'jade')
+app.set('view engine', 'pug')
 app.set('modules', available_modules)
 app.set('games', available_games)
 app.set('theme', used_theme)

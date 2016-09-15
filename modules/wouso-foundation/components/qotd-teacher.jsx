@@ -26,7 +26,6 @@ var QotdTeachListEntry = React.createClass({
 
 
 var QotdTeach = React.createClass({
-  mixins: [require('react-intl').IntlMixin],
   getInitialState: function() {
     return {
       today: []
@@ -39,7 +38,6 @@ var QotdTeach = React.createClass({
     var start = [date.getMonth()+1, date.getDate()-1, date.getFullYear()].join('.');
 
     $.get('/api/qotd/list/100/1?start=' + start, function(res) {
-      console.log(res)
       if (this.isMounted()) {
         this.setState({
           today: res.questions
@@ -53,7 +51,7 @@ var QotdTeach = React.createClass({
       <div>
         <div className="row">
           <div className="large-12 columns">
-            <h2>Today's questions:</h2>
+            <h2>Questions for today:</h2>
             { this.state.today.map(function (q, i) {
               return <QotdTeachListEntry key={i} qotd={q} />
             }, this)}
