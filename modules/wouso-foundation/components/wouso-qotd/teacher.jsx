@@ -37,7 +37,7 @@ var QotdTeach = React.createClass({
     // Get previous day's date
     var start = [date.getMonth()+1, date.getDate()-1, date.getFullYear()].join('.');
 
-    $.get('/api/qotd/list/100/1?start=' + start, function(res) {
+    $.get('/api/wouso-qotd/list/100/1?start=' + start, function(res) {
       if (this.isMounted()) {
         this.setState({
           today: res.questions

@@ -2,13 +2,13 @@ var React            = require('react');
 var ReactDOM         = require('react-dom');
 var ReactIntl        = require('react-intl');
 
-var QStore        = require('../stores/questions');
-var DateStore     = require('../stores/datepicker');
-var AppDispatcher = require('../dispatchers/app');
+var QStore        = require('../../stores/questions');
+var DateStore     = require('../../stores/datepicker');
+var AppDispatcher = require('../../dispatchers/app');
 
 // Common components
-var ListNav    = require('./common/list-nav.jsx');
-var ListSearch = require('./common/list-search.jsx');
+var ListNav    = require('../common/list-nav.jsx');
+var ListSearch = require('../common/list-search.jsx');
 
 
 var QotdQuestionOption = React.createClass({
@@ -56,7 +56,7 @@ var QotdQuestionOption = React.createClass({
 var QotdQuestionForm = React.createClass({
   getInitialState: function() {
     // Render datepicker
-    $.get("/api/qotd/list/dates", function(res) {
+    $.get("/api/wouso-qotd/list/dates", function(res) {
       $('#datepicker').datepicker({
         inline: true,
         beforeShowDay: function(date) {
@@ -84,7 +84,7 @@ var QotdQuestionForm = React.createClass({
     DateStore.addChangeListener(this._onChange);
 
     if (this.props.id) {
-      $.get('/api/qotd/list?id=' + this.props.id, function(res) {
+      $.get('/api/wouso-qotd/list?id=' + this.props.id, function(res) {
         if (this.isMounted()) {
           this.setState({
             question : res.question,
@@ -109,7 +109,7 @@ var QotdQuestionForm = React.createClass({
     var modalTitle  = this.props.id ? "Edit question" : "Add question";
     var modalSubmit = this.props.id ? "Update" : "Add";
     return (
-      <form id="add-qotd-form" method="post" action="/api/qotd/add">
+      <form id="add-qotd-form" method="post" action="/api/wouso-qotd/add">
         <div className="qotd-question">
           <div className="row">
             <div className="large-12 columns">

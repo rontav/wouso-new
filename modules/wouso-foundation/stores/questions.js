@@ -15,7 +15,7 @@ var page = 1;
 var term = '';
 
 function getQotdData(no, page, term) {
-  var url = '/api/qotd/list/' + no + '/' + page + '?search=' + term;
+  var url = '/api/wouso-qotd/list/' + no + '/' + page + '?search=' + term;
   $.get(url, function(res) {
     _qlist = res.questions;
     _count = res.count;

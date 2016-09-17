@@ -67,7 +67,7 @@ var QotdGame = React.createClass({
   },
 
   componentDidMount: function() {
-    $.get('/api/qotd/play', function(res) {
+    $.get('/api/wouso-qotd/play', function(res) {
       if (this.isMounted()) {
         this.setState({
           id       : (res._id      ? res._id      : ""),
@@ -84,7 +84,7 @@ var QotdGame = React.createClass({
     return (
       <div className="row">
         <div className="large-12 columns">
-          <form className="qotd-form" id="qotd" method="post" action="/api/qotd/play">
+          <form className="qotd-form" id="qotd" method="post" action="/api/wouso-qotd/play">
             { countdownTimer > 0 ? <QotdCountdown timer={countdownTimer}/> : null }
             <QotdQuestion id={this.state.id} text={this.state.question}/>
             { this.state.options.map(function (opt, i) {

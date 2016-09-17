@@ -1,6 +1,6 @@
 module.exports = {
   entry: [
-    './node_modules/wouso-foundation/components/qotd.jsx',
+    './node_modules/wouso-foundation/components/wouso-qotd/main.jsx',
     './node_modules/wouso-foundation/components/wouso-quest/main.jsx'
   ],
   output: {

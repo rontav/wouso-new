@@ -9,7 +9,7 @@ var QotdAdmin = React.createClass({
         <div className="large-12 columns">
 
           <h3> {this.props.intl.formatMessage({id: 'qotd_title_settings'})} </h3>
-          <form method='post' action='/api/qotd/settings'>
+          <form method='post' action='/api/wouso-qotd/settings'>
 
             <label> {this.props.intl.formatMessage({id: 'qotd_settings_default_ans'})} </label>
             <input name='defaultNoOfAns' type='text' defaultValue={noOfOptions} />

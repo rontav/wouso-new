@@ -1,5 +1,5 @@
 {
-  "name": "qotd",
+  "name": "wouso-qotd",
   "version": "0.0.0",
   "description": "QotD for wouso-new",
   "main": "routes.js",

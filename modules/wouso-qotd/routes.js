@@ -5,7 +5,7 @@ var settings = mongoose.model('Settings')
 var Tag      = mongoose.model('Tag')
 var Badges   = mongoose.model('Badge')
 var User     = mongoose.model('User')
-var log      = require('../../core/logging')('qotd')
+var log      = require('../../core/logging')('wouso-qotd')
 var util     = require('util')
 var fs       = require('fs')
 var express  = require('express')
@@ -13,7 +13,7 @@ var router   = express.Router()
 
 
 
-router.get('/qotd', function (req, res, next) {
+router.get('/wouso-qotd', function (req, res, next) {
   _self = {}
   qotd.find().exec(gotQuestions)
 
@@ -21,7 +21,7 @@ router.get('/qotd', function (req, res, next) {
     if (err) return next(err)
 
     _self.questions = all
-    Tag.find({'type': 'qotd'}).exec(gotTags)
+    Tag.find({'type': 'wouso-qotd'}).exec(gotTags)
   }
 
   function gotTags(err, tags) {
@@ -39,7 +39,7 @@ router.get('/qotd', function (req, res, next) {
       mysettings[option.key] = option.val
     })
 
-    res.render('qotd', {
+    res.render('wouso-qotd', {
       'questions'  : _self.questions,
       'mysettings' : mysettings,
       'qtags'       : _self.qtags,
@@ -49,18 +49,18 @@ router.get('/qotd', function (req, res, next) {
 })
 
 
-router.post('/api/qotd/settings', function (req, res, next) {
+router.post('/api/wouso-qotd/settings', function (req, res, next) {
   for (var key in req.body) {
     query = {'key': 'qotd-' + key}
     update = {$set: {'val': req.body[key]}}
     settings.update(query, update, {upsert: true}).exec()
   }
 
-  res.redirect('/qotd')
+  res.redirect('/wouso-qotd')
 })
 
 
-router.get('/api/qotd/list', function (req, res, next) {
+router.get('/api/wouso-qotd/list', function (req, res, next) {
   if (!req.query.id) return res.send({})
 
   _self = {}
@@ -68,7 +68,7 @@ router.get('/api/qotd/list', function (req, res, next) {
 
   function gotQotd(err, qotd) {
     _self.qotd = qotd;
-    Tag.find({'type': 'qotd'}).exec(gotTags);
+    Tag.find({'type': 'wouso-qotd'}).exec(gotTags);
   }
 
   function gotTags(err, tags) {
@@ -84,7 +84,7 @@ router.get('/api/qotd/list', function (req, res, next) {
 })
 
 
-router.get('/api/qotd/list/:perPage/:page', function (req, res, next) {
+router.get('/api/wouso-qotd/list/:perPage/:page', function (req, res, next) {
   _self = {}
   show = req.params.perPage
   skip = (req.params.page - 1) * show
@@ -111,7 +111,7 @@ router.get('/api/qotd/list/:perPage/:page', function (req, res, next) {
     if (err) return next(err)
 
     _self.questions = all
-    Tag.find({'type': 'qotd'}).exec(gotTags)
+    Tag.find({'type': 'wouso-qotd'}).exec(gotTags)
   }
 
   function gotTags(err, tags) {
@@ -137,7 +137,7 @@ router.get('/api/qotd/list/:perPage/:page', function (req, res, next) {
 })
 
 
-router.get('/api/qotd/list/dates', function (req, res, next) {
+router.get('/api/wouso-qotd/list/dates', function (req, res, next) {
   qotd.find().select({'date': 1, '_id': 0}).exec(function (err, dates) {
     if (err) return next(err)
 
@@ -151,7 +151,7 @@ router.get('/api/qotd/list/dates', function (req, res, next) {
 })
 
 
-router.get('/api/qotd/play', function (req, res, next) {
+router.get('/api/wouso-qotd/play', function (req, res, next) {
   // Check if user is logged in
   if (!req.user) return res.redirect('/login')
 
@@ -230,7 +230,7 @@ router.get('/api/qotd/play', function (req, res, next) {
 })
 
 
-router.post('/api/qotd/play', function (req, res, next) {
+router.post('/api/wouso-qotd/play', function (req, res, next) {
   var ObjectId = mongoose.Types.ObjectId
 
   query = {'_id': new ObjectId(req.body.question_id)}
@@ -287,12 +287,12 @@ router.post('/api/qotd/play', function (req, res, next) {
         }
       }
     })
-    return res.redirect('/qotd')
+    return res.redirect('/wouso-qotd')
   }
 })
 
 
-router.post('/api/qotd/add', function (req, res, next) {
+router.post('/api/wouso-qotd/add', function (req, res, next) {
 
   options = []
   for (i in req.body.answer) {
@@ -320,7 +320,7 @@ router.post('/api/qotd/add', function (req, res, next) {
 
   // Get tags
   tags = req.body.tags.split(' ')
-  Tag.find({'name': {$in: tags}, 'type': 'qotd'}).exec(gotTags)
+  Tag.find({'name': {$in: tags}, 'type': 'wouso-qotd'}).exec(gotTags)
 
   function gotTags(err, all) {
     tag_ids = []
@@ -351,7 +351,7 @@ router.post('/api/qotd/add', function (req, res, next) {
 
   function qotdSaved(err) {
     if (err) return next(err)
-    res.redirect('/qotd')
+    res.redirect('/wouso-qotd')
   }
 })
 
@@ -407,7 +407,7 @@ function update_points(req, right, rightCount) {
 }
 
 
-router.delete('/api/qotd/delete', function (req, res, next) {
+router.delete('/api/wouso-qotd/delete', function (req, res, next) {
   var del_list = req.query.id.split(',');
   qotd.remove({'_id': {$in: del_list}}).exec(removedQotd);
 

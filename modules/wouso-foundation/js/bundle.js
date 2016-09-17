@@ -26215,7 +26215,7 @@
 	  },
 
 	  componentDidMount: function () {
-	    $.get('/api/qotd/play', function (res) {
+	    $.get('/api/wouso-qotd/play', function (res) {
 	      if (this.isMounted()) {
 	        this.setState({
 	          id: res._id ? res._id : "",
@@ -26237,7 +26237,7 @@
 	        { className: "large-12 columns" },
 	        React.createElement(
 	          "form",
-	          { className: "qotd-form", id: "qotd", method: "post", action: "/api/qotd/play" },
+	          { className: "qotd-form", id: "qotd", method: "post", action: "/api/wouso-qotd/play" },
 	          countdownTimer > 0 ? React.createElement(QotdCountdown, { timer: countdownTimer }) : null,
 	          React.createElement(QotdQuestion, { id: this.state.id, text: this.state.question }),
 	          this.state.options.map(function (opt, i) {
@@ -26326,7 +26326,7 @@
 
 	  getInitialState: function () {
 	    // Render datepicker
-	    $.get("/api/qotd/list/dates", function (res) {
+	    $.get("/api/wouso-qotd/list/dates", function (res) {
 	      $('#datepicker').datepicker({
 	        inline: true,
 	        beforeShowDay: function (date) {
@@ -26355,7 +26355,7 @@
 	    DateStore.addChangeListener(this._onChange);
 
 	    if (this.props.id) {
-	      $.get('/api/qotd/list?id=' + this.props.id, function (res) {
+	      $.get('/api/wouso-qotd/list?id=' + this.props.id, function (res) {
 	        if (this.isMounted()) {
 	          this.setState({
 	            question: res.question,
@@ -26381,7 +26381,7 @@
 	    var modalSubmit = this.props.id ? "Update" : "Add";
 	    return React.createElement(
 	      'form',
-	      { id: 'add-qotd-form', method: 'post', action: '/api/qotd/add' },
+	      { id: 'add-qotd-form', method: 'post', action: '/api/wouso-qotd/add' },
 	      React.createElement(
 	        'div',
 	        { className: 'qotd-question' },
@@ -26662,7 +26662,7 @@
 	var term = '';
 
 	function getQotdData(no, page, term) {
-	  var url = '/api/qotd/list/' + no + '/' + page + '?search=' + term;
+	  var url = '/api/wouso-qotd/list/' + no + '/' + page + '?search=' + term;
 	  $.get(url, function(res) {
 	    _qlist = res.questions;
 	    _count = res.count;
@@ -27641,7 +27641,7 @@
 	    // Get previous day's date
 	    var start = [date.getMonth() + 1, date.getDate() - 1, date.getFullYear()].join('.');
 
-	    $.get('/api/qotd/list/100/1?start=' + start, function (res) {
+	    $.get('/api/wouso-qotd/list/100/1?start=' + start, function (res) {
 	      if (this.isMounted()) {
 	        this.setState({
 	          today: res.questions
@@ -27702,7 +27702,7 @@
 	        ),
 	        React.createElement(
 	          'form',
-	          { method: 'post', action: '/api/qotd/settings' },
+	          { method: 'post', action: '/api/wouso-qotd/settings' },
 	          React.createElement(
 	            'label',
 	            null,
@@ -27791,7 +27791,7 @@
 		"index_description": "A new applciation that evaluates your knowledge",
 		"index_title_users": "Registered users",
 		"module_title": "GAMES",
-		"module_qotd": "QotD",
+		"module_wouso-qotd": "QotD",
 		"module_wouso-quest": "Quest",
 		"role_title": "ROLE",
 		"role_root": "Root",
@@ -27915,7 +27915,7 @@
 		"index_description": "Un concept nou de aplicație ce evaluează cunoștințele dobândite.",
 		"index_title_users": "Utilizatori înregistrați",
 		"module_title": "JOCURI",
-		"module_qotd": "Întrebarea zilei",
+		"module_wouso-qotd": "Întrebarea zilei",
 		"module_wouso-quest": "Quest",
 		"role_title": "ROL",
 		"role_root": "Superutilizator",
@@ -28034,7 +28034,7 @@
 			"wouso-social-login": true
 		},
 		"games": {
-			"qotd": true,
+			"wouso-qotd": true,
 			"wouso-quest": true
 		},
 		"themes": {
