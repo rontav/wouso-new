@@ -242,10 +242,4 @@ if (process.env.NODE_ENV != 'testing') {
   server = app.listen(process.env.PORT || 4000, function() {
     log.notice('Server listening on port 4000')
   })
-
-  // Socket.io
-  var io = require('socket.io').listen(server)
-  io.sockets.on('connection', function(client) {
-    io.sockets.emit('message', { message: 'welcome to the app' })
-  })
 }

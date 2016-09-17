@@ -62,12 +62,9 @@ router.post('/messages/send', function (req, res, next) {
     'destination'  : req.body.destination,
     'message'      : req.body.message
   }).save(function (err) {
-    if (err) return next(err)
+    if (err) return next(err);
 
-    // Alert
-    io.sockets.emit(req.body.destination, { message: 'new message' })
-
-    res.redirect('/messages')
+    res.redirect('/messages');
   })
 })
 

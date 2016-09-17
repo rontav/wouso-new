@@ -80,22 +80,3 @@ $('.setting').change(function() {
     $('.login-message-nologin').show()
   }
 })
-
-// Alerts
-var socket = io.connect('localhost:4000')
-
-// Alerts style
-$.noty.defaults['layout'] = 'bottomLeft'
-$.noty.defaults['theme'] = 'relax'
-$.noty.defaults['type'] = 'information'
-$.noty.defaults['timeout'] = 5000
-
-if (typeof myuser == 'string')
-  socket.on(myuser, function (msg) {
-    noty({
-      text: 'One new message!',
-      callback: {
-        onCloseClick: function() {document.location.href = '/messages'}
-      }
-    })
-  })
