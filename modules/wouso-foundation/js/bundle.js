@@ -28051,19 +28051,19 @@
 		"credentials": {
 			"facebook": {
 				"clientID": "893450493999553",
-				"clientSecret": "9b471a6e23add11c8c06dc7a68f3320c"
+				"clientSecret": "9aeee7ff1e13e9c25c850f04d5d56c08"
 			},
 			"twitter": {
-				"clientID": "JJIFjjLVYXbUpwEv4kffKYW9q",
-				"clientSecret": "C2wi4vFDPhowoY25fI1zYHzj9dL8uMDsNCqFlVwJlD9ibmNQyM"
+				"clientID": "b6jwy6y5dTv6HY93J3e4sAcXp",
+				"clientSecret": "ajao9iGX9e3stkr4EMn3Qp3l20xK8KqcmJ9CyHPhfHr7NkKAcf"
 			},
 			"google": {
 				"clientID": "749085539075-tihno91bjfqlm8950uocj6b5t1tf1asc.apps.googleusercontent.com",
-				"clientSecret": "Adjo7Sz0zNe0974qPAWSXbvN"
+				"clientSecret": "Vu-W3KqXNu60qG1qppJZt6aF"
 			},
 			"github": {
 				"clientID": "834afc76d55160202261",
-				"clientSecret": "de1f8986e0dd2ec8a2e0bd6dd081ee4298b81fe1"
+				"clientSecret": "16f9aeb014875fa4870de27e4175a2b16139b526"
 			}
 		}
 	};

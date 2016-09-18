@@ -7,26 +7,28 @@ var passport      = require('passport');
 var favicon       = require('serve-favicon');
 var flash         = require('connect-flash');
 
-var log           = require('./core/logging')('core')
-var app = module.exports = express()
+var log           = require('./core/logging')('core');
+
+var app = module.exports = express();
 
 
 // Read config file
-app.data = (JSON.parse(fs.readFileSync('./config.json', 'utf8')))
+app.data = (JSON.parse(fs.readFileSync('./config.json', 'utf8')));
 
 // List of enabled and available modules and games
-var available_games = []
-var available_modules = []
+var available_games = [];
+var available_modules = [];
 
 // Used theme
-var used_theme = null
-for (theme in app.data.themes) {
-  if (app.data.themes[theme])
-    used_theme = theme
+var used_theme = null;
+for (var theme in app.data.themes) {
+  if (app.data.themes[theme]) {
+    used_theme = theme;
+  }
 }
 
 // Init db connection
-var configDB = require('./config/database.js')
+var configDB = require('./config/database.js');
 // Skip mongoose deprication warning on startup:
 // Mongoose: mpromise (mongoose's default promise library) is deprecated, plug
 // in your own promise library instead: http://mongoosejs.com/docs/promises.html
@@ -43,17 +45,17 @@ if (process.env.NODE_ENV == 'production') {
 
 
 // Require db schemas
-var Settings = require('./config/models/settings')
-var Tag      = require('./config/models/tag')
-var Badges   = require('./config/models/badges')
+var Settings = require('./config/models/settings');
+var TAg      = require('./config/models/tag');
+var Badges   = require('./config/models/badges');
 
 // Ensure superuser exists
-var User = require('./config/models/user')
+var User = require('./config/models/user');
 // Get first superuser from config dict
-root = Object.keys(app.data.superuser)[0]
-pass = app.data.superuser[root]
+var root = Object.keys(app.data.superuser)[0];
+var pass = app.data.superuser[root];
 // Add to users collection only if does not already exist
-update = {$set: {
+var update = { $set: {
   'role'           : 0,
   'local.username' : 'root',
   'local.email'    : root,

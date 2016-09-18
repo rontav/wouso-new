@@ -1,16 +1,14 @@
-var mongoose = require('mongoose')
-var qotd     = mongoose.model('Qotd')
-var QOption  = mongoose.model('QOption')
-var settings = mongoose.model('Settings')
-var Tag      = mongoose.model('Tag')
-var Badges   = mongoose.model('Badge')
-var User     = mongoose.model('User')
-var log      = require('../../core/logging')('wouso-qotd')
-var util     = require('util')
-var fs       = require('fs')
-var express  = require('express')
-var router   = express.Router()
-
+var mongoose = require('mongoose');
+var qotd     = mongoose.model('Qotd');
+var QOption  = mongoose.model('QOption');
+var settings = mongoose.model('Settings');
+var Tag      = mongoose.model('Tag');
+var Badges   = mongoose.model('Badge');
+var User     = mongoose.model('User');
+var log      = require('../../core/logging')('wouso-qotd');
+var util     = require('util');
+var express  = require('express');
+var router   = express.Router();
 
 
 router.get('/wouso-qotd', function (req, res, next) {
@@ -85,11 +83,11 @@ router.get('/api/wouso-qotd/list', function (req, res, next) {
 
 
 router.get('/api/wouso-qotd/list/:perPage/:page', function (req, res, next) {
-  _self = {}
-  show = req.params.perPage
-  skip = (req.params.page - 1) * show
+  var _self = {};
+  var show = req.params.perPage;
+  var skip = (req.params.page - 1) * show;
 
-  query = {}
+  var query = {};
   if (req.query.id) query['_id'] = req.query.id
   if (req.query.tags) query['tags'] = {$in: req.query.tags.split(',')}
   if (typeof req.query.search !== 'undefined')
@@ -125,28 +123,29 @@ router.get('/api/wouso-qotd/list/:perPage/:page', function (req, res, next) {
       })
     })
 
-    qotd.count(_self.query).exec(gotCount)
+    qotd.count(_self.query).exec(gotCount);
   }
 
   function gotCount(err, count) {
-    response = {}
-    response.questions = _self.questions
-    response.count = count
-    res.send(response)
+    res.send({
+      question : _self.questions,
+      count    : count
+    });
   }
 })
 
 
 router.get('/api/wouso-qotd/list/dates', function (req, res, next) {
   qotd.find().select({'date': 1, '_id': 0}).exec(function (err, dates) {
-    if (err) return next(err)
+    if (err) return next(err);
 
-    dates_list = []
+    var dates_list = [];
     dates.forEach(function(qotd) {
-      if (qotd.date)
-        dates_list.push(qotd.date.toISOString())
-    })
-    res.send(dates_list)
+      if (qotd.date) {
+        dates_list.push(qotd.date.toISOString());
+      }
+    });
+    res.send(dates_list);
   })
 })
 
@@ -275,7 +274,7 @@ router.post('/api/wouso-qotd/play', function (req, res, next) {
         }
         update = {$set: {'answers.$.res': given_answers}}
         qotd.update(query, update).exec(function (err, update) {
-          if (err) console.log('Could not save user response')
+          if (err) log.error('Could not save response from user')
         })
 
         // Reward user if necessary
@@ -374,14 +373,14 @@ function update_badges(req, right, rightCount) {
         'data'        : ''
       }}}
       Badges.update(query, update, {upsert: true}).exec(function (err, update) {
-        if (err) console.log('Could not init badge')
+        if (err) log.error('Could not init badge')
       })
     } else {
       // Increment badge count
       query = {'name': 'qotd-streak', 'history.userId': req.user._id}
       update = {$inc: {'history.$.count': 1}}
       Badges.update(query, update, {upsert: true}).exec(function (err, update) {
-        if (err) console.log('Could not increment badge count')
+        if (err) log.error('Could not increment badge count')
       })
     }
   })
@@ -401,7 +400,7 @@ function update_points(req, right, rightCount) {
   }
 
   function updatedPoints(err) {
-    if (err) console.log('Could not update points')
+    if (err) log.error('Could not update points')
   }
 
 }
