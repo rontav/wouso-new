@@ -128,8 +128,8 @@ router.get('/api/wouso-qotd/list/:perPage/:page', function (req, res, next) {
 
   function gotCount(err, count) {
     res.send({
-      question : _self.questions,
-      count    : count
+      questions : _self.questions,
+      count     : count
     });
   }
 })

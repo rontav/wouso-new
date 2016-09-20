@@ -252,7 +252,7 @@ var QotdList = React.createClass({
   componentDidMount: function() {
     QStore.addChangeListener(this._onChange);
     AppDispatcher.handleViewAction({
-      type : "refreshQotd"
+      type: "refreshQotd"
     });
   },
 

@@ -540,11 +540,11 @@ var QuestContribManageItem = DropTargetDecorator(DragSourceDecorator(React.creat
 var QuestContrib = React.createClass({
   getInitialState: function() {
     return {
-      questions: [],
-      total: null,
-      no: null,
-      page: null,
-      term: ''
+      questions : [],
+      total     : null,
+      no        : null,
+      page      : null,
+      term      : ''
     };
   },
 
