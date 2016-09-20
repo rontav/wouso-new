@@ -12,8 +12,17 @@ var log           = require('./core/logging')('core');
 var app = module.exports = express();
 
 
-// Read config file
-app.data = (JSON.parse(fs.readFileSync('./config.json', 'utf8')));
+app.data = null;
+try {
+  // Check if config.json exists
+  fs.lstatSync('./config.json');
+  app.data = (JSON.parse(fs.readFileSync('./config.json', 'utf8')));
+}
+catch (e) {
+  app.data = (JSON.parse(process.env.config));
+  log.warning('Using config from env var.')
+}
+
 
 // List of enabled and available modules and games
 var available_games = [];
