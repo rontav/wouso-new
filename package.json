@@ -24,7 +24,6 @@
     "passport-local": "^1.0.0",
     "pretty-logger": "^0.1.2",
     "pug": "^2.0.0-beta6",
-    "qotd": "file:./modules/qotd",
     "react": "^15.3.1",
     "react-datetime": "^2.5.0",
     "react-dnd": "^2.1.4",
@@ -37,6 +36,7 @@
     "webpack": "^1.12.3",
     "winston": "^2.0.0",
     "wouso-foundation": "file:./modules/wouso-foundation",
+    "wouso-qotd": "file:./modules/wouso-qotd",
     "wouso-quest": "file:./modules/wouso-quest",
     "wouso-social-login": "file:./modules/wouso-social-login",
     "zombie": "^4.1.0"
