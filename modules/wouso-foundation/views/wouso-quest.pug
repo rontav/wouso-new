@@ -3,9 +3,15 @@ extends layout
 block content
   .row
     .large-12.columns
-    
+      h2= __('quest_title')
+      .spacer
+      - if (!user)
+        h4= __('quest_alert_login')
+
+  // Transfer number of fields through JS
   - if (mysettings['quest-timeToHint'])
     script var timeToHint = #{mysettings['quest-timeToHint']}
+
 
   - if (ROLE < 2)
     #quest-admin
@@ -16,5 +22,5 @@ block content
   - if (ROLE == 3)
     #quest-contrib
 
-  - if (ROLE == 4)   
+  - if (ROLE == 4)
     #quest-game

@@ -124,6 +124,9 @@
   "qotd_tags_title": "Etichete:",
 
 
+  "quest_title":       "Provocare",
+  "quest_alert_login": "Trebuie să te autentifici pentru a putea juca.",
+
   "quest_list_modal_title_add": "Adaugă întrebare",
   "quest_list_modal_title_edit": "Modifică întrebare",
 

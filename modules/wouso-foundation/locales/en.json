@@ -124,6 +124,9 @@
   "qotd_tags_title": "Tags:",
 
 
+  "quest_title":       "Quest",
+  "quest_alert_login": "You need to login to play this game",
+
   "quest_list_modal_title_add": "Add question",
   "quest_list_modal_title_edit": "Edit question",
 
