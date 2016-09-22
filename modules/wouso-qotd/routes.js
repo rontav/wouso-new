@@ -84,7 +84,7 @@ router.get('/api/wouso-qotd/list', function (req, res, next) {
 
 router.get('/api/wouso-qotd/list/:perPage/:page', function (req, res, next) {
   var _self = {};
-  var show = req.params.perPage;
+  var show = parseInt(req.params.perPage);
   var skip = (req.params.page - 1) * show;
 
   var query = {};
@@ -159,12 +159,10 @@ router.get('/api/wouso-qotd/play', function (req, res, next) {
   query = {'date': {$gte: start, $lt: end}}
 
   qotd.find(query).exec(function (err, today) {
-    if (!req.user)
-      return res.send('Login')
+    if (!req.user) return res.send('Login');
 
-    if (!today.length) {
-      return res.send(req.i18n.__('qotd_alert_noquestion'))
-    }
+    // No question for today, send empty response
+    if (!today.length) return res.send({});
 
     sent = false
     today.forEach(function (question) {

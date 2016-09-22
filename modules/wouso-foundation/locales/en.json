@@ -12,16 +12,16 @@
   "index_description": "A new applciation that evaluates your knowledge",
   "index_title_users": "Registered users",
 
-  "module_title": "GAMES",
+  "module_title":        "GAMES",
   "module_wouso-qotd":  "QotD",
-  "module_wouso-quest":  "Quest",
+  "module_wouso-quest": "Quest",
 
-  "role_title":   "ROLE",
-  "role_root":    "Root",
-  "role_admin":   "Admin",
-  "role_teacher": "Teacher",
+  "role_title":       "ROLE",
+  "role_root":        "Root",
+  "role_admin":       "Admin",
+  "role_teacher":     "Teacher",
   "role_contributor": "Contributor",
-  "role_player":  "Player",
+  "role_player":      "Player",
 
   "login_title_auth":   "Authenticate",
   "login_need_account": "Need an account? Click ",
@@ -75,7 +75,7 @@
   "admin_app_twitter":     "Allow Twitter login",
   "admin_app_google":      "Allow Google login",
   "admin_app_github":      "Allow GitHub login",
-  "admin_users_title": "User administration",
+  "admin_users_title":     "User administration",
   "admin_tags_title":      "Tags",
   "admin_tags_title_add":  "Add a new tag",
   "admin_tags_add_name":   "Name:",
@@ -95,20 +95,24 @@
 
   "settings-nologin": "There should be at least one login method enabled.",
 
-  "text_from": "from",
-  "link_here": "here",
-  "button_save": "Save",
+  "text_from":    "from",
+  "link_here":    "here",
+  "button_save":  "Save",
   "button_check": "Check",
 
 
   "qotd_title":            "Question of the day",
   "qotd_alert_login":      "You need to login to play this game",
-  "qotd_alert_noquestion": "No question for today.",
+  "qotd_alert_noquestion": "No question for today. Try again tomorrow.",
 
   "qotd_title_settings":       "Settings",
   "qotd_settings_default_ans": "Default number of available answers:",
   "qotd_settings_timelimit":   "Countdown timer (use positive values to activate):",
   "qotd_settings_points":      "Points (for a right answer):",
+
+  "qotd_game_text":       "Mark the answer of the following question:",
+  "qotd_game_help_title": "How to play this game",
+  "qotd_game_help_text":  "Question of the day (QotD) is a game where you have to choose the right answer to a question from a set of possible answers. There is a new question every day.",
 
   "qotd_add_button":         "Add a question",
   "qotd_edit_title":         "Edit question",
@@ -127,19 +131,22 @@
   "quest_title":       "Quest",
   "quest_alert_login": "You need to login to play this game",
 
-  "quest_list_modal_title_add": "Add question",
+  "quest_list_modal_title_add":  "Add question",
   "quest_list_modal_title_edit": "Edit question",
 
-  "quest_game_wrong_answer": "Wrong answer. Please try again.",
-  "quest_game_finish": "You have finished this quest.",
-  "quest_game_no_quests": "No quests available.",
+  "quest_game_wrong_answer":    "Wrong answer. Please try again.",
+  "quest_game_finish":          "You have finished this quest.",
+  "quest_game_no_quests":       "No quests available.",
   "quest_game_status_complete": "Quest complete!",
   "quest_game_status_progress": "Currently at level",
+  "quest_game_list_text":       "Here are the quests that you can join:",
+  "quest_game_help_title":      "How to play this game",
+  "quest_game_help_text":       "Quests are games where you need to find the answer to a riddel, composed of one or more words. Hints may be given to you over time.",
 
   "quest_title_settings": "Settings",
-  "quest_settings_tth": "Time to hint",
+  "quest_settings_tth":   "Time to hint",
 
 
-  "button_text_add": "Add",
+  "button_text_add":  "Add",
   "button_text_edit": "Edit"
 }

@@ -15,10 +15,39 @@ input[type="radio"] {
   margin: 8px 5px 0px 0px;
 }
 
+.grey-title {
+  color: grey;
+  font-size: 22px;
+}
+
+.game-help {
+  color: grey;
+}
+
 .qotd-right-answer {
   background-color: #8dc53e;
   border-radius: 5px;
   color: white;
+}
+
+#qotd-play-question {
+  font-size: 24px;
+  text-align: center;
+}
+
+#qotd-play-options {
+  font-size: 22px;
+  text-align: center;
+}
+
+#qotd-play-options-box {
+  font-size: 22px;
+  text-align: left;
+  display: inline-block;
+}
+
+#qotd-play-submit {
+  text-align: center;
 }
 
 .profile-card {

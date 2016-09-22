@@ -12,16 +12,16 @@
   "index_description": "Un concept nou de aplicație ce evaluează cunoștințele dobândite.",
   "index_title_users": "Utilizatori înregistrați",
 
-  "module_title": "JOCURI",
+  "module_title":       "JOCURI",
   "module_wouso-qotd":  "Întrebarea zilei",
-  "module_wouso-quest":  "Quest",
+  "module_wouso-quest": "Quest",
 
-  "role_title":   "ROL",
-  "role_root":    "Superutilizator",
-  "role_admin":   "Administrator",
-  "role_teacher": "Profesor",
+  "role_title":       "ROL",
+  "role_root":        "Superutilizator",
+  "role_admin":       "Administrator",
+  "role_teacher":     "Profesor",
   "role_contributor": "Contribuitor",
-  "role_player":  "Jucător",
+  "role_player":      "Jucător",
 
   "login_title_auth":   "Autentificare",
   "login_need_account": "Ai nevoie de un cont? Click ",
@@ -75,7 +75,7 @@
   "admin_app_twitter":     "Permite autentificare cu Twitter",
   "admin_app_google":      "Permite autentificare cu Google",
   "admin_app_github":      "Permite autentificare cu GitHub",
-  "admin_users_title": "Administrarea utilizatorilor",
+  "admin_users_title":     "Administrarea utilizatorilor",
   "admin_tags_title":      "Etichete",
   "admin_tags_title_add":  "Adaugă o tichetă nouă",
   "admin_tags_add_name":   "Numele:",
@@ -95,20 +95,24 @@
 
   "settings-nologin": "Trebuie să existe cel puțin o metodă de autentificare activată.",
 
-  "text_from": "de la",
-  "link_here": "aici",
-  "button_save": "Salvează",
+  "text_from":    "de la",
+  "link_here":    "aici",
+  "button_save":  "Salvează",
   "button_check": "Verifică",
 
 
   "qotd_title":            "Întrebarea zilei",
   "qotd_alert_login":      "Trebuie să te autentifici pentru a putea juca.",
-  "qotd_alert_noquestion": "Nici o întrebare astăzi.",
+  "qotd_alert_noquestion": "Nici o întrebare astăzi. Mai încearcă și mâine.",
 
   "qotd_title_settings":       "Setări",
   "qotd_settings_default_ans": "Numărul implicit de variante de răspuns:",
   "qotd_settings_timelimit":   "Timp pentru răspuns (folosiți valori pozitive pentru activare):",
   "qotd_settings_points":      "Puncte (pentru un răspuns corect):",
+
+  "qotd_game_text":       "Selectează răspunsul corect la următoarea întrebare:",
+  "qotd_game_help_title": "Cum se joacă",
+  "qotd_game_help_text":  "Întrebarea zilei este un joc unde trebuie să alegi răspunsul corect la o întrebare, dintr-un set de răspunsuri posibile. În fiecare zi apare o întrebare nouă.",
 
   "qotd_add_button":         "Adaugă o întrebare",
   "qotd_edit_title":         "Modifică întrebarea",
@@ -130,15 +134,18 @@
   "quest_list_modal_title_add": "Adaugă întrebare",
   "quest_list_modal_title_edit": "Modifică întrebare",
 
-  "quest_game_wrong_answer": "Răspuns greșit. Mai încearcă.",
-  "quest_game_finish": "Ai terminat acest quest.",
-  "quest_game_no_quests": "Nici un quest disponibil momentan.",
+  "quest_game_wrong_answer":    "Răspuns greșit. Mai încearcă.",
+  "quest_game_finish":          "Ai terminat acest quest.",
+  "quest_game_no_quests":       "Nici un quest disponibil momentan.",
   "quest_game_status_complete": "Quest complet!",
   "quest_game_status_progress": "Ajuns la nivelul",
+  "quest_game_list_text":       "Acestea sunt provocările la care poți participa:",
+  "quest_game_help_title":      "Cum se joacă",
+  "quest_game_help_text":       "Provocările sunt jocuri unde trebuie să găsești răspunsul la o ghicitoare, printr-unul sau mai multe cuvinte. Indicii pot veni pe parcurs în ajutorul tău.",
 
   "quest_title_settings": "Setări",
-  "quest_settings_tth": "Timp până la indiciu",
+  "quest_settings_tth":   "Timp până la indiciu",
 
-  "button_text_add": "Adaugă",
+  "button_text_add":  "Adaugă",
   "button_text_edit": "Modifică"
 }

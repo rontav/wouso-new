@@ -26133,49 +26133,50 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(2);
+	var ReactIntl = __webpack_require__(173);
 
 	var QotdCountdown = React.createClass({
-	  displayName: "QotdCountdown",
+	  displayName: 'QotdCountdown',
 
 	  render: function () {
 	    return React.createElement(
-	      "div",
-	      { id: "progress-bar", "data-time": countdownTimer },
-	      React.createElement("div", { className: "pbar" })
+	      'div',
+	      { id: 'progress-bar', 'data-time': countdownTimer },
+	      React.createElement('div', { className: 'pbar' })
 	    );
 	  }
 	});
 
 	var QotdSubmit = React.createClass({
-	  displayName: "QotdSubmit",
+	  displayName: 'QotdSubmit',
 
 	  render: function () {
 	    // Start countdown
 	    $('#progress-bar').anim_progressbar();
 
-	    return React.createElement("input", { className: "button small", id: "qotd-form-submit", type: "submit", value: "Send" });
+	    return React.createElement('input', { className: 'button small', id: 'qotd-form-submit', type: 'submit', value: 'Send' });
 	  }
 	});
 
 	var QotdQuestion = React.createClass({
-	  displayName: "QotdQuestion",
+	  displayName: 'QotdQuestion',
 
 	  render: function () {
 	    return React.createElement(
-	      "div",
-	      { className: "qotd-play-question" },
+	      'div',
+	      null,
 	      React.createElement(
-	        "p",
-	        null,
+	        'p',
+	        { id: 'qotd-play-question' },
 	        this.props.text
 	      ),
-	      React.createElement("input", { name: "question_id", type: "hidden", value: this.props.id, hidden: true })
+	      React.createElement('input', { name: 'question_id', type: 'hidden', value: this.props.id })
 	    );
 	  }
 	});
 
 	var QotdOption = React.createClass({
-	  displayName: "QotdOption",
+	  displayName: 'QotdOption',
 
 	  render: function () {
 	    var checkboxDisable = false;
@@ -26186,14 +26187,16 @@
 	      checkboxDisable = true;
 	    }
 	    // Mark right answers
-	    if (this.props.ans == this.props.text) spanClass = "qotd-right-answer";
+	    if (this.props.ans == this.props.text) {
+	      spanClass = 'qotd-right-answer';
+	    }
 
 	    return React.createElement(
-	      "div",
-	      { className: "qotd-play-answer" },
-	      React.createElement("input", { type: "checkbox", name: "ans", value: this.props.text, disabled: checkboxDisable }),
+	      'div',
+	      { className: 'qotd-play-answer' },
+	      React.createElement('input', { type: 'checkbox', name: 'ans', value: this.props.text, disabled: checkboxDisable }),
 	      React.createElement(
-	        "span",
+	        'span',
 	        { className: spanClass },
 	        this.props.text
 	      )
@@ -26202,7 +26205,7 @@
 	});
 
 	var QotdGame = React.createClass({
-	  displayName: "QotdGame",
+	  displayName: 'QotdGame',
 
 	  getInitialState: function () {
 	    return {
@@ -26230,27 +26233,62 @@
 
 	  render: function () {
 	    return React.createElement(
-	      "div",
-	      { className: "row" },
+	      'div',
+	      { className: 'row' },
 	      React.createElement(
-	        "div",
-	        { className: "large-12 columns" },
+	        'div',
+	        { className: 'large-12 columns' },
 	        React.createElement(
-	          "form",
-	          { className: "qotd-form", id: "qotd", method: "post", action: "/api/wouso-qotd/play" },
+	          'form',
+	          { className: 'qotd-form', id: 'qotd', method: 'post', action: '/api/wouso-qotd/play' },
 	          countdownTimer > 0 ? React.createElement(QotdCountdown, { timer: countdownTimer }) : null,
+	          this.state.question == "" ? this.props.intl.formatMessage({ id: 'qotd_alert_noquestion' }) : null,
+	          this.state.question == "" ? null : React.createElement(
+	            'p',
+	            { className: 'grey-title' },
+	            this.props.intl.formatMessage({ id: 'qotd_game_text' })
+	          ),
 	          React.createElement(QotdQuestion, { id: this.state.id, text: this.state.question }),
-	          this.state.options.map(function (opt, i) {
-	            return React.createElement(QotdOption, { key: i, text: opt, ans: this.state.answer });
-	          }, this),
-	          this.state.submit ? React.createElement(QotdSubmit, null) : null
+	          React.createElement(
+	            'div',
+	            { id: 'qotd-play-options' },
+	            React.createElement(
+	              'div',
+	              { id: 'qotd-play-options-box' },
+	              this.state.options.map(function (opt, i) {
+	                return React.createElement(QotdOption, { key: i, text: opt, ans: this.state.answer });
+	              }, this)
+	            )
+	          ),
+	          React.createElement('div', { className: 'spacer' }),
+	          React.createElement(
+	            'div',
+	            { id: 'qotd-play-submit' },
+	            this.state.submit ? React.createElement(QotdSubmit, null) : null
+	          )
+	        ),
+	        React.createElement(
+	          'div',
+	          { className: 'game-help' },
+	          React.createElement('div', { className: 'spacer' }),
+	          React.createElement('hr', null),
+	          React.createElement(
+	            'p',
+	            { className: 'grey-title' },
+	            this.props.intl.formatMessage({ id: 'qotd_game_help_title' })
+	          ),
+	          React.createElement(
+	            'p',
+	            null,
+	            this.props.intl.formatMessage({ id: 'qotd_game_help_text' })
+	          )
 	        )
 	      )
 	    );
 	  }
 	});
 
-	module.exports = QotdGame;
+	module.exports = ReactIntl.injectIntl(QotdGame);
 
 /***/ },
 /* 197 */
@@ -27871,11 +27909,14 @@
 		"button_check": "Check",
 		"qotd_title": "Question of the day",
 		"qotd_alert_login": "You need to login to play this game",
-		"qotd_alert_noquestion": "No question for today.",
+		"qotd_alert_noquestion": "No question for today. Try again tomorrow.",
 		"qotd_title_settings": "Settings",
 		"qotd_settings_default_ans": "Default number of available answers:",
 		"qotd_settings_timelimit": "Countdown timer (use positive values to activate):",
 		"qotd_settings_points": "Points (for a right answer):",
+		"qotd_game_text": "Mark the answer of the following question:",
+		"qotd_game_help_title": "How to play this game",
+		"qotd_game_help_text": "Question of the day (QotD) is a game where you have to choose the right answer to a question from a set of possible answers. There is a new question every day.",
 		"qotd_add_button": "Add a question",
 		"qotd_edit_title": "Edit question",
 		"qotd_add_title": "Add a new question",
@@ -27895,6 +27936,9 @@
 		"quest_game_no_quests": "No quests available.",
 		"quest_game_status_complete": "Quest complete!",
 		"quest_game_status_progress": "Currently at level",
+		"quest_game_list_text": "Here are the quests that you can join:",
+		"quest_game_help_title": "How to play this game",
+		"quest_game_help_text": "Quests are games where you need to find the answer to a riddel, composed of one or more words. Hints may be given to you over time.",
 		"quest_title_settings": "Settings",
 		"quest_settings_tth": "Time to hint",
 		"button_text_add": "Add",
@@ -27997,11 +28041,14 @@
 		"button_check": "Verifică",
 		"qotd_title": "Întrebarea zilei",
 		"qotd_alert_login": "Trebuie să te autentifici pentru a putea juca.",
-		"qotd_alert_noquestion": "Nici o întrebare astăzi.",
+		"qotd_alert_noquestion": "Nici o întrebare astăzi. Mai încearcă și mâine.",
 		"qotd_title_settings": "Setări",
 		"qotd_settings_default_ans": "Numărul implicit de variante de răspuns:",
 		"qotd_settings_timelimit": "Timp pentru răspuns (folosiți valori pozitive pentru activare):",
 		"qotd_settings_points": "Puncte (pentru un răspuns corect):",
+		"qotd_game_text": "Selectează răspunsul corect la următoarea întrebare:",
+		"qotd_game_help_title": "Cum se joacă",
+		"qotd_game_help_text": "Întrebarea zilei este un joc unde trebuie să alegi răspunsul corect la o întrebare, dintr-un set de răspunsuri posibile. În fiecare zi apare o întrebare nouă.",
 		"qotd_add_button": "Adaugă o întrebare",
 		"qotd_edit_title": "Modifică întrebarea",
 		"qotd_add_title": "Adaugă o întrebare nouă",
@@ -28021,6 +28068,9 @@
 		"quest_game_no_quests": "Nici un quest disponibil momentan.",
 		"quest_game_status_complete": "Quest complet!",
 		"quest_game_status_progress": "Ajuns la nivelul",
+		"quest_game_list_text": "Acestea sunt provocările la care poți participa:",
+		"quest_game_help_title": "Cum se joacă",
+		"quest_game_help_text": "Provocările sunt jocuri unde trebuie să găsești răspunsul la o ghicitoare, printr-unul sau mai multe cuvinte. Indicii pot veni pe parcurs în ajutorul tău.",
 		"quest_title_settings": "Setări",
 		"quest_settings_tth": "Timp până la indiciu",
 		"button_text_add": "Adaugă",
@@ -43888,6 +43938,12 @@
 	          null,
 	          noQuest
 	        ),
+	        React.createElement(
+	          'h3',
+	          null,
+	          this.props.intl.formatMessage({ id: 'quest_game_list_text' })
+	        ),
+	        React.createElement('div', { className: 'spacer' }),
 	        this.props.questList.map(function (q, i) {
 	          // Build quest status message
 	          var questStatus = this.props.intl.formatMessage({ id: 'quest_game_status_progress' });
@@ -44053,7 +44109,23 @@
 	                hint
 	              )
 	            );
-	          })
+	          }),
+	          React.createElement(
+	            'div',
+	            { className: 'game-help' },
+	            React.createElement('div', { className: 'spacer' }),
+	            React.createElement('hr', null),
+	            React.createElement(
+	              'p',
+	              { className: 'grey-title' },
+	              this.props.intl.formatMessage({ id: 'quest_game_help_title' })
+	            ),
+	            React.createElement(
+	              'p',
+	              null,
+	              this.props.intl.formatMessage({ id: 'quest_game_help_text' })
+	            )
+	          )
 	        )
 	      );
 	    }

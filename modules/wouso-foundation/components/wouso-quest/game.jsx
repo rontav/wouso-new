@@ -69,6 +69,8 @@ var QuestGameList = React.createClass({
         <div className='large-12 columns'>
           <h2>{noQuest}</h2>
 
+          <h3>{this.props.intl.formatMessage({id: 'quest_game_list_text'})}</h3>
+          <div className="spacer" />
           {this.props.questList.map(function(q, i) {
             // Build quest status message
             var questStatus = this.props.intl.formatMessage({id: 'quest_game_status_progress'});
@@ -177,6 +179,12 @@ var QuestGameLevel = React.createClass({
                 </div>
               );
             })}
+            <div className='game-help'>
+              <div className="spacer" />
+              <hr />
+              <p className='grey-title'>{this.props.intl.formatMessage({id: 'quest_game_help_title'})}</p>
+              <p>{this.props.intl.formatMessage({id: 'quest_game_help_text'})}</p>
+            </div>
           </div>
         </div>
       );
