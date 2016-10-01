@@ -49,7 +49,15 @@ router.get('/wouso-qotd', function (req, res, next) {
   }
 })
 
-
+/*
+* ENDPOINT: /api/wouso-qotd/settings
+*
+* DESCRIPTION: Saves settings for qotd
+*
+* REDIRECT: /wouso-qotd
+*
+* TODO: Remove final redirect so it can be a proper API endpoint
+*/
 router.post('/api/wouso-qotd/settings', login.isAdmin, function (req, res) {
   for (var key in req.body) {
     var query = {'key': 'qotd-' + key};
@@ -58,13 +66,22 @@ router.post('/api/wouso-qotd/settings', login.isAdmin, function (req, res) {
   }
 
   return res.redirect('/wouso-qotd');
-})
+});
 
+/*
+* ENDPOINT: /api/wouso-qotd/list
+*
+* DESCRIPTION: Lists one qotd by ID, including tags
+*
+* OUTPUT: one qotd
+*
+* PARAMS:
+*     id (required): question _id to look for
+*/
+router.get('/api/wouso-qotd/list', login.isContributor, function (req, res) {
+  if (!req.query.id) return res.send({});
 
-router.get('/api/wouso-qotd/list', function (req, res, next) {
-  if (!req.query.id) return res.send({})
-
-  _self = {}
+  var _self = {};
   qotd.findOne({_id: req.query.id}).exec(gotQotd);
 
   function gotQotd(err, qotd) {
@@ -82,7 +99,7 @@ router.get('/api/wouso-qotd/list', function (req, res, next) {
     })
     res.send(_self.qotd);
   }
-})
+});
 
 
 router.get('/api/wouso-qotd/list/:perPage/:page', function (req, res, next) {
