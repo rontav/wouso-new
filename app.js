@@ -55,7 +55,7 @@ if (process.env.NODE_ENV == 'production') {
 
 // Require db schemas
 var Settings = require('./config/models/settings');
-var TAg      = require('./config/models/tag');
+var Tag      = require('./config/models/tag');
 var Badges   = require('./config/models/badges');
 
 // Ensure superuser exists
@@ -78,6 +78,11 @@ Settings.findOne({'key': 'login-local'}).exec(function (err, num) {
     'val': true
   }).save()
 })
+
+// Add test accounts in development or testing
+if (process.env.NODE_ENV != 'development' || process.env.NODE_ENV != 'testing') {
+  require('./core/demo.js');
+}
 
 // Configuring Passport
 require('./core/auth')(app, passport)

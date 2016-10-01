@@ -1,13 +1,16 @@
 var mongoose = require('mongoose');
+var express  = require('express');
+var util     = require('util');
+
 var qotd     = mongoose.model('Qotd');
 var QOption  = mongoose.model('QOption');
 var settings = mongoose.model('Settings');
 var Tag      = mongoose.model('Tag');
 var Badges   = mongoose.model('Badge');
 var User     = mongoose.model('User');
+
+var login    = require('../../core/login');
 var log      = require('../../core/logging')('wouso-qotd');
-var util     = require('util');
-var express  = require('express');
 var router   = express.Router();
 
 
@@ -47,14 +50,14 @@ router.get('/wouso-qotd', function (req, res, next) {
 })
 
 
-router.post('/api/wouso-qotd/settings', function (req, res, next) {
+router.post('/api/wouso-qotd/settings', login.isAdmin, function (req, res) {
   for (var key in req.body) {
-    query = {'key': 'qotd-' + key}
-    update = {$set: {'val': req.body[key]}}
-    settings.update(query, update, {upsert: true}).exec()
+    var query = {'key': 'qotd-' + key};
+    var update = {$set: {'val': req.body[key]}};
+    settings.update(query, update, {upsert: true}).exec();
   }
 
-  res.redirect('/wouso-qotd')
+  return res.redirect('/wouso-qotd');
 })
 
 
