@@ -1,16 +1,41 @@
+// Responses
+var msgNeedLogin = {
+  'message'     : 'Permission denied',
+  'description' : 'You need to login'
+}
+
+var msgNeedPriviledges = {
+  'message'     : 'Permission denied',
+  'description' : 'Not enough priviledges to access this resource'
+}
+
 module.exports = {
+
+  isRoot: function (req, res, next) {
+    if (!req.user) {
+      res.send(msgNeedLogin);
+    } else if (req.user.role > 0) {
+      res.send(msgNeedPriviledges);
+    } else {
+      next();
+    }
+  },
 
   isAdmin: function (req, res, next) {
     if (!req.user) {
-      res.send({
-        'message'     : 'Permission denied',
-        'description' : 'You need to login'
-      });
+      res.send(msgNeedLogin);
     } else if (req.user.role > 1) {
-      res.send({
-        'message'     : 'Permission denied',
-        'description' : 'Not enough priviledges to access this resource'
-      });
+      res.send(msgNeedPriviledges);
+    } else {
+      next();
+    }
+  },
+
+  isTeacher: function (req, res, next) {
+    if (!req.user) {
+      res.send(msgNeedLogin);
+    } else if (req.user.role > 2) {
+      res.send(msgNeedPriviledges);
     } else {
       next();
     }
@@ -18,15 +43,9 @@ module.exports = {
 
   isContributor: function (req, res, next) {
     if (!req.user) {
-      res.send({
-        'message'     : 'Permission denied',
-        'description' : 'You need to login'
-      });
-    } else if (req.user.role > 2) {
-      res.send({
-        'message'     : 'Permission denied',
-        'description' : 'Not enough priviledges to access this resource'
-      });
+      res.send(msgNeedLogin);
+    } else if (req.user.role > 3) {
+      res.send(msgNeedPriviledges);
     } else {
       next();
     }

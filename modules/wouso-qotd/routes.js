@@ -101,58 +101,79 @@ router.get('/api/wouso-qotd/list', login.isContributor, function (req, res) {
   }
 });
 
-
-router.get('/api/wouso-qotd/list/:perPage/:page', function (req, res, next) {
+/*
+* ENDPOINT: /api/wouso-qotd/list/:perPage/:page
+*
+* DESCRIPTION: Paginated lists of 'qotd's
+*
+* OUTPUT: List of qotd, including tags
+*
+* PARAMS:
+*     id: question _id to look for
+*     tags: list of tags to filter results by
+*     search: term to filter results by
+*     start: date marking the beginning of the time interval to search within
+*     end: date marking the ending of the time interval to search within
+*/
+router.get('/api/wouso-qotd/list/:perPage/:page', login.isContributor, function (req, res, next) {
   var _self = {};
   var show = parseInt(req.params.perPage);
   var skip = (req.params.page - 1) * show;
 
+  // Handle query params
   var query = {};
-  if (req.query.id) query['_id'] = req.query.id
-  if (req.query.tags) query['tags'] = {$in: req.query.tags.split(',')}
-  if (typeof req.query.search !== 'undefined')
-    query['question'] = { '$regex': req.query.search, '$options': 'i' }
+  if (req.query.id) {
+    query['_id'] = req.query.id;
+  }
+  if (req.query.tags) {
+    query['tags'] = {$in: req.query.tags.split(',')};
+  }
+  if (typeof req.query.search !== 'undefined') {
+    query['question'] = { '$regex': req.query.search, '$options': 'i' };
+  }
   if (typeof req.query.start !== 'undefined') {
     var start = new Date(req.query.start);
-    var end = new Date();
+    var end   = new Date();
     // Use provided end date
-    if (typeof req.query.end !== 'undefined')
+    if (typeof req.query.end !== 'undefined') {
       end = new Date(req.query.end);
-
-    query['date'] = { '$gt': start, '$lt': end }
+    }
+    // Build date query
+    query['date'] = { '$gt': start, '$lt': end };
   }
 
-  _self.query = query
-  qotd.find(query).skip(skip).limit(show).exec(gotQotd)
+  // Get 'qotd's
+  _self.query = query;
+  qotd.find(query).skip(skip).limit(show).exec(getTags);
 
-  function gotQotd(err, all) {
+  function getTags(err, all) {
     if (err) return next(err)
 
-    _self.questions = all
-    Tag.find({'type': 'wouso-qotd'}).exec(gotTags)
+    _self.questions = all;
+    Tag.find({'type': 'wouso-qotd'}).exec(useTags);
   }
 
-  function gotTags(err, tags) {
+  function useTags(err, tags) {
     // Replace tag ids with tag names
     _self.questions.forEach(function(q) {
       tags.forEach(function(tag) {
-        var i = q.tags.indexOf(tag._id)
+        var i = q.tags.indexOf(tag._id);
         if (i > -1) {
-          q.tags[i] = tag.name
+          q.tags[i] = tag.name;
         }
       })
     })
-
-    qotd.count(_self.query).exec(gotCount);
+    // Get total count
+    qotd.count(_self.query).exec(sendResponse);
   }
 
-  function gotCount(err, count) {
+  function sendResponse(err, count) {
     res.send({
       questions : _self.questions,
       count     : count
     });
   }
-})
+});
 
 
 router.get('/api/wouso-qotd/list/dates', function (req, res, next) {

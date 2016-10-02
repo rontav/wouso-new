@@ -9,7 +9,7 @@ var fs       = require('fs');
 var Settings = require('../../../config/models/settings');
 var Qotd     = require('../model');
 
-var app, conn, cookie;
+var app, cookie;
 
 Qotd = mongoose.model('Qotd');
 
@@ -17,20 +17,17 @@ Qotd = mongoose.model('Qotd');
 var data = (JSON.parse(fs.readFileSync('./config.json', 'utf8')));
 
 
-describe('Superuser login tests:', function() {
+describe('QOTD settings endpoint:', function() {
   before(function(done) {
     // Drop DB and start app
-    conn = mongoose.createConnection(data.mongo_url.test);
-    conn.on('open', function() {
-      conn.db.dropDatabase(function (err) {
-        if (!err) {
-          // Start app
-          app = require('../../../app').listen(4000);
-          // Login as root
-          setTimeout(login('root', done), 300);
-        }
-      });
-    });
+    dropDB(data.mongo_url.test, droppedDB);
+
+    function droppedDB() {
+      // Start app
+      app = require('../../../app').listen(4000);
+      // Login as root
+      setTimeout(login('root', done), 300);
+    }
   });
 
   it('Save single setting', function(done) {
@@ -100,19 +97,17 @@ describe('Superuser login tests:', function() {
       done();
     }
   });
+});
 
+describe('QOTD list endpoint:', function() {
   it('List qotd; no ID provided', function(done) {
     // Add qotd
     new Qotd({
       'date'     : '01.10.16',
       'question' : 'Is this a qustion ?',
-      'choices'  : [{
-        'text'     : 'yes',
-        'validity' : true
-      }, {
-        'text'     : 'no',
-        'validity' : false
-      }]
+      'choices'  : [
+        {'text': 'yes', 'validity' : true},
+        {'text': 'no', 'validity' : false}]
     }).save(qotdSaved);
 
     function qotdSaved() {
@@ -165,7 +160,87 @@ describe('Superuser login tests:', function() {
       done();
     }
   });
+});
 
+describe('QOTD paginated list endpoint:', function() {
+  before(function(done) {
+    // Login as Contributor
+    login('contributor', dropDatabase);
+
+    // Drop DB and start app
+    function dropDatabase() {
+      dropQotd(data.mongo_url.test, addFirstEntry);
+    }
+
+    function addFirstEntry() {
+      new Qotd({
+        'date'     : '01.10.16',
+        'question' : 'One?',
+        'choices'  : []
+      }).save(addSecondEntry);
+    }
+
+    function addSecondEntry() {
+      new Qotd({
+        'date'     : '02.10.16',
+        'question' : 'Two?',
+        'choices'  : []
+      }).save(addThirdEntry);
+    }
+
+    function addThirdEntry() {
+      new Qotd({
+        'date'     : '03.10.16',
+        'question' : 'Three?',
+        'choices'  : []
+      }).save(done);
+    }
+  });
+
+  it('Paginate qotd list', function(done) {
+    // Get qotd paginated list
+    requestGet('/api/wouso-qotd/list/2/2', cookie, {}, checkResult);
+
+    function checkResult(err, res) {
+      res.body.questions[0].question.should.be.equal('Three?');
+      res.body.count.should.be.equal(3);
+      done()
+    }
+  });
+
+  it('Paginate qotd search', function(done) {
+    requestGet('/api/wouso-qotd/list/1/1?search=two', cookie, {}, checkResult);
+
+    function checkResult(err, res) {
+      res.body.questions[0].question.should.be.equal('Two?');
+      done();
+    }
+  });
+
+  it('Paginate qotd in a certain day', function(done) {
+    var params = '?start=03.09.2016&end=03.11.2016'
+    requestGet('/api/wouso-qotd/list/1/1' + params, cookie, {}, checkResult);
+
+    function checkResult(err, res) {
+      res.body.questions[0].question.should.be.equal('Three?');
+      done();
+    }
+  });
+
+  it('Restrict filter qotd acccess for roles under Teacher', function(done) {
+    // Login as Player
+    login('player', saveSettingAsTeacher);
+
+    function saveSettingAsTeacher() {
+      // Get qotd
+      requestGet('/api/wouso-qotd/list/1/1', cookie, {}, savedSetting);
+    }
+
+    function savedSetting(err, res) {
+      res.body.message.should.equal('Permission denied');
+      done();
+    }
+  });
 });
 
 
@@ -200,4 +275,28 @@ function login(role, callback) {
       // Advance
       callback();
     });
+}
+
+function dropDB(url, callback) {
+  var conn = mongoose.createConnection(url);
+
+  conn.on('open', function() {
+    conn.db.dropDatabase(function (err) {
+      if (!err) {
+        callback();
+      }
+    });
+  });
+}
+
+function dropQotd(url, callback) {
+  var conn = mongoose.createConnection(url);
+
+  conn.on('open', function() {
+    conn.db.dropCollection('qotds', function (err) {
+      if (!err) {
+        callback();
+      }
+    });
+  });
 }
