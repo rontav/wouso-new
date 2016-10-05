@@ -49,6 +49,14 @@ module.exports = {
     } else {
       next();
     }
+  },
+
+  isUser: function (req, res, next) {
+    if (!req.user) {
+      res.send(msgNeedLogin);
+    } else {
+      next();
+    }
   }
 
 }

@@ -233,11 +233,120 @@ describe('QOTD paginated list endpoint:', function() {
 
     function saveSettingAsTeacher() {
       // Get qotd
-      requestGet('/api/wouso-qotd/list/1/1', cookie, {}, savedSetting);
+      requestGet('/api/wouso-qotd/list/1/1', cookie, {}, checkResult);
     }
 
-    function savedSetting(err, res) {
+    function checkResult(err, res) {
       res.body.message.should.equal('Permission denied');
+      done();
+    }
+  });
+});
+
+describe('QOTD dates list endpoint:', function() {
+  before(function(done) {
+    // Login as Contributor
+    login('contributor', done);
+  });
+
+  it('Should return all available dates', function(done) {
+    // Get dates list
+    requestGet('/api/wouso-qotd/list/dates', cookie, {}, checkResult);
+
+    function checkResult(err, res) {
+      res.body.length.should.equal(3);
+      done();
+    }
+  });
+
+  it('Restrict qotd dates list acccess for roles under Teacher', function(done) {
+    // Login as Player
+    login('player', saveSettingAsTeacher);
+
+    function saveSettingAsTeacher() {
+      // Get qotd
+      requestGet('/api/wouso-qotd/list/dates', cookie, {}, checkResult);
+    }
+
+    function checkResult(err, res) {
+      res.body.message.should.equal('Permission denied');
+      done();
+    }
+  });
+});
+
+describe('QOTD play endpoint:', function() {
+  before(function(done) {
+    // Login as Player
+    login('player', dropDatabase);
+
+    // Drop DB and start app
+    function dropDatabase() {
+      dropQotd(data.mongo_url.test, done);
+    }
+  });
+
+  it('Should return nothing', function(done) {
+    requestGet('/api/wouso-qotd/play', cookie, {}, checkResult);
+
+    function checkResult(err, res) {
+      res.body.should.be.empty;
+      done();
+    }
+  });
+
+  before(function(done) {
+    // Add 2 qotds for today and one for tomorrow
+    var today    = new Date().getDate();
+    var tomorrow = new Date().getDate() + 1;
+
+    today = (new Date().getMonth()+1) + '.' + today;
+    today += '.' + new Date().getFullYear().toString().substring(2,4);
+
+    tomorrow = (new Date().getMonth()+1) + '.' + tomorrow;
+    tomorrow += '.' + new Date().getFullYear().toString().substring(2,4);
+
+    // Start adding questions
+    addFirstEntry();
+
+    function addFirstEntry() {
+      new Qotd({
+        'date'     : today,
+        'question' : 'One?',
+        'choices'  : []
+      }).save(addSecondEntry);
+    }
+
+    function addSecondEntry() {
+      new Qotd({
+        'date'     : today,
+        'question' : 'Two?',
+        'choices'  : []
+      }).save(addThirdEntry);
+    }
+
+    function addThirdEntry() {
+      new Qotd({
+        'date'     : tomorrow,
+        'question' : 'Three?',
+        'choices'  : []
+      }).save(done);
+    }
+  });
+
+  it('Should return question from today on two separate calls', function(done) {
+    var previousID = null;
+    requestGet('/api/wouso-qotd/play', cookie, {}, checkResult);
+
+    function checkResult(err, res) {
+      previousID = res.body._id;
+      res.body.question.should.be.equalOneOf(['One?', 'Two?']);
+      // Recheck
+      requestGet('/api/wouso-qotd/play', cookie, {}, recheckResult);
+    }
+
+    function recheckResult(err, res) {
+      res.body._id.should.be.equal(previousID);
       done();
     }
   });

@@ -175,9 +175,18 @@ router.get('/api/wouso-qotd/list/:perPage/:page', login.isContributor, function 
   }
 });
 
+/*
+* ENDPOINT: /api/wouso-qotd/list/dates
+*
+* DESCRIPTION: Qotd dates list
+*
+* OUTPUT: List of qotd dates
+*
+*/
+router.get('/api/wouso-qotd/list/dates', login.isContributor, function (req, res, next) {
+  qotd.find().select({'date': 1, '_id': 0}).exec(filterAvailableDates);
 
-router.get('/api/wouso-qotd/list/dates', function (req, res, next) {
-  qotd.find().select({'date': 1, '_id': 0}).exec(function (err, dates) {
+  function filterAvailableDates(err, dates) {
     if (err) return next(err);
 
     var dates_list = [];
@@ -187,50 +196,53 @@ router.get('/api/wouso-qotd/list/dates', function (req, res, next) {
       }
     });
     res.send(dates_list);
-  })
-})
+  }
+});
 
+/*
+* ENDPOINT: GET /api/wouso-qotd/play
+*
+* DESCRIPTION: Qotd Game
+*
+* OUTPUT: One qotd; includes response if user already answered
+*
+*/
+router.get('/api/wouso-qotd/play', login.isUser, function (req, res, next) {
 
-router.get('/api/wouso-qotd/play', function (req, res, next) {
-  // Check if user is logged in
-  if (!req.user) return res.redirect('/login')
-
-  start = new Date().setHours(0,0,0,0)
-  end   = new Date().setHours(23,59,59,999)
-  query = {'date': {$gte: start, $lt: end}}
+  var start = new Date().setHours(0,0,0,0);
+  var end   = new Date().setHours(23,59,59,999);
+  var query = {'date': {$gte: start, $lt: end}};
 
   qotd.find(query).exec(function (err, today) {
-    if (!req.user) return res.send('Login');
-
     // No question for today, send empty response
     if (!today.length) return res.send({});
 
-    sent = false
+    var sent = false;
     today.forEach(function (question) {
       // Convert result from mongoose object to JSON
-      question = question.toJSON()
+      question = question.toJSON();
 
       // Check if user already saw a question and deliver the same one
       question.answers.forEach(function (ans) {
         if (ans.user == req.user._id.toString()) {
-          sent = true
+          sent = true;
 
           // Compute remaining time
-          var diff = Math.abs(Date.now() - ans.date)
-          var mins = Math.ceil(diff / (1000 * 60))
+          var diff = Math.abs(Date.now() - ans.date);
+          var mins = Math.ceil(diff / (1000 * 60));
 
           if (ans.res != null) {
             // Provide answer contains response
-            question['answer'] = []
+            question['answer'] = [];
             question.choices.forEach(function(ans) {
-              if (ans.val == true) question['answer'].push(ans.text)
-            })
+              if (ans.val == true) question['answer'].push(ans.text);
+            });
           }
 
-          return res.send(shuffleAnswers(question))
+          return res.send(shuffleAnswers(question));
         }
-      })
-    })
+      });
+    });
 
     if (!sent && today.length) {
       // Else, choose a random question from today's poll
@@ -239,19 +251,19 @@ router.get('/api/wouso-qotd/play', function (req, res, next) {
       var question = JSON.parse(JSON.stringify(today[rand]));
 
       // Update question viewer
-      query  = {'_id': question._id};
-      update = {$push: {'answers': {
+      var query  = {'_id': question._id};
+      var update = {$push: {'answers': {
         'user' : req.user._id,
         'date' : Date.now(),
         'res'  : null
       }}};
-      qotd.update(query, update).exec(function(err, update) {
-        if (err) return next(err)
+      qotd.update(query, update).exec(function(err) {
+        if (err) return next(err);
       });
 
       return res.send(shuffleAnswers(question));
     }
-  })
+  });
 
   function shuffleAnswers(question) {
     // Process question answers
@@ -262,10 +274,9 @@ router.get('/api/wouso-qotd/play', function (req, res, next) {
 
     // Shuffle answers
     question.options = answers.sort(function() { return 0.5 - Math.random() });
-
     return question;
   }
-})
+});
 
 
 router.post('/api/wouso-qotd/play', function (req, res, next) {
