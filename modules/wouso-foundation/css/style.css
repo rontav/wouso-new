@@ -67,8 +67,21 @@ input[type="radio"] {
   float: left;
 }
 
-.message {
-  border-bottom: 1px solid #D3D3D3;
+#message-box {
+  border: 1px solid #D3D3D3;
+}
+
+#messages-left {
+  height: 600px;
+}
+
+.messages-user {
+  border: 1px solid #D3D3D3;
+  padding: 3px;
+}
+
+.messages-user:hover {
+  background-color: #D3D3D3;
 }
 
 .question-li {

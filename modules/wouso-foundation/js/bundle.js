@@ -45,7 +45,8 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	__webpack_require__(1);
-	module.exports = __webpack_require__(214);
+	__webpack_require__(214);
+	module.exports = __webpack_require__(439);
 
 
 /***/ },
@@ -44133,6 +44134,151 @@
 	});
 
 	module.exports = ReactIntl.injectIntl(QuestGame);
+
+/***/ },
+/* 439 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var React = __webpack_require__(2);
+	var ReactDOM = __webpack_require__(35);
+	var IntlProvider = __webpack_require__(173).IntlProvider;
+
+	var locales = __webpack_require__(209);
+	var config = __webpack_require__(213);
+
+	var intlData = {
+	  locale: 'en-US',
+	  messages: locales[config.language]
+	};
+
+	var Messages = React.createClass({
+	  displayName: 'Messages',
+
+	  getInitialState: function () {
+	    return {
+	      selectedUser: null,
+	      currentMessage: null,
+	      users: [],
+	      messages: []
+	    };
+	  },
+
+	  componentDidMount: function () {
+	    $.get('/api/messages', function (res) {
+	      if (this.isMounted()) {
+	        this.setState({
+	          users: res.users
+	        });
+	      }
+	    }.bind(this));
+	  },
+
+	  handleUserSelect: function (id) {
+	    $.get('/api/messages/' + id, function (res) {
+	      if (this.isMounted()) {
+	        this.setState({
+	          selectedUser: id,
+	          messages: res
+	        });
+	      }
+	    }.bind(this));
+	  },
+
+	  sendMessage: function () {
+	    var params = {
+	      'to': this.state.selectedUser,
+	      'message': this.state.currentMessage
+	    };
+	    $.post('/api/messages/send', params);
+	    this.handleUserSelect(this.state.selectedUser);
+	  },
+
+	  searchUser: function (event) {
+	    alert(event.target.value);
+	  },
+
+	  render: function () {
+	    return React.createElement(
+	      'div',
+	      { id: 'message-box', className: 'row' },
+	      React.createElement(
+	        'div',
+	        { className: 'large-4 columns', id: 'messages-left' },
+	        React.createElement(
+	          'div',
+	          { className: 'messages-user' },
+	          React.createElement(
+	            'p',
+	            null,
+	            'Start a new conversation'
+	          ),
+	          React.createElement('input', { id: 'search', type: 'text', onChange: this.searchUser })
+	        ),
+	        this.state.users.map(function (user) {
+	          return React.createElement(
+	            'div',
+	            { className: 'messages-user', onClick: this.handleUserSelect.bind(this, user._id) },
+	            user._id
+	          );
+	        }, this)
+	      ),
+	      React.createElement(
+	        'div',
+	        { className: 'large-8 columns' },
+	        this.state.messages.map(function (msg) {
+	          var user = 'Me';
+	          if (msg.direction == 'recv') {
+	            user = 'Him';
+	          }
+	          return React.createElement(
+	            'p',
+	            null,
+	            React.createElement(
+	              'b',
+	              null,
+	              user,
+	              ': '
+	            ),
+	            msg.message
+	          );
+	        })
+	      ),
+	      React.createElement(
+	        'div',
+	        { className: 'large-8 columns' },
+	        React.createElement(
+	          'div',
+	          { className: 'row collapse' },
+	          React.createElement(
+	            'div',
+	            { className: 'small-10 columns' },
+	            React.createElement('textarea', { id: 'message', type: 'text', rows: '1', onChange: this.editMessage })
+	          ),
+	          React.createElement(
+	            'div',
+	            { className: 'small-2 columns' },
+	            React.createElement('input', { className: 'button postfix',
+	              type: 'submit', value: 'Send', onClick: this.sendMessage })
+	          )
+	        )
+	      )
+	    );
+	  },
+
+	  editMessage: function (event) {
+	    this.setState({
+	      currentMessage: event.target.value
+	    });
+	  }
+	});
+
+	if ($('#messages').length) {
+	  ReactDOM.render(React.createElement(
+	    IntlProvider,
+	    { locale: intlData.locale, messages: intlData.messages },
+	    React.createElement(Messages, null)
+	  ), document.getElementById('messages'));
+	}
 
 /***/ }
 /******/ ]);

@@ -6,9 +6,9 @@ block content
       h4= __('messages_alert_login')
     - else
       h3= __('messages_new')
-      form(action='/messages/send', method='post')
+      form(action='/api/messages/send', method='post')
         label= __('messages_compose_to')
-        input(name='destination', type='text')
+        input(name='to', type='text')
         label= __('messages_compose_body')
         textarea(name='message', rows='5')
         button.btn.btn-warning(type='submit')= __('messages_compose_send')
@@ -16,10 +16,7 @@ block content
 
       h3= __('messages_title_list')
       .spacer
-      - if (messages.length)
-        each message in messages
-          .message
-            | <b>#{message.source} --> #{message.destination}:</b> #{message.message}
+      #messages
+      .spacer
 
-      - else
-        h5= __('messages_alert_nomsg')
+      h5= __('messages_alert_nomsg')
