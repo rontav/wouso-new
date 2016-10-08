@@ -2,7 +2,8 @@ module.exports = {
   entry: [
     './node_modules/wouso-foundation/components/wouso-qotd/main.jsx',
     './node_modules/wouso-foundation/components/wouso-quest/main.jsx',
-    './node_modules/wouso-foundation/components/messages.jsx'
+    './node_modules/wouso-foundation/components/messages.jsx',
+    './node_modules/wouso-foundation/components/profile.jsx'
   ],
   output: {
     filename: './node_modules/wouso-foundation/js/bundle.js'

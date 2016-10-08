@@ -46,7 +46,8 @@
 
 	__webpack_require__(1);
 	__webpack_require__(214);
-	module.exports = __webpack_require__(439);
+	__webpack_require__(439);
+	module.exports = __webpack_require__(440);
 
 
 /***/ },
@@ -44278,6 +44279,133 @@
 	    { locale: intlData.locale, messages: intlData.messages },
 	    React.createElement(Messages, null)
 	  ), document.getElementById('messages'));
+	}
+
+/***/ },
+/* 440 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var React = __webpack_require__(2);
+	var ReactDOM = __webpack_require__(35);
+	var IntlProvider = __webpack_require__(173).IntlProvider;
+
+	var locales = __webpack_require__(209);
+	var config = __webpack_require__(213);
+
+	var intlData = {
+	  locale: 'en-US',
+	  messages: locales[config.language]
+	};
+
+	var Profile = React.createClass({
+	  displayName: 'Profile',
+
+	  getInitialState: function () {
+	    return {
+	      user: {}
+	    };
+	  },
+
+	  componentDidMount: function () {
+	    $.get('/api/user', function (res) {
+	      if (this.isMounted()) {
+	        this.setState({
+	          user: res
+	        });
+	      }
+	    }.bind(this));
+	  },
+
+	  render: function () {
+	    if (this.state.user.name || this.state.user.email) {
+	      return React.createElement(
+	        'div',
+	        null,
+	        React.createElement(
+	          'h3',
+	          null,
+	          'Primary info:'
+	        ),
+	        React.createElement(
+	          'label',
+	          null,
+	          'User name'
+	        ),
+	        React.createElement(
+	          'h4',
+	          null,
+	          this.state.user.name
+	        ),
+	        React.createElement(
+	          'label',
+	          null,
+	          'Primary email'
+	        ),
+	        React.createElement(
+	          'h4',
+	          null,
+	          this.state.user.email
+	        )
+	      );
+	    } else if (this.state.user) {
+	      var availableEmails = [];
+	      ['local', 'facebook', 'github'].forEach(function (sn) {
+	        if (this.state.user[sn] && this.state.user[sn]['email']) {
+	          availableEmails.push(this.state.user[sn]['email']);
+	        }
+	      }, this);
+	      return React.createElement(
+	        'div',
+	        { className: 'row' },
+	        React.createElement(
+	          'div',
+	          { className: 'large-6 columns' },
+	          React.createElement(
+	            'form',
+	            { method: 'post', action: '/api/profile/primary' },
+	            React.createElement(
+	              'h3',
+	              null,
+	              'Let\'s set your primary name and email:'
+	            ),
+	            React.createElement(
+	              'label',
+	              null,
+	              'Real name:'
+	            ),
+	            React.createElement('input', { name: 'primary_name', type: 'text' }),
+	            React.createElement(
+	              'label',
+	              null,
+	              'Primary email:'
+	            ),
+	            React.createElement(
+	              'select',
+	              { name: 'primary_email' },
+	              availableEmails.map(function (email, i) {
+	                return React.createElement(
+	                  'option',
+	                  { key: i, value: email },
+	                  ' ',
+	                  email,
+	                  ' '
+	                );
+	              })
+	            ),
+	            React.createElement('input', { className: 'button small right', type: 'submit', value: 'Save' })
+	          )
+	        )
+	      );
+	    }
+	  }
+	});
+
+	if ($('#profile').length) {
+	  ReactDOM.render(React.createElement(
+	    IntlProvider,
+	    { locale: intlData.locale, messages: intlData.messages },
+	    React.createElement(Profile, null)
+	  ), document.getElementById('profile'));
 	}
 
 /***/ }
