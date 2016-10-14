@@ -84,6 +84,17 @@ input[type="radio"] {
   background-color: #D3D3D3;
 }
 
+.messages-user-selected {
+  background-color: #D3D3D3;
+  border: 1px solid #D3D3D3;
+  padding: 3px;
+}
+
+.messages-user-search {
+  border: 1px solid #D3D3D3;
+  padding: 3px;
+}
+
 .question-li {
   height: 25px;
   overflow: hidden;

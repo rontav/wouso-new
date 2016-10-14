@@ -5,18 +5,7 @@ block content
     - if (!user)
       h4= __('messages_alert_login')
     - else
-      h3= __('messages_new')
-      form(action='/api/messages/send', method='post')
-        label= __('messages_compose_to')
-        input(name='to', type='text')
-        label= __('messages_compose_body')
-        textarea(name='message', rows='5')
-        button.btn.btn-warning(type='submit')= __('messages_compose_send')
-      br
-
       h3= __('messages_title_list')
       .spacer
       #messages
       .spacer
-
-      h5= __('messages_alert_nomsg')

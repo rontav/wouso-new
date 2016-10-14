@@ -44142,6 +44142,7 @@
 
 	var React = __webpack_require__(2);
 	var ReactDOM = __webpack_require__(35);
+	var ReactIntl = __webpack_require__(173);
 	var IntlProvider = __webpack_require__(173).IntlProvider;
 
 	var locales = __webpack_require__(209);
@@ -44152,13 +44153,14 @@
 	  messages: locales[config.language]
 	};
 
-	var Messages = React.createClass({
+	var Messages = ReactIntl.injectIntl(React.createClass({
 	  displayName: 'Messages',
 
 	  getInitialState: function () {
 	    return {
 	      selectedUser: null,
 	      currentMessage: null,
+	      suggestedUsers: [],
 	      users: [],
 	      messages: []
 	    };
@@ -44175,14 +44177,37 @@
 	  },
 
 	  handleUserSelect: function (id) {
-	    $.get('/api/messages/' + id, function (res) {
-	      if (this.isMounted()) {
-	        this.setState({
-	          selectedUser: id,
-	          messages: res
-	        });
+	    // Check if user conversation exists
+	    var found = false;
+	    this.state.users.forEach(function (user) {
+	      if (user._id == id) {
+	        found = true;
 	      }
-	    }.bind(this));
+	    });
+
+	    if (found) {
+	      $.get('/api/messages/' + id, function (res) {
+	        if (this.isMounted()) {
+	          this.setState({
+	            selectedUser: id,
+	            messages: res
+	          });
+	        }
+	      }.bind(this));
+	    } else {
+	      $.get('/api/user?id=' + id, function (res) {
+	        var currentUsers = this.state.users;
+	        currentUsers.unshift(res);
+
+	        if (this.isMounted()) {
+	          this.setState({
+	            users: currentUsers,
+	            selectedUser: id,
+	            messages: []
+	          });
+	        }
+	      }.bind(this));
+	    }
 	  },
 
 	  sendMessage: function () {
@@ -44195,10 +44220,18 @@
 	  },
 
 	  searchUser: function (event) {
-	    alert(event.target.value);
+	    $.get('/api/users/search?search=' + event.target.value, function (res) {
+	      if (this.isMounted()) {
+	        this.setState({
+	          suggestedUsers: res
+	        });
+	      }
+	    }.bind(this));
 	  },
 
 	  render: function () {
+	    console.log(this.state.messages.length);
+	    console.log(this.state.selectedUser);
 	    return React.createElement(
 	      'div',
 	      { id: 'message-box', className: 'row' },
@@ -44207,42 +44240,91 @@
 	        { className: 'large-4 columns', id: 'messages-left' },
 	        React.createElement(
 	          'div',
-	          { className: 'messages-user' },
+	          { className: 'messages-user-search' },
 	          React.createElement(
-	            'p',
+	            'b',
 	            null,
 	            'Start a new conversation'
 	          ),
-	          React.createElement('input', { id: 'search', type: 'text', onChange: this.searchUser })
+	          React.createElement(
+	            'label',
+	            null,
+	            'Search by name or email:'
+	          ),
+	          React.createElement('input', { id: 'search', type: 'text', onChange: this.searchUser }),
+	          this.state.suggestedUsers.length !== 0 ? React.createElement(
+	            'label',
+	            null,
+	            'Suggested users:'
+	          ) : null,
+	          this.state.suggestedUsers.map(function (user, i) {
+	            return React.createElement(
+	              'div',
+	              { key: i, className: 'messages-user', onClick: this.handleUserSelect.bind(this, user._id) },
+	              user.name,
+	              ' ',
+	              user.email,
+	              ' ',
+	              user._id
+	            );
+	          }, this),
+	          React.createElement('div', { className: 'spacer' })
 	        ),
-	        this.state.users.map(function (user) {
-	          return React.createElement(
-	            'div',
-	            { className: 'messages-user', onClick: this.handleUserSelect.bind(this, user._id) },
-	            user._id
-	          );
+	        this.state.users.map(function (user, i) {
+	          if (user._id == this.state.selectedUser) {
+	            return React.createElement(
+	              'div',
+	              { key: i, className: 'messages-user-selected', onClick: this.handleUserSelect.bind(this, user._id) },
+	              user.name,
+	              ' ',
+	              user.email,
+	              ' ',
+	              user._id
+	            );
+	          } else {
+	            return React.createElement(
+	              'div',
+	              { key: i, className: 'messages-user', onClick: this.handleUserSelect.bind(this, user._id) },
+	              user.name,
+	              ' ',
+	              user.email,
+	              ' ',
+	              user._id
+	            );
+	          }
 	        }, this)
 	      ),
 	      React.createElement(
 	        'div',
 	        { className: 'large-8 columns' },
-	        this.state.messages.map(function (msg) {
-	          var user = 'Me';
+	        this.state.messages.length == 0 && this.state.selectedUser != null ? React.createElement(
+	          'p',
+	          null,
+	          this.props.intl.formatMessage({ id: 'messages_alert_nomsg' })
+	        ) : null,
+	        this.state.messages.map(function (msg, i) {
+	          // Set correct name for the sender of a message
+	          // Can be 'Me' or the name of the sender
+	          var username = 'Me';
 	          if (msg.direction == 'recv') {
-	            user = 'Him';
+	            this.state.users.forEach(function (user) {
+	              if (user._id === this.state.selectedUser) {
+	                username = user.name;
+	              }
+	            }, this);
 	          }
 	          return React.createElement(
 	            'p',
-	            null,
+	            { key: i },
 	            React.createElement(
 	              'b',
 	              null,
-	              user,
+	              username,
 	              ': '
 	            ),
 	            msg.message
 	          );
-	        })
+	        }, this)
 	      ),
 	      React.createElement(
 	        'div',
@@ -44271,7 +44353,7 @@
 	      currentMessage: event.target.value
 	    });
 	  }
-	});
+	}));
 
 	if ($('#messages').length) {
 	  ReactDOM.render(React.createElement(
