@@ -1,30 +1,44 @@
-var Message = require('../config/models/message')
-var Users   = require('../config/models/user')
-var express = require('express')
-var router  = express.Router()
+var Message  = require('../config/models/message');
+var Users    = require('../config/models/user');
+var express  = require('express');
+var mongoose = require('mongoose');
+var router   = express.Router();
 
 
-router.get('/messages', function (req, res, next) {
-  _self = {}
-  query = (req.user? req.user._id : null)
-  Message.find(query).exec(gotMessages)
+router.get('/messages', function(req, res) {
+  res.render('messages', {
+    user: req.user
+  });
+});
+
+router.get('/api/messages', function (req, res, next) {
+  var ObjectId = mongoose.Types.ObjectId;
+
+  var _self = {};
+  var query = {'$or': [{'source': ObjectId(req.user._id)}, {'destination': ObjectId(req.user._id)}]}
+  Message.find(query).exec(gotMessages);
 
   function gotMessages(err, all) {
-    if (err) return next(err)
+    if (err) return next(err);
 
-    users = []
-    all.forEach(function (message){
-      if (users.indexOf(message.source) < 0)
-        users.push(message.source)
-      if (users.indexOf(message.destination) < 0)
-        users.push(message.destination)
-    })
+    _self.users = [];
+    var userIDs = [];
+    all.forEach(function (message) {
+      if (userIDs.indexOf(message.source.toString()) < 0) {
+        userIDs.push(message.source.toString());
+        _self.users.push(message.source);
+      }
+      if (userIDs.indexOf(message.destination.toString()) < 0) {
+        userIDs.push(message.destination.toString());
+        _self.users.push(message.destination);
+      }
+    });
 
-    _self.messages = all
-    Users.find({'_id': {$in: users}}).exec(gotUsers)
+    _self.messages = all;
+    Users.find({'_id': {$in: _self.users}}).exec(getUserDetails);
   }
 
-  function gotUsers(err, people) {
+  function getUserDetails(err, people) {
     _self.messages.forEach(function (message) {
       people.forEach(function (peep) {
         if (peep._id == message.source)
@@ -34,10 +48,10 @@ router.get('/messages', function (req, res, next) {
       })
     })
 
-    res.render('messages', {
-      'user'     : req.user,
+    res.send({
+      'users'    : people,
       'messages' : _self.messages
-    })
+    });
   }
 
   function getAvailableName(peep) {
@@ -54,12 +68,40 @@ router.get('/messages', function (req, res, next) {
     if (peep.local && peep.local.email)
       return peep.local.email
   }
-})
+});
 
-router.post('/messages/send', function (req, res, next) {
+router.get('/api/messages/:userID', function (req, res, next) {
+  var ObjectId = mongoose.Types.ObjectId;
+
+  var query = {'$or': [
+    {'$and': [{'source': ObjectId(req.user._id)}, {'destination': ObjectId(req.params.userID)}]},
+    {'$and': [{'source': ObjectId(req.params.userID)}, {'destination': ObjectId(req.user._id)}]}
+  ]};
+  Message.find(query).exec(gotMessages);
+
+  function gotMessages(err, all) {
+    var messages = [];
+    // Clenup message; keep only text and direction (sent or recv)
+    all.forEach(function(msg) {
+      var cleanMsg = {};
+      // Save message text
+      cleanMsg.message = msg.message;
+      // Determine message direction; assume it's received and check
+      cleanMsg.direction = 'recv';
+      if (msg.source == req.user._id) {
+        cleanMsg.direction = 'sent';
+      }
+      // Push message to final list
+      messages.push(cleanMsg);
+    });
+    res.send(messages);
+  }
+});
+
+router.post('/api/messages/send', function (req, res, next) {
   new Message({
     'source'       : req.user._id,
-    'destination'  : req.body.destination,
+    'destination'  : req.body.to,
     'message'      : req.body.message
   }).save(function (err) {
     if (err) return next(err);

@@ -7,6 +7,7 @@ block content
 
     - else
       h3= __('profile_title')
+      #profile
 
       if (user && !user.facebook.id && mysettings['login-fb'] === 'true')
         a(href='/wouso-social-login/connect/facebook')= __('profile_connect_facebook')

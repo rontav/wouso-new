@@ -1,7 +1,8 @@
-var Settings = require('../config/models/settings')
-var Badges   = require('../config/models/badges')
-var express  = require('express')
-var router   = express.Router()
+var Settings = require('../config/models/settings');
+var Users    = require('../config/models/user');
+var Badges   = require('../config/models/badges');
+var express  = require('express');
+var router   = express.Router();
 
 
 router.get('/profile', function (req, res, next) {
@@ -55,7 +56,23 @@ router.get('/profile', function (req, res, next) {
         'mysettings' : _self.mysettings
       })
     }
-  })
+  });
+
+
+router.post('/api/profile/primary', function (req, res, next) {
+  var query  = {'_id': req.user._id};
+  var update = {'$set': {
+    'name'  : req.body.primary_name,
+    'email' : req.body.primary_email
+  }}
+  Users.update(query, update).exec(redirectUser);
+
+  function redirectUser(err) {
+    if (err) return next(err);
+
+    res.redirect('/profile');
+  }
+});
 
 
 module.exports = router

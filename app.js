@@ -151,6 +151,8 @@ app.use(function (req, res, next) {
   if (req.app.get('env') == 'development' && process.argv[2] == 'login') {
     req.user = {
       '_id':  '000000000000000000000000',
+      'name': 'Dev User',
+      'email': 'user@user.com',
       'role': 0,
       'facebook': {
         'id': 0
