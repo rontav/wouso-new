@@ -87,14 +87,14 @@ router.post('/api/tags/add', function(req, res) {
   })
 })
 
-router.get('/api/user/:user', function(req, res) {
+router.get('/api/user/:user', function(req, res, next) {
   // Check if user is logged in and is superuser
   if (!req.user || (req.user && req.user.role != 0)) return res.redirect('/login')
 
   var conditions = {'_id': req.params.user}
   var update = {$set: {'role': req.query.role}}
   User.update(conditions, update, function (err, num) {
-    if (err) return next(err)
+    if (err) return next(err);
     if (num) res.json({success: true})
   })
 })

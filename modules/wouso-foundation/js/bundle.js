@@ -45,7 +45,9 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	__webpack_require__(1);
-	module.exports = __webpack_require__(214);
+	__webpack_require__(214);
+	__webpack_require__(439);
+	module.exports = __webpack_require__(440);
 
 
 /***/ },
@@ -44133,6 +44135,360 @@
 	});
 
 	module.exports = ReactIntl.injectIntl(QuestGame);
+
+/***/ },
+/* 439 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var React = __webpack_require__(2);
+	var ReactDOM = __webpack_require__(35);
+	var ReactIntl = __webpack_require__(173);
+	var IntlProvider = __webpack_require__(173).IntlProvider;
+
+	var locales = __webpack_require__(209);
+	var config = __webpack_require__(213);
+
+	var intlData = {
+	  locale: 'en-US',
+	  messages: locales[config.language]
+	};
+
+	var Messages = ReactIntl.injectIntl(React.createClass({
+	  displayName: 'Messages',
+
+	  getInitialState: function () {
+	    return {
+	      selectedUser: null,
+	      currentMessage: null,
+	      suggestedUsers: [],
+	      users: [],
+	      messages: []
+	    };
+	  },
+
+	  componentDidMount: function () {
+	    $.get('/api/messages', function (res) {
+	      if (this.isMounted()) {
+	        this.setState({
+	          users: res.users
+	        });
+	      }
+	    }.bind(this));
+	  },
+
+	  handleUserSelect: function (id) {
+	    // Check if user conversation exists
+	    var found = false;
+	    this.state.users.forEach(function (user) {
+	      if (user._id == id) {
+	        found = true;
+	      }
+	    });
+
+	    if (found) {
+	      $.get('/api/messages/' + id, function (res) {
+	        if (this.isMounted()) {
+	          this.setState({
+	            selectedUser: id,
+	            messages: res
+	          });
+	        }
+	      }.bind(this));
+	    } else {
+	      $.get('/api/user?id=' + id, function (res) {
+	        var currentUsers = this.state.users;
+	        currentUsers.unshift(res);
+
+	        if (this.isMounted()) {
+	          this.setState({
+	            users: currentUsers,
+	            selectedUser: id,
+	            messages: []
+	          });
+	        }
+	      }.bind(this));
+	    }
+	  },
+
+	  sendMessage: function () {
+	    var params = {
+	      'to': this.state.selectedUser,
+	      'message': this.state.currentMessage
+	    };
+	    $.post('/api/messages/send', params);
+	    this.handleUserSelect(this.state.selectedUser);
+	  },
+
+	  searchUser: function (event) {
+	    $.get('/api/users/search?search=' + event.target.value, function (res) {
+	      if (this.isMounted()) {
+	        this.setState({
+	          suggestedUsers: res
+	        });
+	      }
+	    }.bind(this));
+	  },
+
+	  render: function () {
+	    console.log(this.state.messages.length);
+	    console.log(this.state.selectedUser);
+	    return React.createElement(
+	      'div',
+	      { id: 'message-box', className: 'row' },
+	      React.createElement(
+	        'div',
+	        { className: 'large-4 columns', id: 'messages-left' },
+	        React.createElement(
+	          'div',
+	          { className: 'messages-user-search' },
+	          React.createElement(
+	            'b',
+	            null,
+	            'Start a new conversation'
+	          ),
+	          React.createElement(
+	            'label',
+	            null,
+	            'Search by name or email:'
+	          ),
+	          React.createElement('input', { id: 'search', type: 'text', onChange: this.searchUser }),
+	          this.state.suggestedUsers.length !== 0 ? React.createElement(
+	            'label',
+	            null,
+	            'Suggested users:'
+	          ) : null,
+	          this.state.suggestedUsers.map(function (user, i) {
+	            return React.createElement(
+	              'div',
+	              { key: i, className: 'messages-user', onClick: this.handleUserSelect.bind(this, user._id) },
+	              user.name,
+	              ' ',
+	              user.email,
+	              ' ',
+	              user._id
+	            );
+	          }, this),
+	          React.createElement('div', { className: 'spacer' })
+	        ),
+	        this.state.users.map(function (user, i) {
+	          if (user._id == this.state.selectedUser) {
+	            return React.createElement(
+	              'div',
+	              { key: i, className: 'messages-user-selected', onClick: this.handleUserSelect.bind(this, user._id) },
+	              user.name,
+	              ' ',
+	              user.email,
+	              ' ',
+	              user._id
+	            );
+	          } else {
+	            return React.createElement(
+	              'div',
+	              { key: i, className: 'messages-user', onClick: this.handleUserSelect.bind(this, user._id) },
+	              user.name,
+	              ' ',
+	              user.email,
+	              ' ',
+	              user._id
+	            );
+	          }
+	        }, this)
+	      ),
+	      React.createElement(
+	        'div',
+	        { className: 'large-8 columns' },
+	        this.state.messages.length == 0 && this.state.selectedUser != null ? React.createElement(
+	          'p',
+	          null,
+	          this.props.intl.formatMessage({ id: 'messages_alert_nomsg' })
+	        ) : null,
+	        this.state.messages.map(function (msg, i) {
+	          // Set correct name for the sender of a message
+	          // Can be 'Me' or the name of the sender
+	          var username = 'Me';
+	          if (msg.direction == 'recv') {
+	            this.state.users.forEach(function (user) {
+	              if (user._id === this.state.selectedUser) {
+	                username = user.name;
+	              }
+	            }, this);
+	          }
+	          return React.createElement(
+	            'p',
+	            { key: i },
+	            React.createElement(
+	              'b',
+	              null,
+	              username,
+	              ': '
+	            ),
+	            msg.message
+	          );
+	        }, this)
+	      ),
+	      React.createElement(
+	        'div',
+	        { className: 'large-8 columns' },
+	        React.createElement(
+	          'div',
+	          { className: 'row collapse' },
+	          React.createElement(
+	            'div',
+	            { className: 'small-10 columns' },
+	            React.createElement('textarea', { id: 'message', type: 'text', rows: '1', onChange: this.editMessage })
+	          ),
+	          React.createElement(
+	            'div',
+	            { className: 'small-2 columns' },
+	            React.createElement('input', { className: 'button postfix',
+	              type: 'submit', value: 'Send', onClick: this.sendMessage })
+	          )
+	        )
+	      )
+	    );
+	  },
+
+	  editMessage: function (event) {
+	    this.setState({
+	      currentMessage: event.target.value
+	    });
+	  }
+	}));
+
+	if ($('#messages').length) {
+	  ReactDOM.render(React.createElement(
+	    IntlProvider,
+	    { locale: intlData.locale, messages: intlData.messages },
+	    React.createElement(Messages, null)
+	  ), document.getElementById('messages'));
+	}
+
+/***/ },
+/* 440 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var React = __webpack_require__(2);
+	var ReactDOM = __webpack_require__(35);
+	var IntlProvider = __webpack_require__(173).IntlProvider;
+
+	var locales = __webpack_require__(209);
+	var config = __webpack_require__(213);
+
+	var intlData = {
+	  locale: 'en-US',
+	  messages: locales[config.language]
+	};
+
+	var Profile = React.createClass({
+	  displayName: 'Profile',
+
+	  getInitialState: function () {
+	    return {
+	      user: {}
+	    };
+	  },
+
+	  componentDidMount: function () {
+	    $.get('/api/user', function (res) {
+	      if (this.isMounted()) {
+	        this.setState({
+	          user: res
+	        });
+	      }
+	    }.bind(this));
+	  },
+
+	  render: function () {
+	    if (this.state.user.name || this.state.user.email) {
+	      return React.createElement(
+	        'div',
+	        null,
+	        React.createElement(
+	          'h3',
+	          null,
+	          'Primary info:'
+	        ),
+	        React.createElement(
+	          'label',
+	          null,
+	          'User name'
+	        ),
+	        React.createElement(
+	          'h4',
+	          null,
+	          this.state.user.name
+	        ),
+	        React.createElement(
+	          'label',
+	          null,
+	          'Primary email'
+	        ),
+	        React.createElement(
+	          'h4',
+	          null,
+	          this.state.user.email
+	        )
+	      );
+	    } else if (this.state.user) {
+	      var availableEmails = [];
+	      ['local', 'facebook', 'github'].forEach(function (sn) {
+	        if (this.state.user[sn] && this.state.user[sn]['email']) {
+	          availableEmails.push(this.state.user[sn]['email']);
+	        }
+	      }, this);
+	      return React.createElement(
+	        'div',
+	        { className: 'row' },
+	        React.createElement(
+	          'div',
+	          { className: 'large-6 columns' },
+	          React.createElement(
+	            'form',
+	            { method: 'post', action: '/api/profile/primary' },
+	            React.createElement(
+	              'h3',
+	              null,
+	              'Let\'s set your primary name and email:'
+	            ),
+	            React.createElement(
+	              'label',
+	              null,
+	              'Real name:'
+	            ),
+	            React.createElement('input', { name: 'primary_name', type: 'text' }),
+	            React.createElement(
+	              'label',
+	              null,
+	              'Primary email:'
+	            ),
+	            React.createElement(
+	              'select',
+	              { name: 'primary_email' },
+	              availableEmails.map(function (email, i) {
+	                return React.createElement(
+	                  'option',
+	                  { key: i, value: email },
+	                  ' ',
+	                  email,
+	                  ' '
+	                );
+	              })
+	            ),
+	            React.createElement('input', { className: 'button small right', type: 'submit', value: 'Save' })
+	          )
+	        )
+	      );
+	    }
+	  }
+	});
+
+	if ($('#profile').length) {
+	  ReactDOM.render(React.createElement(
+	    IntlProvider,
+	    { locale: intlData.locale, messages: intlData.messages },
+	    React.createElement(Profile, null)
+	  ), document.getElementById('profile'));
+	}
 
 /***/ }
 /******/ ]);
