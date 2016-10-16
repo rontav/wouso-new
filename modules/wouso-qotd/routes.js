@@ -14,40 +14,46 @@ var log      = require('../../core/logging')('wouso-qotd');
 var router   = express.Router();
 
 
+/*
+* ENDPOINT: /wouso-qotd
+*
+* DESCRIPTION: Serves main qotd page
+*
+*/
 router.get('/wouso-qotd', function (req, res, next) {
-  _self = {}
-  qotd.find().exec(gotQuestions)
+  var _self = {};
+  qotd.find().exec(gotQuestions);
 
   function gotQuestions(err, all) {
-    if (err) return next(err)
+    if (err) return next(err);
 
-    _self.questions = all
-    Tag.find({'type': 'wouso-qotd'}).exec(gotTags)
+    _self.questions = all;
+    Tag.find({'type': 'wouso-qotd'}).exec(gotTags);
   }
 
   function gotTags(err, tags) {
-    if (err) return next(err)
+    if (err) return next(err);
 
-    _self.qtags = tags
-    settings.find().exec(gotSettings)
+    _self.qtags = tags;
+    settings.find().exec(gotSettings);
   }
 
   function gotSettings(err, settings) {
-    if (err) return next(err)
+    if (err) return next(err);
 
-    mysettings = {}
+    var mysettings = {};
     settings.forEach(function(option) {
-      mysettings[option.key] = option.val
-    })
+      mysettings[option.key] = option.val;
+    });
 
     res.render('wouso-qotd', {
       'questions'  : _self.questions,
       'mysettings' : mysettings,
-      'qtags'       : _self.qtags,
+      'qtags'      : _self.qtags,
       'user'       : req.user
-    })
+    });
   }
-})
+});
 
 /*
 * ENDPOINT: /api/wouso-qotd/settings

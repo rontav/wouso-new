@@ -25,7 +25,7 @@ describe('QOTD settings endpoint:', function() {
 
     function droppedDB() {
       // Start app
-      app = require('../../../app').listen(4000);
+      app = require('../../../app').listen();
       // Login as root
       setTimeout(login('root', done), 300);
     }
@@ -34,7 +34,7 @@ describe('QOTD settings endpoint:', function() {
   it('Save single setting', function(done) {
     // Save setting
     var body = {'foo': 'bar'};
-    requestPost('/api/wouso-qotd/settings', cookie, body, savedSetting);
+    requestPost(app, '/api/wouso-qotd/settings', cookie, body, savedSetting);
 
     function savedSetting() {
       Settings.findOne({'key': 'qotd-foo'}).exec(gotSetting);
@@ -49,7 +49,7 @@ describe('QOTD settings endpoint:', function() {
   it('Update single setting', function(done) {
     // Update previous setting
     var body = {'foo': 'test'};
-    requestPost('/api/wouso-qotd/settings', cookie, body, savedSetting);
+    requestPost(app, '/api/wouso-qotd/settings', cookie, body, savedSetting);
 
     function savedSetting() {
       Settings.findOne({'key': 'qotd-foo'}).exec(gotSetting);
@@ -64,7 +64,7 @@ describe('QOTD settings endpoint:', function() {
   it('Save multiple settings', function(done) {
     // Save 2 settings
     var body = {'foo': 'bar', 'ceva': 'altceva'};
-    requestPost('/api/wouso-qotd/settings', cookie, body, savedSetting);
+    requestPost(app, '/api/wouso-qotd/settings', cookie, body, savedSetting);
 
     function savedSetting() {
       // First setting
@@ -90,7 +90,7 @@ describe('QOTD settings endpoint:', function() {
     function saveSettingAsTeacher() {
       // Save settings as teacher
       var body = {'foo': 'bar', 'ceva': 'altceva'};
-      requestPost('/api/wouso-qotd/settings', cookie, body, savedSetting);
+      requestPost(app, '/api/wouso-qotd/settings', cookie, body, savedSetting);
     }
 
     function savedSetting(err, res) {
@@ -113,7 +113,7 @@ describe('QOTD list endpoint:', function() {
 
     function qotdSaved() {
       // Get qotd
-      requestGet('/api/wouso-qotd/list', cookie, {}, gotQotd);
+      requestGet(app, '/api/wouso-qotd/list', cookie, {}, gotQotd);
     }
 
     function gotQotd(err, res) {
@@ -124,7 +124,7 @@ describe('QOTD list endpoint:', function() {
 
   it('List qotd with invalid ID', function(done) {
     // Get qotd
-    requestGet('/api/wouso-qotd/list?id=111', cookie, {}, gotQotd);
+    requestGet(app, '/api/wouso-qotd/list?id=111', cookie, {}, gotQotd);
 
     function gotQotd(err, res) {
       res.body.should.be.empty;
@@ -138,7 +138,7 @@ describe('QOTD list endpoint:', function() {
 
     function gotID(err, qotd) {
       // Get qotd
-      requestGet('/api/wouso-qotd/list?id=' + qotd._id, cookie, {}, gotQotd);
+      requestGet(app, '/api/wouso-qotd/list?id=' + qotd._id, cookie, {}, gotQotd);
     }
 
     function gotQotd(err, res) {
@@ -153,7 +153,7 @@ describe('QOTD list endpoint:', function() {
 
     function saveSettingAsTeacher() {
       // Get qotd
-      requestGet('/api/wouso-qotd/list?id=', cookie, {}, savedSetting);
+      requestGet(app, '/api/wouso-qotd/list?id=', cookie, {}, savedSetting);
     }
 
     function savedSetting(err, res) {
@@ -200,7 +200,7 @@ describe('QOTD paginated list endpoint:', function() {
 
   it('Paginate qotd list', function(done) {
     // Get qotd paginated list
-    requestGet('/api/wouso-qotd/list/2/2', cookie, {}, checkResult);
+    requestGet(app, '/api/wouso-qotd/list/2/2', cookie, {}, checkResult);
 
     function checkResult(err, res) {
       res.body.questions[0].question.should.be.equal('Three?');
@@ -210,7 +210,7 @@ describe('QOTD paginated list endpoint:', function() {
   });
 
   it('Paginate qotd search', function(done) {
-    requestGet('/api/wouso-qotd/list/1/1?search=two', cookie, {}, checkResult);
+    requestGet(app, '/api/wouso-qotd/list/1/1?search=two', cookie, {}, checkResult);
 
     function checkResult(err, res) {
       res.body.questions[0].question.should.be.equal('Two?');
@@ -220,7 +220,7 @@ describe('QOTD paginated list endpoint:', function() {
 
   it('Paginate qotd in a certain day', function(done) {
     var params = '?start=03.09.2016&end=03.11.2016'
-    requestGet('/api/wouso-qotd/list/1/1' + params, cookie, {}, checkResult);
+    requestGet(app, '/api/wouso-qotd/list/1/1' + params, cookie, {}, checkResult);
 
     function checkResult(err, res) {
       res.body.questions[0].question.should.be.equal('Three?');
@@ -234,7 +234,7 @@ describe('QOTD paginated list endpoint:', function() {
 
     function saveSettingAsTeacher() {
       // Get qotd
-      requestGet('/api/wouso-qotd/list/1/1', cookie, {}, checkResult);
+      requestGet(app, '/api/wouso-qotd/list/1/1', cookie, {}, checkResult);
     }
 
     function checkResult(err, res) {
@@ -252,7 +252,7 @@ describe('QOTD dates list endpoint:', function() {
 
   it('Should return all available dates', function(done) {
     // Get dates list
-    requestGet('/api/wouso-qotd/list/dates', cookie, {}, checkResult);
+    requestGet(app, '/api/wouso-qotd/list/dates', cookie, {}, checkResult);
 
     function checkResult(err, res) {
       res.body.length.should.equal(3);
@@ -266,7 +266,7 @@ describe('QOTD dates list endpoint:', function() {
 
     function saveSettingAsTeacher() {
       // Get qotd
-      requestGet('/api/wouso-qotd/list/dates', cookie, {}, checkResult);
+      requestGet(app, '/api/wouso-qotd/list/dates', cookie, {}, checkResult);
     }
 
     function checkResult(err, res) {
@@ -288,7 +288,7 @@ describe('QOTD play endpoint:', function() {
   });
 
   it('Should return nothing', function(done) {
-    requestGet('/api/wouso-qotd/play', cookie, {}, checkResult);
+    requestGet(app, '/api/wouso-qotd/play', cookie, {}, checkResult);
 
     function checkResult(err, res) {
       res.body.should.be.empty;
@@ -337,13 +337,13 @@ describe('QOTD play endpoint:', function() {
 
   it('Should return question from today on two separate calls', function(done) {
     var previousID = null;
-    requestGet('/api/wouso-qotd/play', cookie, {}, checkResult);
+    requestGet(app, '/api/wouso-qotd/play', cookie, {}, checkResult);
 
     function checkResult(err, res) {
       previousID = res.body._id;
       res.body.question.should.be.equalOneOf(['One?', 'Two?']);
       // Recheck
-      requestGet('/api/wouso-qotd/play', cookie, {}, recheckResult);
+      requestGet(app, '/api/wouso-qotd/play', cookie, {}, recheckResult);
     }
 
     function recheckResult(err, res) {
@@ -388,7 +388,7 @@ describe('QOTD play POST endpoint:', function() {
   it('Should add user to qotd responders', function(done) {
 
     // Look at qotd
-    requestGet('/api/wouso-qotd/play', cookie, {}, getQotdInfo);
+    requestGet(app, '/api/wouso-qotd/play', cookie, {}, getQotdInfo);
 
     function getQotdInfo() {
       Qotd.findOne().exec(sendResponse);
@@ -399,7 +399,7 @@ describe('QOTD play POST endpoint:', function() {
         'question_id' : q._id.toString(),
         'ans'         : '1'
       };
-      requestPost('/api/wouso-qotd/play', cookie, body, getQotd);
+      requestPost(app, '/api/wouso-qotd/play', cookie, body, getQotd);
     }
 
     function getQotd() {
@@ -432,7 +432,7 @@ describe('QOTD add endpoint:', function() {
       'date'     : '',
       'tags'     : ''
     };
-    requestPost('/api/wouso-qotd/add', cookie, body, getQotd);
+    requestPost(app, '/api/wouso-qotd/add', cookie, body, getQotd);
 
     function getQotd() {
       Qotd.findOne().exec(checkExistance);
@@ -457,7 +457,7 @@ describe('QOTD add endpoint:', function() {
         'date'     : '',
         'tags'     : ''
       };
-      requestPost('/api/wouso-qotd/add', cookie, body, getQotd);
+      requestPost(app, '/api/wouso-qotd/add', cookie, body, getQotd);
     }
 
     function getQotd() {
@@ -476,7 +476,7 @@ describe('QOTD add endpoint:', function() {
 
     function addQotdAsPlayer() {
       // Get qotd
-      requestPost('/api/wouso-qotd/add', cookie, {}, checkResult);
+      requestPost(app, '/api/wouso-qotd/add', cookie, {}, checkResult);
     }
 
     function checkResult(err, res) {

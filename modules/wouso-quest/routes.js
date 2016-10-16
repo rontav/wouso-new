@@ -7,11 +7,18 @@ var Quest    = mongoose.model('Quest');
 var Tag      = mongoose.model('Tag');
 var Settings = mongoose.model('Settings');
 
-var log = require('../../core/logging')('wouso-quest');
-
+var login    = require('../../core/login');
+var log      = require('../../core/logging')('wouso-quest');
 var router   = express.Router();
 var ObjectId = mongoose.Types.ObjectId;
 
+
+/*
+* ENDPOINT: /wouso-quest
+*
+* DESCRIPTION: Serves main quest page
+*
+*/
 router.get('/wouso-quest', function(req, res, next) {
 
   Settings.find().exec(gotSettings)
@@ -29,8 +36,62 @@ router.get('/wouso-quest', function(req, res, next) {
       mysettings: mysettings
     });
   }
-
 });
+
+/*
+* ENDPOINT: /api/wouso-quest/settings
+*
+* DESCRIPTION: Saves settings for quest
+*
+* REDIRECT: /wouso-quest
+*
+* TODO: Remove final redirect so it can be a proper API endpoint
+*/
+router.post('/api/wouso-quest/settings', login.isAdmin, function (req, res, next) {
+  for (var key in req.body) {
+    var query = {'key': 'quest-' + key};
+    var update = {$set: {'val': req.body[key]}};
+    Settings.update(query, update, {upsert: true}).exec(function (err) {
+      if (err) return next(err);
+    });
+  }
+
+  res.redirect('/wouso-quest');
+});
+
+/*
+* ENDPOINT: /api/wouso-quest/list
+*
+* DESCRIPTION: Lists one quest by ID, including tags
+*
+* OUTPUT: one quest
+*
+* PARAMS:
+*     id (required): question _id to look for
+*/
+router.get('/api/wouso-quest/list', login.isContributor, function (req, res) {
+  if (!req.query.id) return res.send({})
+
+  var _self = {}
+  QuestQ.findOne({_id: req.query.id}).exec(gotQuestQ);
+
+  function gotQuestQ(err, quest) {
+    _self.quest = quest;
+    Tag.find({'type': 'wouso-quest'}).exec(gotTags);
+  }
+
+  function gotTags(err, tags) {
+    // Replace tag ids with tag names
+    tags.forEach(function(tag) {
+      var i = _self.quest.tags.indexOf(tag._id);
+      if (i > -1) {
+        _self.quest.tags[i] = tag.name;
+      }
+    });
+    res.send(_self.quest);
+  }
+});
+
 
 router.post('/api/wouso-quest/add', function(req, res, next) {
   // Get tags
@@ -287,29 +348,6 @@ router.get('/api/wouso-quest/play', function(req, res, next) {
   }
 });
 
-router.get('/api/wouso-quest/list', function (req, res) {
-  if (!req.query.id) return res.send({})
-
-  var _self = {}
-  QuestQ.findOne({_id: req.query.id}).exec(gotQuestQ);
-
-  function gotQuestQ(err, quest) {
-    _self.quest = quest;
-    Tag.find({'type': 'wouso-quest'}).exec(gotTags);
-  }
-
-  function gotTags(err, tags) {
-    // Replace tag ids with tag names
-    tags.forEach(function(tag) {
-      var i = _self.quest.tags.indexOf(tag._id);
-      if (i > -1) {
-        _self.quest.tags[i] = tag.name;
-      }
-    })
-    res.send(_self.quest);
-  }
-})
-
 router.get('/api/wouso-quest/qlist', function(req, res, next) {
   var query = {};
   var fields = {};
@@ -558,16 +596,5 @@ router.get('/api/wouso-quest/respond', function(req, res, next) {
   }
 });
 
-router.post('/api/wouso-quest/settings', function (req, res, next) {
-  for (var key in req.body) {
-    var query = {'key': 'quest-' + key}
-    var update = {$set: {'val': req.body[key]}}
-    Settings.update(query, update, {upsert: true}).exec(function (err) {
-      if (err) return next(err);
-    });
-  }
-
-  res.redirect('/wouso-quest')
-})
 
 module.exports = router;
