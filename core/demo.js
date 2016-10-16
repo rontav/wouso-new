@@ -14,6 +14,7 @@ roles.forEach(function(role, i) {
   // Add to users collection only if does not already exist
   var query  = {'local.email': email};
   var update = { $set: {
+    '_id'            : '00000000000000000000000' + i,
     'role'           : i,
     'local.username' : role,
     'local.email'    : email,

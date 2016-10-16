@@ -279,41 +279,52 @@ router.get('/api/wouso-qotd/play', login.isUser, function (req, res, next) {
 });
 
 
-router.post('/api/wouso-qotd/play', function (req, res, next) {
-  var ObjectId = mongoose.Types.ObjectId
+/*
+* ENDPOINT: POST /api/wouso-qotd/play
+*
+* DESCRIPTION: Qotd Game Response
+*
+* REDIRECT: /wouso-qotd
+*
+*/
+router.post('/api/wouso-qotd/play', login.isUser, function (req, res, next) {
+  var ObjectId = mongoose.Types.ObjectId;
 
-  query = {'_id': new ObjectId(req.body.question_id)}
-  qotd.findOne(query).exec(gotQuestion)
+  var query = {'_id': new ObjectId(req.body.question_id)};
+  qotd.findOne(query).exec(gotQuestion);
 
   function gotQuestion(err, question) {
     if (err) return next(err)
 
-    var update = {}
-    var right = wrong = rightCount = 0
+    var update = {};
+    var right = 0;
+    var wrong = 0;
+    var rightCount = 0;
 
     question.answers.forEach(function (ans) {
       if (ans.user == req.user._id.toString() && ans.res == null) {
         // User did not answer yet, check his answers
-        var given_answers = []
+        var given_answers = [];
 
         if (req.body.ans) {
           question.choices.forEach(function(ans) {
-            if (ans.val == true) rightCount++
+            if (ans.val == true) rightCount++;
 
-            var found = 0
+            var found = 0;
             // Convert single answer to array
-            if (typeof req.body.ans === 'string')
-              req.body.ans = req.body.ans.split()
+            if (typeof req.body.ans === 'string') {
+              req.body.ans = req.body.ans.split();
+            }
             // Count right/wrong answers
             req.body.ans.forEach(function (response) {
               if (ans.text == response) {
-                given_answers.push(ans)
-                found++
-                right++
+                given_answers.push(ans);
+                found++;
+                right++;
               }
-            })
+            });
 
-            if (!found) wrong++
+            if (!found) wrong++;
           })
         }
 
@@ -321,34 +332,42 @@ router.post('/api/wouso-qotd/play', function (req, res, next) {
         query = {
           '_id'          : new ObjectId(req.body.question_id),
           'answers.user' : req.user._id
-        }
-        update = {$set: {'answers.$.res': given_answers}}
-        qotd.update(query, update).exec(function (err, update) {
-          if (err) log.error('Could not save response from user')
+        };
+        update = {$set: {'answers.$.res': given_answers}};
+        qotd.update(query, update).exec(function (err) {
+          if (err) log.error('Could not save response from user');
         })
 
         // Reward user if necessary
         if (right) {
           // Update qotd-streak for correct answer
-          update_badges(req, right, rightCount)
+          update_badges(req, right, rightCount);
           // Update user points
-          update_points(req, right, rightCount)
+          update_points(req, right, rightCount);
         }
       }
     })
-    return res.redirect('/wouso-qotd')
+    return res.redirect('/wouso-qotd');
   }
 })
 
 
-router.post('/api/wouso-qotd/add', function (req, res, next) {
+/*
+* ENDPOINT: POST /api/wouso-qotd/add
+*
+* DESCRIPTION: Add Qotd
+*
+* REDIRECT: /wouso-qotd
+*
+*/
+router.post('/api/wouso-qotd/add', login.isContributor, function (req, res, next) {
 
-  options = []
-  for (i in req.body.answer) {
-    validity = false
+  var options = [];
+  for (var i in req.body.answer) {
+    var validity = false;
     // Ignore empty answers
     if (req.body.answer[i] != '') {
-      if (req.body.valid[i] == 'true') validity = true
+      if (req.body.valid[i] == 'true') validity = true;
 
       options.push(new QOption({
         'text' : req.body.answer[i],
@@ -358,21 +377,22 @@ router.post('/api/wouso-qotd/add', function (req, res, next) {
   }
 
   // Format received date
-  if (req.body.date)
-    formatted_date = util.format('%d.%d.%d',
+  if (req.body.date) {
+    var formatted_date = util.format('%d.%d.%d',
       req.body.date.split('/')[1],
       req.body.date.split('/')[0],
       req.body.date.split('/')[2]
-    )
-  else
-    formatted_date = null
+    );
+  } else {
+    formatted_date = null;
+  }
 
   // Get tags
-  tags = req.body.tags.split(' ')
+  var tags = req.body.tags.split(' ')
   Tag.find({'name': {$in: tags}, 'type': 'wouso-qotd'}).exec(gotTags)
 
   function gotTags(err, all) {
-    tag_ids = []
+    var tag_ids = []
     all.forEach(function(tag) {
       // Increment tag count
       Tag.update({'_id': tag._id}, {$inc: {'count': 1}}).exec(function (err) {
@@ -383,7 +403,7 @@ router.post('/api/wouso-qotd/add', function (req, res, next) {
       tag_ids.push(tag._id)
     })
 
-    new_qotd = {
+    var new_qotd = {
       'question'  : req.body.question,
       'choices'   : options,
       'date'      : formatted_date,
@@ -402,61 +422,22 @@ router.post('/api/wouso-qotd/add', function (req, res, next) {
     if (err) return next(err)
     res.redirect('/wouso-qotd')
   }
-})
+});
 
 
-function update_badges(req, right, rightCount) {
-  if (right != rightCount) return
+/*
+* ENDPOINT: DELETE /api/wouso-qotd/delete
+*
+* DESCRIPTION: Delete Qotd
+*
+* OUTPUT:
+*   OK - qotd sucessfully removed
+*   NOK - failed to remove qotd
+*
+*/
+router.delete('/api/wouso-qotd/delete', login.isContributor, function (req, res) {
+  if (!req.query.id) return res.send('NOK');
 
-  query = {
-    'name'           : 'qotd-streak',
-    'history.userId' : req.user._id
-  }
-  Badges.findOne(query).exec(function(err, user) {
-    if (!user) {
-      // Init user to badge db
-      query = {'name': 'qotd-streak'}
-      update = {$push: {'history': {
-        'userId'      : req.user._id,
-        'count'       : 1,
-        'lastUpdate'  : Date.now(),
-        'data'        : ''
-      }}}
-      Badges.update(query, update, {upsert: true}).exec(function (err, update) {
-        if (err) log.error('Could not init badge')
-      })
-    } else {
-      // Increment badge count
-      query = {'name': 'qotd-streak', 'history.userId': req.user._id}
-      update = {$inc: {'history.$.count': 1}}
-      Badges.update(query, update, {upsert: true}).exec(function (err, update) {
-        if (err) log.error('Could not increment badge count')
-      })
-    }
-  })
-}
-
-function update_points(req, right, rightCount) {
-  // Get points for qotd
-  settings.findOne({'key': 'qotd-points'}).exec(gotPoints)
-
-  function gotPoints(err, points) {
-    // Update user points
-    points = points.val / rightCount * right
-    query  = {'_id': req.user._id}
-    update = {$inc: {'points': points}}
-
-    User.update(query, update).exec(updatedPoints)
-  }
-
-  function updatedPoints(err) {
-    if (err) log.error('Could not update points')
-  }
-
-}
-
-
-router.delete('/api/wouso-qotd/delete', function (req, res, next) {
   var del_list = req.query.id.split(',');
   qotd.remove({'_id': {$in: del_list}}).exec(removedQotd);
 
@@ -469,8 +450,58 @@ router.delete('/api/wouso-qotd/delete', function (req, res, next) {
       return res.send('OK');
     }
   }
-
 });
+
+
+// Utils
+function update_badges(req, right, rightCount) {
+  if (right != rightCount) return
+
+  var query = {
+    'name'           : 'qotd-streak',
+    'history.userId' : req.user._id
+  }
+  Badges.findOne(query).exec(function(err, user) {
+    if (!user) {
+      // Init user to badge db
+      var query = {'name': 'qotd-streak'}
+      var update = {$push: {'history': {
+        'userId'      : req.user._id,
+        'count'       : 1,
+        'lastUpdate'  : Date.now(),
+        'data'        : ''
+      }}}
+      Badges.update(query, update, {upsert: true}).exec(function (err) {
+        if (err) log.error('Could not init badge')
+      })
+    } else {
+      // Increment badge count
+      query = {'name': 'qotd-streak', 'history.userId': req.user._id}
+      update = {$inc: {'history.$.count': 1}}
+      Badges.update(query, update, {upsert: true}).exec(function (err) {
+        if (err) log.error('Could not increment badge count')
+      })
+    }
+  })
+}
+
+function update_points(req, right, rightCount) {
+  // Get points for qotd
+  settings.findOne({'key': 'qotd-points'}).exec(gotPoints);
+
+  function gotPoints(err, points) {
+    // Update user points
+    points = points.val / rightCount * right;
+    var query  = {'_id': req.user._id};
+    var update = {$inc: {'points': points}};
+
+    User.update(query, update).exec(updatedPoints);
+  }
+
+  function updatedPoints(err) {
+    if (err) log.error('Could not update points');
+  }
+}
 
 
 module.exports = router;

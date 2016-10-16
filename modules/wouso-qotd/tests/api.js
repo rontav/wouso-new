@@ -6,12 +6,13 @@ var should   = require('should');
 var mongoose = require('mongoose');
 var fs       = require('fs');
 
-var Settings = require('../../../config/models/settings');
-var Qotd     = require('../model');
+var Settings  = require('../../../config/models/settings');
+var QotdModel = require('../model');
 
 var app, cookie;
 
-Qotd = mongoose.model('Qotd');
+var QOption  = mongoose.model('QOption');
+var Qotd     = mongoose.model('Qotd');
 
 // Read config file
 var data = (JSON.parse(fs.readFileSync('./config.json', 'utf8')));
@@ -352,6 +353,194 @@ describe('QOTD play endpoint:', function() {
   });
 });
 
+describe('QOTD play POST endpoint:', function() {
+  before(function(done) {
+    // Login as Player
+    login('player', dropDatabase);
+
+    // Drop DB and start app
+    function dropDatabase() {
+      dropQotd(data.mongo_url.test, addQuestion);
+    }
+
+    // Add a single question
+    function addQuestion() {
+      // Add 1 qotd for today
+      var today = new Date().getDate();
+      today = (new Date().getMonth()+1) + '.' + today;
+      today += '.' + new Date().getFullYear().toString().substring(2,4);
+
+      // Add question
+      new Qotd({
+        'date'     : today,
+        'question' : 'One?',
+        'choices'  : [new QOption({
+          'text' : '1',
+          'val'  : true
+        }), new QOption({
+          'text' : '2',
+          'val'  : false
+        })]
+      }).save(done);
+    }
+  });
+
+  it('Should add user to qotd responders', function(done) {
+
+    // Look at qotd
+    requestGet('/api/wouso-qotd/play', cookie, {}, getQotdInfo);
+
+    function getQotdInfo() {
+      Qotd.findOne().exec(sendResponse);
+    }
+
+    function sendResponse(err, q) {
+      var body = {
+        'question_id' : q._id.toString(),
+        'ans'         : '1'
+      };
+      requestPost('/api/wouso-qotd/play', cookie, body, getQotd);
+    }
+
+    function getQotd() {
+      Qotd.findOne().exec(checkResult);
+    }
+
+    function checkResult(err, res) {
+      res.answers[0].res[0].text.should.be.equal('1');
+      done();
+    }
+  });
+});
+
+describe('QOTD add endpoint:', function() {
+  before(function(done) {
+    // Login as Contributor
+    login('contributor', dropDatabase);
+
+    // Drop DB and start app
+    function dropDatabase() {
+      dropQotd(data.mongo_url.test, done);
+    }
+  });
+
+  it('Should add qotd to db', function(done) {
+    var body = {
+      'question' : 'Foo ?',
+      'answer'   : ['Bar', 'Tar'],
+      'valid'    : ['true', 'false'],
+      'date'     : '',
+      'tags'     : ''
+    };
+    requestPost('/api/wouso-qotd/add', cookie, body, getQotd);
+
+    function getQotd() {
+      Qotd.findOne().exec(checkExistance);
+    }
+
+    function checkExistance(err, qotd) {
+      qotd.question.should.be.equal('Foo ?');
+      done();
+    }
+  });
+
+  it('Should edit qotd from db', function(done) {
+    // Get qotd info
+    Qotd.findOne().exec(editQotd);
+
+    function editQotd(err, qotd) {
+      var body = {
+        'id'       : qotd._id,
+        'question' : 'Bar ?',
+        'answer'   : ['Bar', 'Tar'],
+        'valid'    : ['true', 'false'],
+        'date'     : '',
+        'tags'     : ''
+      };
+      requestPost('/api/wouso-qotd/add', cookie, body, getQotd);
+    }
+
+    function getQotd() {
+      Qotd.findOne().exec(checkQotd);
+    }
+
+    function checkQotd(err, qotd) {
+      qotd.question.should.be.equal('Bar ?');
+      done();
+    }
+  });
+
+  it('Restrict qotd add acccess for roles under Contributor', function(done) {
+    // Login as Player
+    login('player', addQotdAsPlayer);
+
+    function addQotdAsPlayer() {
+      // Get qotd
+      requestPost('/api/wouso-qotd/add', cookie, {}, checkResult);
+    }
+
+    function checkResult(err, res) {
+      res.body.message.should.equal('Permission denied');
+      done();
+    }
+  });
+});
+
+describe('QOTD remove endpoint:', function() {
+  before(function(done) {
+    // Login as Contributor
+    login('contributor', dropDatabase);
+
+    // Drop DB and start app
+    function dropDatabase() {
+      dropQotd(data.mongo_url.test, addQotd);
+    }
+
+    function addQotd() {
+      new Qotd({
+        'question' : 'Bar ?',
+        'answer'   : ['Bar', 'Tar'],
+        'valid'    : ['true', 'false'],
+        'date'     : Date.now()
+      }).save(done);
+    }
+  });
+
+  it('Should remove qotd', function(done) {
+    // Check that qotd exists
+    Qotd.findOne().exec(removeQotd);
+
+    function removeQotd(err, qotd) {
+      qotd.question.should.be.string;
+      requestDelete('/api/wouso-qotd/delete?id=' + qotd._id, cookie, {}, getQotd)
+    }
+
+    function getQotd() {
+      Qotd.findOne().exec(checkQotd);
+    }
+
+    function checkQotd(err, qotd) {
+      should.not.exist(qotd);
+      done();
+    }
+  });
+
+  it('Restrict qotd remove acccess for roles under Contributor', function(done) {
+    // Login as Player
+    login('player', addQotdAsPlayer);
+
+    function addQotdAsPlayer() {
+      // Get qotd
+      requestDelete('/api/wouso-qotd/delete', cookie, {}, checkResult);
+    }
+
+    function checkResult(err, res) {
+      res.body.message.should.equal('Permission denied');
+      done();
+    }
+  });
+});
+
 
 // UTILS
 function requestPost(url, cookie, body, callback) {
@@ -365,6 +554,15 @@ function requestPost(url, cookie, body, callback) {
 
 function requestGet(url, cookie, body, callback) {
   var req = request(app).get(url);
+  req.cookies = cookie;
+  req.set('Accept','application/json')
+    .send(body)
+    .expect('Content-Type', /json/)
+    .end(callback);
+}
+
+function requestDelete(url, cookie, body, callback) {
+  var req = request(app).delete(url);
   req.cookies = cookie;
   req.set('Accept','application/json')
     .send(body)
