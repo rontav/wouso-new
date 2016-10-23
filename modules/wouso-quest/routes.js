@@ -173,9 +173,14 @@ router.post('/api/wouso-quest/add-quest', function(req, res, next) {
 });
 
 /*
-* List quests or get one if id is specified.
+* ENDPOINT: /api/wouso-quest/play
+*
+* DESCRIPTION: Quest game
+*
+* OUTPUT: List of active quests or quest game
+*
 */
-router.get('/api/wouso-quest/play', function(req, res, next) {
+router.get('/api/wouso-quest/play', login.isUser, function(req, res, next) {
   // Check if user is logged in
   if (!req.user) return res.redirect('/login');
 
@@ -279,9 +284,6 @@ router.get('/api/wouso-quest/play', function(req, res, next) {
 
     // Add hints
     var questStartTime = new Date(_self.levelStartTime).getTime();
-    var nowUTC = new Date()
-    // Convert current date to GMT+0
-    nowUTC = new Date(nowUTC.valueOf() + nowUTC.getTimezoneOffset() * 60000);
     // Compute time diff
     var questTimeDiff = (Date.now() - questStartTime) / 1000 / 60;
     // Number of hints to show
@@ -329,7 +331,7 @@ router.get('/api/wouso-quest/play', function(req, res, next) {
       quest.levels.forEach(function(level, i) {
         level.users.forEach(function(user) {
           if (user._id.toString() === req.user._id.toString()) {
-            levelIndex = i;
+            levelIndex = i + 1;
           }
         });
       });
@@ -340,7 +342,7 @@ router.get('/api/wouso-quest/play', function(req, res, next) {
         startTime   : quest.start,
         endTime     : quest.end,
         levelCount  : quest.levels.length,
-        levelNumber : levelIndex + 1,
+        levelNumber : levelIndex,
         finished    : finished
       });
     });
@@ -413,9 +415,21 @@ router.get('/api/wouso-quest/quest', function(req, res, next) {
   }
 });
 
-router.get('/api/wouso-quest/list/:perPage/:page', function(req, res, next) {
+/*
+* ENDPOINT: /api/wouso-quest/list/:perPage/:page
+*
+* DESCRIPTION: Paginated lists of Quest Questions
+*
+* OUTPUT: List of quest questions, including tags
+*
+* PARAMS:
+*     id: question _id to look for
+*     tags: list of tags to filter results by
+*     search: term to filter results by
+*/
+router.get('/api/wouso-quest/list/:perPage/:page', login.isContributor, function(req, res, next) {
   var _self = {};
-  var show = req.params.perPage;
+  var show = parseInt(req.params.perPage);
   var skip = (req.params.page - 1) * show;
 
   var query = {};

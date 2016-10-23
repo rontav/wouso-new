@@ -46,5 +46,19 @@ module.exports = {
         }
       });
     });
+  },
+
+  dropCollection: function(url, collection, callback) {
+    var conn = mongoose.createConnection(url);
+
+    conn.on('open', function() {
+      conn.db.dropCollection(collection, function (err) {
+        // Ignore 'ns not found' errors
+        if (err && err.code !== 26) {
+          console.log(err);
+        }
+        callback();
+      });
+    });
   }
 }

@@ -160,3 +160,155 @@ describe('Quest questions list endpoint:', function() {
     }
   });
 });
+
+describe('Quest questions paginated list endpoint:', function() {
+  before(function(done) {
+    // Login as Contributor
+    common.login(app, 'contributor', dropDatabase);
+
+    // Drop DB and start app
+    function dropDatabase() {
+      common.dropCollection(data.mongo_url.test, 'questqs', addFirstEntry);
+    }
+
+    function addFirstEntry() {
+      new QuestQ({
+        'question' : 'Foo1',
+        'answer'   : 'Bar1'
+      }).save(addSecondEntry);
+    }
+
+    function addSecondEntry() {
+      new QuestQ({
+        'question' : 'Foo2',
+        'answer'   : 'Bar2'
+      }).save(addThirdEntry);
+    }
+
+    function addThirdEntry() {
+      new QuestQ({
+        'question' : 'Foo3',
+        'answer'   : 'Bar3'
+      }).save(done);
+    }
+  });
+
+  it('Paginate quest questions list', function(done) {
+    // Get qotd paginated list
+    common.requestGet(app, '/api/wouso-quest/list/2/2', {}, checkResult);
+
+    function checkResult(err, res) {
+      res.body.questions[0].question.should.be.equal('Foo3');
+      res.body.count.should.be.equal(3);
+      done()
+    }
+  });
+
+  it('Paginate quest questions search', function(done) {
+    common.requestGet(app, '/api/wouso-quest/list/1/1?search=foo2', {}, checkResult);
+
+    function checkResult(err, res) {
+      res.body.questions[0].question.should.be.equal('Foo2');
+      done();
+    }
+  });
+
+
+  it('Restrict filter quest questions acccess for roles under Teacher', function(done) {
+    // Login as Player
+    common.login(app, 'player', saveSettingAsPlayer);
+
+    function saveSettingAsPlayer() {
+      // Get quest questions
+      common.requestGet(app, '/api/wouso-quest/list/1/1', {}, checkResult);
+    }
+
+    function checkResult(err, res) {
+      res.body.message.should.equal('Permission denied');
+      done();
+    }
+  });
+});
+
+describe('Quest play endpoint:', function() {
+  before(function(done) {
+    this.timeout(4000);
+    // Login as Player
+    common.login(app, 'player', dropQuestions);
+    // Drop quest questions collection
+    function dropQuestions() {
+      common.dropCollection(data.mongo_url.test, 'questqs', dropQuests);
+    }
+    // Drop quests collection
+    function dropQuests() {
+      common.dropCollection(data.mongo_url.test, 'quests', done);
+    }
+  });
+
+  it('Should return nothing', function(done) {
+    common.requestGet(app, '/api/wouso-quest/play', {}, checkResult);
+
+    function checkResult(err, res) {
+      res.body.should.be.empty;
+      done();
+    }
+  });
+
+  before(function(done) {
+    // Add 2 quests starting today, ending tomorrow
+    var today    = new Date().getDate();
+    var tomorrow = new Date().getDate() + 1;
+
+    today = (new Date().getMonth()+1) + '.' + today;
+    today += '.' + new Date().getFullYear().toString().substring(2,4);
+
+    tomorrow = (new Date().getMonth()+1) + '.' + tomorrow;
+    tomorrow += '.' + new Date().getFullYear().toString().substring(2,4);
+
+    // Start adding questions
+    addFirstEntry();
+
+    function addFirstEntry() {
+      new Quest({
+        'name'  : 'Foo1',
+        'start' : today,
+        'end'   : tomorrow,
+        'levels'   : []
+      }).save(addSecondEntry);
+    }
+
+    function addSecondEntry() {
+      new Quest({
+        'name'  : 'Foo2',
+        'start' : today,
+        'end'   : tomorrow,
+        'levels' : []
+      }).save(done);
+    }
+  });
+
+  it('Should return the list of quests', function(done) {
+    // Get quests
+    common.requestGet(app, '/api/wouso-quest/play', {}, checkResult);
+
+    function checkResult(err, res) {
+      res.body.length.should.be.equal(2);
+      res.body[0].name.should.be.equalOneOf(['Foo1', 'Foo2']);
+      done();
+    }
+  });
+
+  it('Should return first question in first quest', function(done) {
+    // Get first quest ID
+    Quest.findOne().exec(getQuest);
+
+    function getQuest(err, quest) {
+      common.requestGet(app, '/api/wouso-quest/play?id=' + quest._id, {}, checkResult);
+    }
+
+    function checkResult(err, res) {
+      res.body.name.should.be.equal('Foo1');
+      done();
+    }
+  });
+});

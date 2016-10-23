@@ -230,9 +230,9 @@ describe('QOTD paginated list endpoint:', function() {
 
   it('Restrict filter qotd acccess for roles under Teacher', function(done) {
     // Login as Player
-    login('player', saveSettingAsTeacher);
+    login('player', saveSettingAsPlayer);
 
-    function saveSettingAsTeacher() {
+    function saveSettingAsPlayer() {
       // Get qotd
       requestGet(app, '/api/wouso-qotd/list/1/1', cookie, {}, checkResult);
     }
