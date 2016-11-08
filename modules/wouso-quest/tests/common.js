@@ -22,6 +22,15 @@ module.exports = {
       .end(callback);
   },
 
+  requestDelete: function(app, url, body, callback) {
+    var req = request(app).delete(url);
+    req.cookies = cookie;
+    req.set('Accept','application/json')
+      .send(body)
+      .expect('Content-Type', /json/)
+      .end(callback);
+  },
+
   login: function(app, role, callback) {
     request(app)
       .post('/login')

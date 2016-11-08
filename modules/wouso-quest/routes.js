@@ -17,7 +17,6 @@ var ObjectId = mongoose.Types.ObjectId;
 * ENDPOINT: /wouso-quest
 *
 * DESCRIPTION: Serves main quest page
-*
 */
 router.get('/wouso-quest', function(req, res, next) {
 
@@ -92,24 +91,26 @@ router.get('/api/wouso-quest/list', login.isContributor, function (req, res) {
   }
 });
 
-
-router.post('/api/wouso-quest/add', function(req, res, next) {
+/*
+* ENDPOINT: POST /api/wouso-quest/add
+*
+* DESCRIPTION: Add a new Quest Question
+*
+* REDIRECT: /wouso-quest
+*/
+router.post('/api/wouso-quest/add', login.isContributor, function(req, res, next) {
   // Get tags
   var tags = req.body.tags.split(' ');
   Tag.find({name: {$in: tags}, type: 'wouso-quest'}).exec(gotTags);
 
   function gotTags(err, all) {
-    if (err) {
-      return next(err);
-    }
+    if (err) return next(err);
 
     var tagIDs = [];
     all.forEach(function(tag) {
       // Increment tag count
       Tag.update({_id: tag._id}, {$inc: {count: 1}}).exec(function(err) {
-        if (err) {
-          return next(err);
-        }
+        if (err) return next(err);
       });
 
       // Save to list
@@ -117,39 +118,33 @@ router.post('/api/wouso-quest/add', function(req, res, next) {
     });
 
     var newQuestQ = {
-      question: req.body.question,
-      quest: req.body.quest,
-      answer: req.body.answer,
-      hint1: req.body.hint1,
-      hint2: req.body.hint2,
-      hint3: req.body.hint3,
-      tags: tagIDs
+      question : req.body.question,
+      quest    : req.body.quest,
+      answer   : req.body.answer,
+      hint1    : req.body.hint1,
+      hint2    : req.body.hint2,
+      hint3    : req.body.hint3,
+      tags     : tagIDs
     };
 
     // If id is provided, we are in edit mode; else we create a new object
     if (req.body.id) {
-      QuestQ
-      .update({_id: req.body.id}, newQuestQ, {upsert: true})
-      .exec(questqSaved);
+      QuestQ.update({_id: req.body.id}, newQuestQ, {upsert: true}).exec(questqSaved);
     } else {
       new QuestQ(newQuestQ).save(questqSaved);
     }
   }
 
   function questqSaved(err, questQ) {
+    if (err) return next(err);
+    // Use ID from request or from newly saved object
     var qID = req.body.id || questQ._id;
-
-    if (err) {
-      return next(err);
-    }
 
     // Find newly added question and update quest question list
     var query = {_id: req.body.quest};
     var update = {$push: {levels: {_id: qID}}};
     Quest.update(query, update).exec(function(err) {
-      if (err) {
-        return next(err);
-      }
+      if (err) return next(err);
     });
 
     // Redirect back
@@ -157,7 +152,14 @@ router.post('/api/wouso-quest/add', function(req, res, next) {
   }
 });
 
-router.post('/api/wouso-quest/add-quest', function(req, res, next) {
+/*
+* ENDPOINT: POST /api/wouso-quest/add-quest
+*
+* DESCRIPTION: Add a new Quest
+*
+* REDIRECT: /wouso-quest
+*/
+router.post('/api/wouso-quest/add-quest', login.isContributor, function(req, res, next) {
   var newQuest = {
     name: req.body.name
   };
@@ -165,9 +167,7 @@ router.post('/api/wouso-quest/add-quest', function(req, res, next) {
   new Quest(newQuest).save(questSaved);
 
   function questSaved(err) {
-    if (err) {
-      return next(err);
-    }
+    if (err) return next(err)
     res.redirect('/wouso-quest');
   }
 });
@@ -178,7 +178,6 @@ router.post('/api/wouso-quest/add-quest', function(req, res, next) {
 * DESCRIPTION: Quest game
 *
 * OUTPUT: List of active quests or quest game
-*
 */
 router.get('/api/wouso-quest/play', login.isUser, function(req, res, next) {
   // Check if user is logged in
@@ -350,7 +349,17 @@ router.get('/api/wouso-quest/play', login.isUser, function(req, res, next) {
   }
 });
 
-router.get('/api/wouso-quest/qlist', function(req, res, next) {
+/*
+* ENDPOINT: /api/wouso-quest/qlist
+*
+* DESCRIPTION: Get quest or a list of quest names
+*
+* OUTPUT: Quest including all attributes
+*
+* PARAMS:
+*     id: question _id to look for
+*/
+router.get('/api/wouso-quest/qlist', login.isContributor, function(req, res, next) {
   var query = {};
   var fields = {};
 
@@ -369,10 +378,17 @@ router.get('/api/wouso-quest/qlist', function(req, res, next) {
   }
 });
 
-/**
-* Get quest object, expanding included questions.
+/*
+* ENDPOINT: /api/wouso-quest/quest
+*
+* DESCRIPTION: Get all quest attributes, expanding questions
+*
+* OUTPUT: Quest including all attributes
+*
+* PARAMS:
+*     id: question _id to look for
 */
-router.get('/api/wouso-quest/quest', function(req, res, next) {
+router.get('/api/wouso-quest/quest', login.isContributor, function(req, res, next) {
   var _self = {};
   var query = {};
 
@@ -474,21 +490,50 @@ router.get('/api/wouso-quest/list/:perPage/:page', login.isContributor, function
   }
 });
 
-router.delete('/api/wouso-quest/delete', function(req, res) {
+/*
+* ENDPOINT: DELETE /api/wouso-quest/delete
+*
+* DESCRIPTION: Remove one or more quest questions
+*
+* OUTPUT:
+*   OK
+*   NOK
+*/
+router.delete('/api/wouso-quest/delete', login.isContributor, function(req, res) {
   var delList = req.query.id.split(',');
-  QuestQ.remove({_id: {$in: delList}}).exec(removedQotd);
+  QuestQ.remove({_id: {$in: delList}}).exec(sendResponse);
 
-  function removedQotd(err) {
+  function sendResponse(err) {
     if (err) {
       log.error('Could not remove quest questions: ' + delList);
       return res.send('NOK');
     }
+    unlinkQuestQ();
     log.info('Removed quest question: ' + delList);
     return res.send('OK');
   }
+
+  function unlinkQuestQ() {
+    var query = {'levels._id': {'$in': delList}};
+    var update = {'$pull': {'levels': {'_id': {'$in': delList}}}};
+    Quest.update(query, update).exec(checkError);
+  }
+
+  function checkError(err) {
+    if (err) log.error('Could not unlink quest questions: ' + delList);
+  }
 });
 
-router.post('/api/wouso-quest/reorder', function(req, res) {
+/*
+* ENDPOINT: POST /api/wouso-quest/reorder
+*
+* DESCRIPTION: Reorder quest questions
+*
+* BODY:
+*     id: quest ID
+*     levels: list of question IDs, in new desired order
+*/
+router.post('/api/wouso-quest/reorder', login.isContributor, function(req, res) {
   var levels = req.body.levels.split(',');
   Quest.findOne({_id: req.body.id}).exec(gotQuest);
 
@@ -513,45 +558,81 @@ router.post('/api/wouso-quest/reorder', function(req, res) {
       if (err) {
         var msg = 'Could not reorder question of quest: %s';
         log.error(util.format(msg, req.body.id));
+        return res.send('NOK');
       }
+      return res.send('OK');
     }
   }
 });
 
-// TODO: limit access to this route
-router.post('/api/wouso-quest/edit', function(req, res) {
-
+/*
+* ENDPOINT: POST /api/wouso-quest/edit
+*
+* DESCRIPTION: Edit quest start and/or end time
+*
+* BODY:
+*   id: quest ID
+*   start: new quest start date
+*   end: new quest end date
+*
+* OUTPUT:
+*   OK
+*   NOK
+*/
+router.post('/api/wouso-quest/edit', login.isContributor, function(req, res) {
   var update = {};
   if (req.body.start) {
-    update.start = new Date(req.body.start);
+    try {
+      update.start = new Date(req.body.start);
+    } catch(e) {
+      updatedQuest('Bad date format');
+    }
   }
   if (req.body.end) {
-    update.end = new Date(req.body.end);
+    try {
+      update.end = new Date(req.body.end);
+    } catch(e) {
+      updatedQuest('Bad date format');
+    }
   }
   Quest.update({_id: req.body.id}, update).exec(updatedQuest);
 
   function updatedQuest(err) {
     if (err) {
-      var msg = 'Could not update quest times: %s';
-      log.error(util.format(msg, req.body.id));
+      var msg = 'Could not update quest times for %s: %s';
+      log.error(util.format(msg, req.body.id, err));
+      return res.send('NOK');
     }
+    return res.send('OK');
   }
 });
 
-// TODO: limit access to this route
-router.get('/api/wouso-quest/respond', function(req, res, next) {
-  // Check if user is logged in
-  if (!req.user) return res.redirect('/login');
-
+/*
+* ENDPOINT: /api/wouso-quest/respond
+*
+* DESCRIPTION: Quest game response
+*
+* OUTPUT:
+*   OK
+*   NOK
+*
+* TODO: ratelimit this endpoint
+*/
+router.get('/api/wouso-quest/respond', login.isUser, function(req, res, next) {
   var _self = {};
   var query = {};
 
   if (req.query.id) {
     query._id = req.query.id;
     Quest.findOne(query).exec(gotQuest);
+  } else {
+    return res.send({
+      'message'     : 'Missing quest ID',
+      'description' : 'No quest ID specified'
+    });
   }
 
-  /* Handle a single quest. */
+  // Handle a single quest
   function gotQuest(err, quest) {
     if (err) return next(err);
 
@@ -568,7 +649,10 @@ router.get('/api/wouso-quest/respond', function(req, res, next) {
 
     // No level found, send 1 level of quest
     if (!('levelNo' in _self)) {
-      return res.send('ERR: you did not register for this quest');
+      return res.send({
+        'message'     : 'Permission denied',
+        'description' : 'You did not register for this quest'
+      });
     }
 
     // Get questions with corresponding IDs
@@ -606,6 +690,7 @@ router.get('/api/wouso-quest/respond', function(req, res, next) {
   }
 
   function moveUser(err) {
+    if (err) return next(err);
     return res.send('OK');
   }
 });
