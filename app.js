@@ -1,3 +1,5 @@
+require('newrelic');
+
 var fs            = require('fs');
 var express       = require('express');
 var bodyParser    = require('body-parser');
@@ -19,6 +21,7 @@ try {
   app.data = (JSON.parse(fs.readFileSync('./config.json', 'utf8')));
 }
 catch (e) {
+  // Read config from env var
   app.data = (JSON.parse(process.env.config));
   log.warning('Using config from env var.')
 }

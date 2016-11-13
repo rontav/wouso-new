@@ -36,5 +36,6 @@
 			"clientID"    : "xxxxxxxxxxxxxxxxxxx",
       "clientSecret": "xxxxxxxxxxxxxxxxxxxxxxxxxx"
 		}
-	}
+	},
+	"newrelic_license_key": "xxxxxxxxxxxxxxx"
 }
