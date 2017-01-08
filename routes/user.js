@@ -18,6 +18,16 @@ router.get('/api/user', function (req, res, next) {
   }
 });
 
+router.get('/api/users', function (req, res, next) {
+  Users.find().exec(sendResponse);
+
+  function sendResponse(err, users) {
+    if (err) return next(err);
+
+    return res.send(users);
+  }
+});
+
 router.get('/api/users/search', function (req, res, next) {
   var query = {'$or': [
     {'name'  : { '$regex': req.query.search, '$options': 'i' }},

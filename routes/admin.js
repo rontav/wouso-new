@@ -1,75 +1,35 @@
 var User     = require('../config/models/user')
 var Tag      = require('../config/models/tag')
 var Settings = require('../config/models/settings')
+var log      = require('../core/logging')('core')
 var app      = require('../app')
 var express  = require('express')
 var router   = express.Router()
 
 
-router.get('/admin', function (req, res, next) {
+router.get(['/admin', '/admin/:tab'], function (req, res, next) {
   // Check if user is logged in and is superuser
-  if (!req.user || (req.user && req.user.role != 0)) return res.redirect('/login')
+  if (!req.user || (req.user && req.user.role != 0)) return res.redirect('/login');
 
   User.find().exec(function (err, all) {
-    if (err) return next(err)
+    if (err) return next(err);
 
     res.render('admin', {
       'user'       : req.user,
       'users'      : all
-    })
-  })
-})
+    });
+  });
+});
 
-router.get('/admin/:tab', function (req, res, next) {
-  // Check if user is logged in and is superuser
-  if (!req.user || (req.user && req.user.role != 0)) return res.redirect('/login')
-
-  _self = {}
-  if (req.params.tab == 'users')
-    User.find().exec(gotUsers)
-  else if (req.params.tab == 'settings')
-    Settings.find().exec(gotSettings)
-  else if (req.params.tab == 'tags')
-    Tag.find().exec(gotTags)
-  else
-    renderPage()
-
-  function gotUsers(err, all) {
-    if (err) return next(err)
-
-    _self.users = all
-    renderPage()
-  }
-
-  function gotSettings(err, all) {
-    if (err) return next(err)
-
-    _self.mysettings = {}
-    all.forEach(function(set) {
-      _self.mysettings[set.key] = set.val
-    })
-    renderPage()
-  }
+router.get('/api/tags', function(req, res, next) {
+  Tag.find().exec(gotTags);
 
   function gotTags(err, all) {
-    if (err) return next(err)
+    if (err) return next(err);
 
-    _self.tags = all
-    renderPage()
+    res.send(all);
   }
-
-  function renderPage() {
-    res.render('admin', {
-      'user'       : req.user,
-      'people'     : _self.users,
-      'mytags'     : _self.tags,
-      'mysettings' : _self.mysettings,
-      'tab'        : req.params.tab,
-      'app_data'   : app.data
-    })
-  }
-})
-
+});
 
 // Add a new tag
 // For e better organization, tags are managed independently, and they are

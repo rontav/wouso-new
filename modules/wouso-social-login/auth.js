@@ -31,7 +31,7 @@ module.exports = function(app, passport) {
           settings.forEach(function (set) {
             if (set.key == 'login-level' && user && user.role > set.val)
               return done(null, false, req.flash('error', req.i18n.__('login-level-disabled')))
-            if (set.key == 'login-fb' && set.val == 'false')
+            if (set.key == 'login-facebook' && set.val == 'false')
               return done(null, false, req.flash('error', req.i18n.__('login-fb-disabled')))
           })
 
@@ -104,15 +104,15 @@ module.exports = function(app, passport) {
           settings.forEach(function (set) {
             if (set.key == 'login-level' && user && user.role > set.val)
               return done(null, false, req.flash('error', req.i18n.__('login-level-disabled')))
-            if (set.key == 'login-tw' && set.val == 'false')
+            if (set.key == 'login-twitter' && set.val == 'false')
               return done(null, false, req.flash('error', req.i18n.__('login-tw-disabled')))
           })
 
           // User is not logged in, but found in db
           if (!req.user && user) {
-            user.twitter.token       = token
-            user.twitter.username    = profile.username
-            user.twitter.displayName = profile.displayName
+            user.twitter.token = token
+            user.twitter.email = profile.username
+            user.twitter.name  = profile.displayName
 
             user.save(function(err) {
               if (err)
@@ -121,11 +121,11 @@ module.exports = function(app, passport) {
 
           // User is not logged in and not found in db
           } else if (!req.user && !user) {
-            user                     = new User()
-            user.twitter.id          = profile.id
-            user.twitter.token       = token
-            user.twitter.username    = profile.username
-            user.twitter.displayName = profile.displayName
+            user               = new User()
+            user.twitter.id    = profile.id
+            user.twitter.token = token
+            user.twitter.email = profile.username
+            user.twitter.name  = profile.displayName
 
             user.save(function(err) {
               if (err)
@@ -138,11 +138,11 @@ module.exports = function(app, passport) {
             // If that accound was already in db, remove it and add detailes to the new one
             if (user) User.remove({'_id': user._id}).exec()
 
-            user                     = req.user
-            user.twitter.id          = profile.id
-            user.twitter.token       = token
-            user.twitter.username    = profile.username
-            user.twitter.displayName = profile.displayName
+            user               = req.user
+            user.twitter.id    = profile.id
+            user.twitter.token = token
+            user.twitter.email = profile.username
+            user.twitter.name  = profile.displayName
 
             user.save(function(err) {
               if (err)
@@ -177,7 +177,7 @@ module.exports = function(app, passport) {
           settings.forEach(function (set) {
             if (set.key == 'login-level' && user && user.role > set.val)
               return done(null, false, req.flash('error', req.i18n.__('login-level-disabled')))
-            if (set.key == 'login-gp' && set.val == 'false')
+            if (set.key == 'login-google' && set.val == 'false')
               return done(null, false, req.flash('error', req.i18n.__('login-gp-disabled')))
           })
 
@@ -254,7 +254,7 @@ module.exports = function(app, passport) {
           settings.forEach(function (set) {
             if (set.key == 'login-level' && user && user.role > set.val)
               return done(null, false, req.flash('error', req.i18n.__('login-level-disabled')))
-            if (set.key == 'login-gh' && set.val == 'false')
+            if (set.key == 'login-github' && set.val == 'false')
               return done(null, false, req.flash('error', req.i18n.__('login-gh-disabled')))
           })
 

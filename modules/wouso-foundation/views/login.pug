@@ -39,17 +39,17 @@ block content
 
 
     - if (settings.modules.indexOf('wouso-social-login') > -1)
-      - if (mysettings['login-fb'] === 'true' || mysettings['login-tw'] === 'true' || mysettings['login-gp'] === 'true' || mysettings['login-gh'] === 'true')
+      - if (mysettings['login-facebook'] === 'true' || mysettings['login-twitter'] === 'true' || mysettings['login-google'] === 'true' || mysettings['login-github'] === 'true')
         .large-5.columns
           h3= __('login_title_social')
-          - if (mysettings['login-fb'] === 'true')
+          - if (mysettings['login-facebook'] === 'true')
             a(href='/wouso-social-login/auth/facebook')= __('login_facebook')
             br
-          - if (mysettings['login-tw'] === 'true')
+          - if (mysettings['login-twitter'] === 'true')
             a(href='/wouso-social-login/auth/twitter')= __('login_twitter')
             br
-          - if (mysettings['login-gp'] === 'true')
+          - if (mysettings['login-google'] === 'true')
             a(href='/wouso-social-login/auth/google')= __('login_google')
             br
-          - if (mysettings['login-gh'] === 'true')
+          - if (mysettings['login-github'] === 'true')
             a(href='/wouso-social-login/auth/github')= __('login_github')

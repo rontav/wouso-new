@@ -75,4 +75,21 @@ router.post('/api/profile/primary', function (req, res, next) {
 });
 
 
+router.get('/api/profile/settings', function (req, res, next) {
+  Settings.find({'key': /login-.*/}).exec(gotSettings);
+
+  function gotSettings(err, all) {
+    if (err) return next(err)
+
+    var mysettings = {}
+    all.forEach(function(set) {
+      mysettings[set.key] = set.val;
+    });
+
+    res.send(mysettings);
+  }
+
+});
+
+
 module.exports = router
