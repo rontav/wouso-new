@@ -1,8 +1,13 @@
 var React        = require('react');
 var ReactDOM     = require('react-dom');
 var ReactIntl    = require('react-intl');
-var Datetime     = require('react-datetime');
+//var Datetime     = require('react-datetime');
 var IntlProvider = require('react-intl').IntlProvider;
+
+var Moment = require('moment');
+var Datetime = require('react-widgets').DateTimePicker;
+var momentLocalizer = require('react-widgets/lib/localizers/moment');
+momentLocalizer(Moment);
 
 var locales = require('../../locales/locales.js');
 var config  = require('../../../../config.json');
@@ -304,16 +309,40 @@ var QuestContribManage = ReactDnD.DragDropContext(HTML5Backend)(React.createClas
     };
   },
 
-  handleStartDateClick: function(e) {
+  handleStartDateClick: function(md, dp) {
+    if (md == null) {
+      // Date selected from datepicker
+      console.log('Date selected from datepicker')
+      console.log(dp.date)
+    } else {
+      // Date manually changed
+      console.log('Date manually changed')
+      // This regex is good enough; we still catch date errors on the backend
+      var validRegEx = /^\d\d-\d\d-\d\d\d\d \d\d:\d\d$/;
+      if ($('#dpt').val().match(validRegEx)) {
+        console.log($('#dpt').val())
+        dp = {};
+        // Use user's timezone
+        dp.date = new Date();
+        // Set time from form input
+        dp.date.setDate($('#dpt').val().slice(0, 2));
+        dp.date.setMonth(parseInt($('#dpt').val().slice(3, 5)) - 1);
+        dp.date.setFullYear($('#dpt').val().slice(6, 10));
+        dp.date.setHours($('#dpt').val().slice(11, 13));
+        dp.date.setMinutes($('#dpt').val().slice(14, 16));
+        dp.date.setSeconds(0);
+      }
+    }
     // Send request; remove TZ info
     var params = {
       id: this.state.currentQuestID,
-      start: e.toString()
+      start: dp.date.toString()
     };
     $.post('/api/wouso-quest/edit', params);
     // Update state
     var q = this.state.currentQuest
-    q.start = e._d.toString().substring(0, 24);
+    //q.start = e._d.toString().substring(0, 24);
+    q.start = dp.date.toString();
     this.setState({currentQuest: q});
   },
 
@@ -326,7 +355,8 @@ var QuestContribManage = ReactDnD.DragDropContext(HTML5Backend)(React.createClas
     $.post('/api/wouso-quest/edit', params);
     // Update state
     var q = this.state.currentQuest
-    q.end = e._d.toString().substring(0, 24);
+    //q.end = e._d.toString().substring(0, 24);
+    q.end = this.formatDatetime(e.toString());
     this.setState({currentQuest: q});
   },
 
@@ -342,6 +372,17 @@ var QuestContribManage = ReactDnD.DragDropContext(HTML5Backend)(React.createClas
   },
 
   componentDidMount: function(qID) {
+    $('#dpt').fdatepicker({
+      format: 'dd-mm-yyyy hh:ii',
+      disableDblClickSelection: true,
+      pickTime: true
+    }).on('changeDate', function (ev) {
+      // Hack to prevent multiple date updates
+      if ($('#dpt').val() !== this.formatUTCDatetime(this.state.currentQuest.start)) {
+        this.handleStartDateClick(null, ev);
+      }
+    }.bind(this));
+
     if (qID) {
       $.get('/api/wouso-quest/quest?id=' + qID, function(res) {
         if (this.isMounted()) {
@@ -350,8 +391,14 @@ var QuestContribManage = ReactDnD.DragDropContext(HTML5Backend)(React.createClas
             currentQuest: res,
             questLevels: res.levels
           });
+
+          // Update displayed date
+          if (res.start) {
+            $('#dpt').fdatepicker('update', this.formatDatetime(res.start));
+          }
         }
       }.bind(this));
+
     } else {
       $.get('/api/wouso-quest/qlist', function(res) {
         if (this.isMounted()) {
@@ -385,6 +432,28 @@ var QuestContribManage = ReactDnD.DragDropContext(HTML5Backend)(React.createClas
     this.setState({questLevels: cards});
   },
 
+  formatDatetime: function(datestring) {
+    var time = new Date(datestring);
+    var questTime = ('00' + time.getDate()).slice(-2) + '-';
+    questTime += ('00' + (time.getMonth()+1)).slice(-2) + '-';
+    questTime += time.getFullYear() + ' ';
+    questTime += ('00' + time.getHours()).slice(-2) + ':';
+    questTime += ('00' + time.getMinutes()).slice(-2);
+
+    return questTime;
+  },
+
+  formatUTCDatetime: function(datestring) {
+    var time = new Date(datestring);
+    var questTime = ('00' + time.getUTCDate()).slice(-2) + '-';
+    questTime += ('00' + (time.getUTCMonth()+1)).slice(-2) + '-';
+    questTime += time.getUTCFullYear() + ' ';
+    questTime += ('00' + time.getUTCHours()).slice(-2) + ':';
+    questTime += ('00' + time.getUTCMinutes()).slice(-2);
+
+    return questTime;
+  },
+
   render: function() {
     var alert = null;
     if (!this.state.currentQuest) {
@@ -399,12 +468,12 @@ var QuestContribManage = ReactDnD.DragDropContext(HTML5Backend)(React.createClas
     }
 
     // Set quest times
-    var questStartTime = '---';
-    var questEndTime = '---';
+    //var questStartTime = null;
+    var questEndTime   = null;
 
     if (this.state.currentQuest) {
-      questStartTime = this.state.currentQuest.start;
-      questEndTime = this.state.currentQuest.end;
+      //questStartTime = this.formatDatetime(this.state.currentQuest.start);
+      questEndTime   = this.formatDatetime(this.state.currentQuest.end);
     }
 
     return (<div>
@@ -428,10 +497,12 @@ var QuestContribManage = ReactDnD.DragDropContext(HTML5Backend)(React.createClas
 
       <div className="row" id="quest-time">
         <div className="large-6 columns">
-          <Datetime value={questStartTime} onChange={this.handleStartDateClick} />
+          <label>Start time (DD-MM-YYY hh:mm):</label>
+          <input type="text" className="span2" id="dpt" onChange={this.handleStartDateClick} />
         </div>
         <div className="large-6 columns">
-          <Datetime value={questEndTime} onChange={this.handleEndDateClick} />
+          <label>End time (DD-MM-YYY hh:mm):</label>
+          <Datetime value={questEndTime} dateFormat="DD-MM-YYYY" timeFormat="hh:mm" onChange={this.handleEndDateClick} />
         </div>
       </div>
 

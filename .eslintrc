@@ -7,7 +7,10 @@
     },
 
     "globals": {
-        "React": true
+        "React": true,
+        "describe": true,
+        "before": true,
+        "it": true
     },
 
     "parserOptions": {
