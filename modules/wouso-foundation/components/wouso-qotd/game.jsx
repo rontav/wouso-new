@@ -25,12 +25,10 @@ var QotdSubmit = React.createClass({
 
 var QotdQuestion = React.createClass({
   render: function() {
-    return (
-      <div>
-        <p id='qotd-play-question'>{this.props.text}</p>
-        <input name='question_id' type='hidden' value={this.props.id} />
-      </div>
-    )
+    return (<div>
+      <p id='qotd-play-question'>{this.props.text}</p>
+      <input name='question_id' type='hidden' value={this.props.id} />
+    </div>);
   }
 })
 
@@ -73,7 +71,7 @@ var QotdGame = React.createClass({
       if (this.isMounted()) {
         this.setState({
           id       : (res._id      ? res._id      : ""),
-          question : (res.question ? res.question : res),
+          question : (res.question ? res.question : null),
           options  : (res.options  ? res.options  : []),
           submit   : ((!res.answer && res.question)  ? true : false),
           answer   : res.answer
@@ -83,15 +81,26 @@ var QotdGame = React.createClass({
   },
 
   render: function() {
+    var qotdQuestion  = null;
+    var qotdGameIntro = null;
+    var qotdNoQuestionWarn = null;
+
+    if (this.state.question) {
+      qotdQuestion = <QotdQuestion id={this.state.id} text={this.state.question} />
+      qotdGameIntro = <p className='grey-title'>{this.props.intl.formatMessage({id: 'qotd_game_text'})}</p>
+    } else {
+      qotdNoQuestionWarn = <p className='grey-title'>{this.props.intl.formatMessage({id: 'qotd_alert_noquestion'})}</p>
+    }
     return (
       <div className="row">
         <div className="large-12 columns">
           <form className="qotd-form" id="qotd" method="post" action="/api/wouso-qotd/play">
             { countdownTimer > 0 ? <QotdCountdown timer={countdownTimer} /> : null }
-            { this.state.question == "" ? this.props.intl.formatMessage({id: 'qotd_alert_noquestion'}) : null }
 
-            { this.state.question == "" ? null : <p className='grey-title'>{this.props.intl.formatMessage({id: 'qotd_game_text'})}</p> }
-            <QotdQuestion id={this.state.id} text={this.state.question} />
+            {qotdNoQuestionWarn}
+            {qotdGameIntro}
+            {qotdQuestion}
+
             <div id='qotd-play-options'>
               <div id='qotd-play-options-box'>
                 { this.state.options.map(function (opt, i) {

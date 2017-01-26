@@ -26225,7 +26225,7 @@
 	      if (this.isMounted()) {
 	        this.setState({
 	          id: res._id ? res._id : "",
-	          question: res.question ? res.question : res,
+	          question: res.question ? res.question : null,
 	          options: res.options ? res.options : [],
 	          submit: !res.answer && res.question ? true : false,
 	          answer: res.answer
@@ -26235,6 +26235,24 @@
 	  },
 
 	  render: function () {
+	    var qotdQuestion = null;
+	    var qotdGameIntro = null;
+	    var qotdNoQuestionWarn = null;
+
+	    if (this.state.question) {
+	      qotdQuestion = React.createElement(QotdQuestion, { id: this.state.id, text: this.state.question });
+	      qotdGameIntro = React.createElement(
+	        'p',
+	        { className: 'grey-title' },
+	        this.props.intl.formatMessage({ id: 'qotd_game_text' })
+	      );
+	    } else {
+	      qotdNoQuestionWarn = React.createElement(
+	        'p',
+	        { className: 'grey-title' },
+	        this.props.intl.formatMessage({ id: 'qotd_alert_noquestion' })
+	      );
+	    }
 	    return React.createElement(
 	      'div',
 	      { className: 'row' },
@@ -26245,13 +26263,9 @@
 	          'form',
 	          { className: 'qotd-form', id: 'qotd', method: 'post', action: '/api/wouso-qotd/play' },
 	          countdownTimer > 0 ? React.createElement(QotdCountdown, { timer: countdownTimer }) : null,
-	          this.state.question == "" ? this.props.intl.formatMessage({ id: 'qotd_alert_noquestion' }) : null,
-	          this.state.question == "" ? null : React.createElement(
-	            'p',
-	            { className: 'grey-title' },
-	            this.props.intl.formatMessage({ id: 'qotd_game_text' })
-	          ),
-	          React.createElement(QotdQuestion, { id: this.state.id, text: this.state.question }),
+	          qotdNoQuestionWarn,
+	          qotdGameIntro,
+	          qotdQuestion,
 	          React.createElement(
 	            'div',
 	            { id: 'qotd-play-options' },

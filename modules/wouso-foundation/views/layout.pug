@@ -5,12 +5,12 @@ html
     title= __('title')
 
     // Foundation css + js
-    link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.1/css/normalize.css')
-    link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.1/css/foundation.css')
-    script(src='https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.1/js/vendor/modernizr.js')
-    script(src='https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.1/js/vendor/jquery.js')
-    script(src='https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.1/js/vendor/fastclick.js')
-    script(src='https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.1/js/foundation.min.js')
+    link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/css/normalize.css')
+    link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/css/foundation.css')
+    script(src='https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/js/vendor/modernizr.js')
+    script(src='https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/js/vendor/jquery.js')
+    script(src='https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/js/vendor/fastclick.js')
+    script(src='https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/js/foundation.min.js')
 
     // Countdown
     link(rel='stylesheet', href='https://code.jquery.com/ui/1.8.2/themes/smoothness/jquery-ui.css')
@@ -20,7 +20,7 @@ html
     link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.0/css/bootstrap-datepicker.css')
     script(src='https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.0/js/bootstrap-datepicker.min.js')
 
-    // Datetimepicker    
+    // Datetimepicker
     link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/foundation-datepicker/1.5.5/css/foundation-datepicker.min.css')
     script(src='https://cdnjs.cloudflare.com/ajax/libs/foundation-datepicker/1.5.5/js/foundation-datepicker.min.js')
 
@@ -101,7 +101,7 @@ html
 
   block footer
   - if (user)
-    script var myuser = '#{user._id}'
+    script $(document).foundation(); var myuser = '#{user._id}'
 
   // Google Analytics
   script(type="text/javascript", src='/public/js/google_analytics.js')
