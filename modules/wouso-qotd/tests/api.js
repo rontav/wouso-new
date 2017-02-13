@@ -6,13 +6,14 @@ var should   = require('should');
 var mongoose = require('mongoose');
 var fs       = require('fs');
 
+var common    = require('./common');
 var Settings  = require('../../../config/models/settings');
 var QotdModel = require('../model');
 
-var app, cookie;
+var app;
 
-var QOption  = mongoose.model('QOption');
-var Qotd     = mongoose.model('Qotd');
+var QOption = mongoose.model('QOption');
+var Qotd    = mongoose.model('Qotd');
 
 // Read config file
 var data = (JSON.parse(fs.readFileSync('./config.json', 'utf8')));
@@ -21,20 +22,20 @@ var data = (JSON.parse(fs.readFileSync('./config.json', 'utf8')));
 describe('QOTD settings endpoint:', function() {
   before(function(done) {
     // Drop DB and start app
-    dropDB(data.mongo_url.test, droppedDB);
+    common.dropDB(data.mongo_url.test, droppedDB);
 
     function droppedDB() {
       // Start app
       app = require('../../../app').listen();
       // Login as root
-      setTimeout(login('root', done), 300);
+      setTimeout(common.login(app, 'root', done), 300);
     }
   });
 
   it('Save single setting', function(done) {
     // Save setting
     var body = {'foo': 'bar'};
-    requestPost(app, '/api/wouso-qotd/settings', cookie, body, savedSetting);
+    common.requestPost(app, '/api/wouso-qotd/settings', body, savedSetting);
 
     function savedSetting() {
       Settings.findOne({'key': 'qotd-foo'}).exec(gotSetting);
@@ -49,7 +50,7 @@ describe('QOTD settings endpoint:', function() {
   it('Update single setting', function(done) {
     // Update previous setting
     var body = {'foo': 'test'};
-    requestPost(app, '/api/wouso-qotd/settings', cookie, body, savedSetting);
+    common.requestPost(app, '/api/wouso-qotd/settings', body, savedSetting);
 
     function savedSetting() {
       Settings.findOne({'key': 'qotd-foo'}).exec(gotSetting);
@@ -64,7 +65,7 @@ describe('QOTD settings endpoint:', function() {
   it('Save multiple settings', function(done) {
     // Save 2 settings
     var body = {'foo': 'bar', 'ceva': 'altceva'};
-    requestPost(app, '/api/wouso-qotd/settings', cookie, body, savedSetting);
+    common.requestPost(app, '/api/wouso-qotd/settings', body, savedSetting);
 
     function savedSetting() {
       // First setting
@@ -85,12 +86,12 @@ describe('QOTD settings endpoint:', function() {
 
   it('Restrict settings acccess for roles under Admin', function(done) {
     // Login as teacher
-    login('teacher', saveSettingAsTeacher);
+    common.login(app, 'teacher', saveSettingAsTeacher);
 
     function saveSettingAsTeacher() {
       // Save settings as teacher
       var body = {'foo': 'bar', 'ceva': 'altceva'};
-      requestPost(app, '/api/wouso-qotd/settings', cookie, body, savedSetting);
+      common.requestPost(app, '/api/wouso-qotd/settings', body, savedSetting);
     }
 
     function savedSetting(err, res) {
@@ -113,7 +114,7 @@ describe('QOTD list endpoint:', function() {
 
     function qotdSaved() {
       // Get qotd
-      requestGet(app, '/api/wouso-qotd/list', cookie, {}, gotQotd);
+      common.requestGet(app, '/api/wouso-qotd/list', {}, gotQotd);
     }
 
     function gotQotd(err, res) {
@@ -124,7 +125,7 @@ describe('QOTD list endpoint:', function() {
 
   it('List qotd with invalid ID', function(done) {
     // Get qotd
-    requestGet(app, '/api/wouso-qotd/list?id=111', cookie, {}, gotQotd);
+    common.requestGet(app, '/api/wouso-qotd/list?id=111', {}, gotQotd);
 
     function gotQotd(err, res) {
       res.body.should.be.empty;
@@ -138,7 +139,7 @@ describe('QOTD list endpoint:', function() {
 
     function gotID(err, qotd) {
       // Get qotd
-      requestGet(app, '/api/wouso-qotd/list?id=' + qotd._id, cookie, {}, gotQotd);
+      common.requestGet(app, '/api/wouso-qotd/list?id=' + qotd._id, {}, gotQotd);
     }
 
     function gotQotd(err, res) {
@@ -149,11 +150,11 @@ describe('QOTD list endpoint:', function() {
 
   it('Restrict list qotd acccess for roles under Teacher', function(done) {
     // Login as Player
-    login('player', saveSettingAsTeacher);
+    common.login(app, 'player', saveSettingAsTeacher);
 
     function saveSettingAsTeacher() {
       // Get qotd
-      requestGet(app, '/api/wouso-qotd/list?id=', cookie, {}, savedSetting);
+      common.requestGet(app, '/api/wouso-qotd/list?id=', {}, savedSetting);
     }
 
     function savedSetting(err, res) {
@@ -166,11 +167,11 @@ describe('QOTD list endpoint:', function() {
 describe('QOTD paginated list endpoint:', function() {
   before(function(done) {
     // Login as Contributor
-    login('contributor', dropDatabase);
+    common.login(app, 'contributor', dropDatabase);
 
     // Drop DB and start app
     function dropDatabase() {
-      dropQotd(data.mongo_url.test, addFirstEntry);
+      common.dropCollection(data.mongo_url.test, 'qotds', addFirstEntry);
     }
 
     function addFirstEntry() {
@@ -200,7 +201,7 @@ describe('QOTD paginated list endpoint:', function() {
 
   it('Paginate qotd list', function(done) {
     // Get qotd paginated list
-    requestGet(app, '/api/wouso-qotd/list/2/2', cookie, {}, checkResult);
+    common.requestGet(app, '/api/wouso-qotd/list/2/2', {}, checkResult);
 
     function checkResult(err, res) {
       res.body.questions[0].question.should.be.equal('Three?');
@@ -210,7 +211,7 @@ describe('QOTD paginated list endpoint:', function() {
   });
 
   it('Paginate qotd search', function(done) {
-    requestGet(app, '/api/wouso-qotd/list/1/1?search=two', cookie, {}, checkResult);
+    common.requestGet(app, '/api/wouso-qotd/list/1/1?search=two', {}, checkResult);
 
     function checkResult(err, res) {
       res.body.questions[0].question.should.be.equal('Two?');
@@ -220,7 +221,7 @@ describe('QOTD paginated list endpoint:', function() {
 
   it('Paginate qotd in a certain day', function(done) {
     var params = '?start=03.09.2016&end=03.11.2016'
-    requestGet(app, '/api/wouso-qotd/list/1/1' + params, cookie, {}, checkResult);
+    common.requestGet(app, '/api/wouso-qotd/list/1/1' + params, {}, checkResult);
 
     function checkResult(err, res) {
       res.body.questions[0].question.should.be.equal('Three?');
@@ -230,11 +231,11 @@ describe('QOTD paginated list endpoint:', function() {
 
   it('Restrict filter qotd acccess for roles under Teacher', function(done) {
     // Login as Player
-    login('player', saveSettingAsPlayer);
+    common.login(app, 'player', saveSettingAsPlayer);
 
     function saveSettingAsPlayer() {
       // Get qotd
-      requestGet(app, '/api/wouso-qotd/list/1/1', cookie, {}, checkResult);
+      common.requestGet(app, '/api/wouso-qotd/list/1/1', {}, checkResult);
     }
 
     function checkResult(err, res) {
@@ -247,12 +248,12 @@ describe('QOTD paginated list endpoint:', function() {
 describe('QOTD dates list endpoint:', function() {
   before(function(done) {
     // Login as Contributor
-    login('contributor', done);
+    common.login(app, 'contributor', done);
   });
 
   it('Should return all available dates', function(done) {
     // Get dates list
-    requestGet(app, '/api/wouso-qotd/list/dates', cookie, {}, checkResult);
+    common.requestGet(app, '/api/wouso-qotd/list/dates', {}, checkResult);
 
     function checkResult(err, res) {
       res.body.length.should.equal(3);
@@ -262,11 +263,11 @@ describe('QOTD dates list endpoint:', function() {
 
   it('Restrict qotd dates list acccess for roles under Teacher', function(done) {
     // Login as Player
-    login('player', saveSettingAsTeacher);
+    common.login(app, 'player', saveSettingAsTeacher);
 
     function saveSettingAsTeacher() {
       // Get qotd
-      requestGet(app, '/api/wouso-qotd/list/dates', cookie, {}, checkResult);
+      common.requestGet(app, '/api/wouso-qotd/list/dates', {}, checkResult);
     }
 
     function checkResult(err, res) {
@@ -279,16 +280,16 @@ describe('QOTD dates list endpoint:', function() {
 describe('QOTD play endpoint:', function() {
   before(function(done) {
     // Login as Player
-    login('player', dropDatabase);
+    common.login(app, 'player', dropDatabase);
 
     // Drop DB and start app
     function dropDatabase() {
-      dropQotd(data.mongo_url.test, done);
+      common.dropCollection(data.mongo_url.test, 'qotds', done);
     }
   });
 
   it('Should return nothing', function(done) {
-    requestGet(app, '/api/wouso-qotd/play', cookie, {}, checkResult);
+    common.requestGet(app, '/api/wouso-qotd/play', {}, checkResult);
 
     function checkResult(err, res) {
       res.body.should.be.empty;
@@ -337,13 +338,13 @@ describe('QOTD play endpoint:', function() {
 
   it('Should return question from today on two separate calls', function(done) {
     var previousID = null;
-    requestGet(app, '/api/wouso-qotd/play', cookie, {}, checkResult);
+    common.requestGet(app, '/api/wouso-qotd/play', {}, checkResult);
 
     function checkResult(err, res) {
       previousID = res.body._id;
       res.body.question.should.be.equalOneOf(['One?', 'Two?']);
       // Recheck
-      requestGet(app, '/api/wouso-qotd/play', cookie, {}, recheckResult);
+      common.requestGet(app, '/api/wouso-qotd/play', {}, recheckResult);
     }
 
     function recheckResult(err, res) {
@@ -356,11 +357,11 @@ describe('QOTD play endpoint:', function() {
 describe('QOTD play POST endpoint:', function() {
   before(function(done) {
     // Login as Player
-    login('player', dropDatabase);
+    common.login(app, 'player', dropDatabase);
 
     // Drop DB and start app
     function dropDatabase() {
-      dropQotd(data.mongo_url.test, addQuestion);
+      common.dropCollection(data.mongo_url.test, 'qotds', addQuestion);
     }
 
     // Add a single question
@@ -388,7 +389,7 @@ describe('QOTD play POST endpoint:', function() {
   it('Should add user to qotd responders', function(done) {
 
     // Look at qotd
-    requestGet(app, '/api/wouso-qotd/play', cookie, {}, getQotdInfo);
+    common.requestGet(app, '/api/wouso-qotd/play', {}, getQotdInfo);
 
     function getQotdInfo() {
       Qotd.findOne().exec(sendResponse);
@@ -399,7 +400,7 @@ describe('QOTD play POST endpoint:', function() {
         'question_id' : q._id.toString(),
         'ans'         : '1'
       };
-      requestPost(app, '/api/wouso-qotd/play', cookie, body, getQotd);
+      common.requestPost(app, '/api/wouso-qotd/play', body, getQotd);
     }
 
     function getQotd() {
@@ -416,11 +417,11 @@ describe('QOTD play POST endpoint:', function() {
 describe('QOTD add endpoint:', function() {
   before(function(done) {
     // Login as Contributor
-    login('contributor', dropDatabase);
+    common.login(app, 'contributor', dropDatabase);
 
     // Drop DB and start app
     function dropDatabase() {
-      dropQotd(data.mongo_url.test, done);
+      common.dropCollection(data.mongo_url.test, 'qotds', done);
     }
   });
 
@@ -432,7 +433,7 @@ describe('QOTD add endpoint:', function() {
       'date'     : '',
       'tags'     : ''
     };
-    requestPost(app, '/api/wouso-qotd/add', cookie, body, getQotd);
+    common.requestPost(app, '/api/wouso-qotd/add', body, getQotd);
 
     function getQotd() {
       Qotd.findOne().exec(checkExistance);
@@ -457,7 +458,7 @@ describe('QOTD add endpoint:', function() {
         'date'     : '',
         'tags'     : ''
       };
-      requestPost(app, '/api/wouso-qotd/add', cookie, body, getQotd);
+      common.requestPost(app, '/api/wouso-qotd/add', body, getQotd);
     }
 
     function getQotd() {
@@ -472,11 +473,11 @@ describe('QOTD add endpoint:', function() {
 
   it('Restrict qotd add acccess for roles under Contributor', function(done) {
     // Login as Player
-    login('player', addQotdAsPlayer);
+    common.login(app, 'player', addQotdAsPlayer);
 
     function addQotdAsPlayer() {
       // Get qotd
-      requestPost(app, '/api/wouso-qotd/add', cookie, {}, checkResult);
+      common.requestPost(app, '/api/wouso-qotd/add', {}, checkResult);
     }
 
     function checkResult(err, res) {
@@ -489,11 +490,11 @@ describe('QOTD add endpoint:', function() {
 describe('QOTD remove endpoint:', function() {
   before(function(done) {
     // Login as Contributor
-    login('contributor', dropDatabase);
+    common.login(app, 'contributor', dropDatabase);
 
     // Drop DB and start app
     function dropDatabase() {
-      dropQotd(data.mongo_url.test, addQotd);
+      common.dropCollection(data.mongo_url.test, 'qotds', addQotd);
     }
 
     function addQotd() {
@@ -512,7 +513,7 @@ describe('QOTD remove endpoint:', function() {
 
     function removeQotd(err, qotd) {
       qotd.question.should.be.string;
-      requestDelete('/api/wouso-qotd/delete?id=' + qotd._id, cookie, {}, getQotd)
+      common.requestDelete(app, '/api/wouso-qotd/delete?id=' + qotd._id, {}, getQotd)
     }
 
     function getQotd() {
@@ -527,11 +528,11 @@ describe('QOTD remove endpoint:', function() {
 
   it('Restrict qotd remove acccess for roles under Contributor', function(done) {
     // Login as Player
-    login('player', addQotdAsPlayer);
+    common.login(app, 'player', addQotdAsPlayer);
 
     function addQotdAsPlayer() {
       // Get qotd
-      requestDelete('/api/wouso-qotd/delete', cookie, {}, checkResult);
+      common.requestDelete(app, '/api/wouso-qotd/delete', {}, checkResult);
     }
 
     function checkResult(err, res) {
@@ -540,70 +541,3 @@ describe('QOTD remove endpoint:', function() {
     }
   });
 });
-
-
-// UTILS
-function requestPost(url, cookie, body, callback) {
-  var req = request(app).post(url);
-  req.cookies = cookie;
-  req.set('Accept','application/json')
-    .send(body)
-    .expect('Content-Type', /json/)
-    .end(callback);
-}
-
-function requestGet(url, cookie, body, callback) {
-  var req = request(app).get(url);
-  req.cookies = cookie;
-  req.set('Accept','application/json')
-    .send(body)
-    .expect('Content-Type', /json/)
-    .end(callback);
-}
-
-function requestDelete(url, cookie, body, callback) {
-  var req = request(app).delete(url);
-  req.cookies = cookie;
-  req.set('Accept','application/json')
-    .send(body)
-    .expect('Content-Type', /json/)
-    .end(callback);
-}
-
-function login(role, callback) {
-  request(app)
-    .post('/login')
-    .set('Accept','application/json')
-    .send({"email": role + "@example.com", "password": role})
-    .expect('Content-Type', /json/)
-    .end(function (err, res) {
-      cookie = res.headers['set-cookie'].pop().split(';')[0];
-
-      // Advance
-      callback();
-    });
-}
-
-function dropDB(url, callback) {
-  var conn = mongoose.createConnection(url);
-
-  conn.on('open', function() {
-    conn.db.dropDatabase(function (err) {
-      if (!err) {
-        callback();
-      }
-    });
-  });
-}
-
-function dropQotd(url, callback) {
-  var conn = mongoose.createConnection(url);
-
-  conn.on('open', function() {
-    conn.db.dropCollection('qotds', function (err) {
-      if (!err) {
-        callback();
-      }
-    });
-  });
-}
