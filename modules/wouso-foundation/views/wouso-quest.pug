@@ -8,9 +8,12 @@ block content
       - if (!user)
         h4= __('quest_alert_login')
 
+  // Default values
+  script var timeToHint = '';
+
   // Transfer number of fields through JS
   - if (mysettings['quest-timeToHint'])
-    script var timeToHint = #{mysettings['quest-timeToHint']}
+    script timeToHint = #{mysettings['quest-timeToHint']}
 
 
   - if (ROLE < 2)

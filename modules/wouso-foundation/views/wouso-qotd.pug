@@ -8,13 +8,16 @@ block content
       - if (!user)
         h4= __('qotd_alert_login')
 
+  // Default values
+  script var noOfOptions = '', countdownTimer = '', qotdPoints = '';
+
   // Transfer number of fields through JS
   - if (mysettings['qotd-defaultNoOfAns'])
-    script var noOfOptions = #{mysettings['qotd-defaultNoOfAns']}
+    script noOfOptions = #{mysettings['qotd-defaultNoOfAns']}
   - if (mysettings['qotd-countdownTimer'])
-    script var countdownTimer = #{mysettings['qotd-countdownTimer']}
+    script countdownTimer = #{mysettings['qotd-countdownTimer']}
     - if (mysettings['qotd-points'])
-      script var qotdPoints = #{mysettings['qotd-points']}
+      script qotdPoints = #{mysettings['qotd-points']}
   script function do_on_timeout() { $('#qotd').submit() }
 
 
@@ -27,9 +30,9 @@ block content
   - if (ROLE == 3)
     #qotd-contrib
 
-  - if (ROLE == 4)   
+  - if (ROLE == 4)
     #qotd-game
-          
-          
+
+
 block footer
   script(type="text/javascript", src='/public/js/countdown.js')
