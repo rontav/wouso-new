@@ -5,12 +5,13 @@ html
     title= __('title')
 
     // Foundation css + js
-    link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/css/normalize.css')
-    link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/css/foundation.css')
-    script(src='https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/js/vendor/modernizr.js')
-    script(src='https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/js/vendor/jquery.js')
-    script(src='https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/js/vendor/fastclick.js')
-    script(src='https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/js/foundation.min.js')
+    //link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/foundation/6.3.0/css/normalize.css')
+    link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/foundation/6.3.0/css/foundation.css')
+    //script(src='https://cdnjs.cloudflare.com/ajax/libs/foundation/6.3.0/js/vendor/modernizr.js')
+    //script(src='https://cdnjs.cloudflare.com/ajax/libs/foundation/6.3.0/js/vendor/jquery.js')
+    //script(src='https://cdnjs.cloudflare.com/ajax/libs/foundation/6.3.0/js/vendor/fastclick.js')
+    script(src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js')
+    script(src='https://cdnjs.cloudflare.com/ajax/libs/foundation/6.3.0/js/foundation.min.js')
 
     // Countdown
     link(rel='stylesheet', href='https://code.jquery.com/ui/1.8.2/themes/smoothness/jquery-ui.css')
@@ -29,17 +30,20 @@ html
 
 
   body
-    nav.top-bar(data-topbar, role='navigation', data-options="is_hover:false,dropdown_autoclose:false")
-      ul.title-area
-        li.name
-          h1
+    nav.top-bar
+      .top-bar-left
+        ul.menu
+          li
             a(href='/')= __('nav_home')
-        li.toggle-topbar.menu-icon
-          a(href="#")
-            span
-
-      section.top-bar-section
-        ul.right
+          li
+            a(href='/profile')= __('nav_profile')
+          li
+            a(href='/messages')= __('nav_messages')
+          - if (user && user.role <= 1)
+            li
+              a(href='/admin')= __('nav_admin')
+      .top-bar-right
+        ul.dropdown.menu(data-dropdown-menu)
           - if (!user)
             li.active
               a(href='/login')= __('nav_login')
@@ -49,7 +53,7 @@ html
 
               // Display roles only for non-players
               - if (user.role < 4)
-                li.has-dropdown
+                li
                   a(href='#')= __('role_title') + ' | '
                     - if (ROLE == 0)
                       = __('role_root')
@@ -63,7 +67,7 @@ html
                       = __('role_player')
 
                   // Available roles
-                  ul.dropdown
+                  ul.menu
                     - if (user.role == 0)
                       li: a(href=locals.URL + '?role=0')= __('role_root')
                     - if (user.role <= 1)
@@ -78,22 +82,11 @@ html
               li.active
                 a(href='/logout')= __('nav_logout')
 
-        ul.left
-          li
-            a(href='/profile')= __('nav_profile')
-          li
-            a(href='/messages')= __('nav_messages')
-          - if (user && user.role <= 1)
-            li
-              a(href='/admin')= __('nav_admin')
-
-    dl.sub-nav
-      .row
-        .large-12.columns
-          dt= __('module_title') + ':'
-          each mod in settings.games
-            dd.active
-              a(href='/' + mod)= __('module_' + mod)
+    .row
+      ul.sub-nav.menu(role="navigation")
+        li.sub-nav-title= __('module_title') + ':'
+        each mod in settings.games
+          li: a(href='/' + mod)= __('module_' + mod)
 
     #main
       block sidebar

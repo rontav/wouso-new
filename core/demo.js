@@ -16,6 +16,8 @@ roles.forEach(function(role, i) {
   var update = { $set: {
     '_id'            : '00000000000000000000000' + i,
     'role'           : i,
+    'name'           : role,
+    'email'          : email,
     'local.username' : role,
     'local.email'    : email,
     'local.password' : pass

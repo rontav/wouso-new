@@ -1,5 +1,25 @@
+.top-bar {
+  background: #333;
+  height: 50px;
+  padding: 5px;
+}
+
+.top-bar ul {
+  background: #333;
+}
+
+.is-dropdown-submenu {
+  border: 1px solid #333;
+}
+
 .sub-nav {
-  margin-top: 10px;
+  padding: 0.5rem 0.5rem 0.5rem 0;
+}
+
+.sub-nav li {
+    color: #999999;
+    font-size: 16px;
+    font-weight: bold;
 }
 
 .spacer {
