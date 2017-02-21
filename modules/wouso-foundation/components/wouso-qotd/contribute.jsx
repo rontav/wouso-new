@@ -125,7 +125,7 @@ var QotdQuestionForm = React.createClass({
               <input name="tags" type="text" id="qotd-tags" value={this.state.tags} onChange={this.editTags}></input>
             </div>
           </div>
-          <div className="row">
+          <div className="row" id='qotd-options'>
             <div className="large-6 columns">
               <label>Answers:</label>
               <div id="qotd-answer-list">
@@ -143,11 +143,11 @@ var QotdQuestionForm = React.createClass({
             </div>
           </div>
           <div className="spacer"></div>
-          <div className="row controls">
-            <div className="large-10 left">
-              <input className="button small left" onClick={this.addOption} type="button" value="ADD"></input>
+          <div className="row">
+            <div className="large-10 left columns">
+              <input className="button small left" onClick={this.addOption} type="button" value="Add option"></input>
             </div>
-            <div className="large-2 right">
+            <div className="large-2 right columns">
               <input className="button small right" type="submit" value={modalSubmit}></input>
             </div>
           </div>
@@ -199,10 +199,11 @@ var QotdListEntry = React.createClass({
     handleEditClick: function(id) {
       // Mount component and reveal modal
       ReactDOM.render(<QotdQuestionForm id={id} />, document.getElementById("qotdModal"));
-      $('#qotdModal').foundation("reveal", "open");
+      var popup = new Foundation.Reveal($('#qotdModal'));
+      popup.open();
 
       // On modal close, unmount component
-      $(document).on('closed.fndtn.reveal', '[data-reveal]', function () {
+      $(document).on('closed.zf.reveal', '[data-reveal]', function () {
         ReactDOM.unmountComponentAtNode(document.getElementById("qotdModal"));
       });
     },
@@ -268,7 +269,7 @@ var QotdList = React.createClass({
                       selected={QotdListEntry.selected_qotd} />
         </div>
         <div className="row">
-          <div className="reveal-modal" id="qotdModal" data-reveal aria-hidden="true" role="dialog"></div>
+          <div className="reveal" id="qotdModal" data-reveal></div>
           <div className="large-12 columns">
             <a className="radius button" href="#" onClick={QotdListEntry.handleEditClick.bind(this, null)}>Add qotd</a>
             <h2>

@@ -54,6 +54,10 @@ input[type="radio"] {
   color: white;
 }
 
+#qotd-options {
+  min-height: 300px;
+}
+
 #qotd-play-question {
   font-size: 24px;
   text-align: center;
