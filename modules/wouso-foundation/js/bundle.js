@@ -26574,7 +26574,7 @@
 	      popup.open();
 
 	      // On modal close, unmount component
-	      $(document).on('closed.fndtn.reveal', '[data-reveal]', function () {
+	      $(document).on('closed.zf.reveal', '[data-reveal]', function () {
 	        ReactDOM.unmountComponentAtNode(document.getElementById("qotdModal"));
 	      });
 	    }
@@ -28712,7 +28712,7 @@
 	    popup.open();
 
 	    // On modal close, unmount component
-	    $(document).on('closed.fndtn.reveal', '[data-reveal]', function () {
+	    $(document).on('closed.zf.reveal', '[data-reveal]', function () {
 	      ReactDOM.unmountComponentAtNode(document.getElementById("questManageModal"));
 	    });
 	  },
