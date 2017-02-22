@@ -26476,7 +26476,7 @@
 	        ),
 	        React.createElement(
 	          'div',
-	          { className: 'row' },
+	          { className: 'row', id: 'qotd-options' },
 	          React.createElement(
 	            'div',
 	            { className: 'large-6 columns' },
@@ -26508,15 +26508,15 @@
 	        React.createElement('div', { className: 'spacer' }),
 	        React.createElement(
 	          'div',
-	          { className: 'row controls' },
+	          { className: 'row' },
 	          React.createElement(
 	            'div',
-	            { className: 'large-10 left' },
-	            React.createElement('input', { className: 'button small left', onClick: this.addOption, type: 'button', value: 'ADD' })
+	            { className: 'large-10 left columns' },
+	            React.createElement('input', { className: 'button small left', onClick: this.addOption, type: 'button', value: 'Add option' })
 	          ),
 	          React.createElement(
 	            'div',
-	            { className: 'large-2 right' },
+	            { className: 'large-2 right columns' },
 	            React.createElement('input', { className: 'button small right', type: 'submit', value: modalSubmit })
 	          )
 	        )
@@ -26570,10 +26570,11 @@
 	    handleEditClick: function (id) {
 	      // Mount component and reveal modal
 	      ReactDOM.render(React.createElement(QotdQuestionForm, { id: id }), document.getElementById("qotdModal"));
-	      $('#qotdModal').foundation("reveal", "open");
+	      var popup = new Foundation.Reveal($('#qotdModal'));
+	      popup.open();
 
 	      // On modal close, unmount component
-	      $(document).on('closed.fndtn.reveal', '[data-reveal]', function () {
+	      $(document).on('closed.zf.reveal', '[data-reveal]', function () {
 	        ReactDOM.unmountComponentAtNode(document.getElementById("qotdModal"));
 	      });
 	    }
@@ -26656,7 +26657,7 @@
 	      React.createElement(
 	        'div',
 	        { className: 'row' },
-	        React.createElement('div', { className: 'reveal-modal', id: 'qotdModal', 'data-reveal': true, 'aria-hidden': 'true', role: 'dialog' }),
+	        React.createElement('div', { className: 'reveal', id: 'qotdModal', 'data-reveal': true }),
 	        React.createElement(
 	          'div',
 	          { className: 'large-12 columns' },
@@ -28455,7 +28456,7 @@
 	          { className: 'row' },
 	          React.createElement(
 	            'div',
-	            { className: 'large-2 right' },
+	            { className: 'large-12 columns' },
 	            React.createElement('input', { className: 'button small right',
 	              type: 'submit', value: modalSubmit })
 	          )
@@ -28549,7 +28550,7 @@
 	          { className: 'row' },
 	          React.createElement(
 	            'div',
-	            { className: 'large-2 right' },
+	            { className: 'large-12 columns' },
 	            React.createElement('input', { className: 'button small right', type: 'submit', value: 'Save' })
 	          )
 	        )
@@ -28588,10 +28589,11 @@
 	        React.createElement(QuestQuestionForm, { id: id, qID: questID })
 	      ), document.getElementById("questModal"));
 
-	      $('#questModal').foundation("reveal", "open");
+	      var popup = new Foundation.Reveal($('#questModal'));
+	      popup.open();
 
 	      // On modal close, unmount component
-	      $(document).on('closed.fndtn.reveal', '[data-reveal]', function () {
+	      $(document).on('closed.zf.reveal', '[data-reveal]', function () {
 	        ReactDOM.unmountComponentAtNode(document.getElementById("questModal"));
 	      });
 	    }
@@ -28706,10 +28708,11 @@
 	  handleAddClick: function (id) {
 	    // Mount component and reveal modal
 	    ReactDOM.render(React.createElement(QuestManageForm, _extends({}, intlData, { id: id })), document.getElementById("questManageModal"));
-	    $('#questManageModal').foundation("reveal", "open");
+	    var popup = new Foundation.Reveal($('#questManageModal'));
+	    popup.open();
 
 	    // On modal close, unmount component
-	    $(document).on('closed.fndtn.reveal', '[data-reveal]', function () {
+	    $(document).on('closed.zf.reveal', '[data-reveal]', function () {
 	      ReactDOM.unmountComponentAtNode(document.getElementById("questManageModal"));
 	    });
 	  },
@@ -28831,8 +28834,7 @@
 	        React.createElement(
 	          'div',
 	          { className: 'large-12 columns' },
-	          React.createElement('div', { className: 'reveal-modal', id: 'questManageModal',
-	            'data-reveal': true, 'aria-hidden': 'true', role: 'dialog' }),
+	          React.createElement('div', { className: 'reveal', id: 'questManageModal', 'data-reveal': true }),
 	          React.createElement(
 	            'a',
 	            { className: 'radius button small right', href: '#',
@@ -29040,8 +29042,7 @@
 	      React.createElement(
 	        'div',
 	        { className: 'row' },
-	        React.createElement('div', { className: 'reveal-modal', id: 'questModal',
-	          'data-reveal': true, 'aria-hidden': 'true', role: 'dialog' }),
+	        React.createElement('div', { className: 'reveal', id: 'questModal', 'data-reveal': true }),
 	        React.createElement(
 	          'div',
 	          { className: 'large-12 columns' },

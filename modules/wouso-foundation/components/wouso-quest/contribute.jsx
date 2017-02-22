@@ -144,7 +144,7 @@ var QuestQuestionForm = ReactIntl.injectIntl(React.createClass({
             </div>
           </div>
           <div className="row">
-            <div className="large-2 right">
+            <div className="large-12 columns">
               <input className="button small right"
                 type="submit" value={modalSubmit} />
             </div>
@@ -219,7 +219,7 @@ var QuestManageForm = React.createClass({
             </div>
           </div>
           <div className="row">
-            <div className="large-2 right">
+            <div className="large-12 columns">
               <input className="button small right" type="submit" value="Save" />
             </div>
           </div>
@@ -258,10 +258,11 @@ var QuestListEntry = React.createClass({
         </IntlProvider>
       , document.getElementById("questModal"));
 
-      $('#questModal').foundation("reveal", "open");
+      var popup = new Foundation.Reveal($('#questModal'));
+      popup.open();
 
       // On modal close, unmount component
-      $(document).on('closed.fndtn.reveal', '[data-reveal]', function () {
+      $(document).on('closed.zf.reveal', '[data-reveal]', function () {
         ReactDOM.unmountComponentAtNode(document.getElementById("questModal"));
       });
     },
@@ -363,10 +364,11 @@ var QuestContribManage = ReactDnD.DragDropContext(HTML5Backend)(React.createClas
   handleAddClick: function(id) {
     // Mount component and reveal modal
     ReactDOM.render(<QuestManageForm {...intlData} id={id} />, document.getElementById("questManageModal"));
-    $('#questManageModal').foundation("reveal", "open");
+    var popup = new Foundation.Reveal($('#questManageModal'));
+    popup.open();
 
     // On modal close, unmount component
-    $(document).on('closed.fndtn.reveal', '[data-reveal]', function () {
+    $(document).on('closed.zf.reveal', '[data-reveal]', function () {
       ReactDOM.unmountComponentAtNode(document.getElementById("questManageModal"));
     });
   },
@@ -479,8 +481,7 @@ var QuestContribManage = ReactDnD.DragDropContext(HTML5Backend)(React.createClas
     return (<div>
       <div className="row">
         <div className="large-12 columns">
-          <div className="reveal-modal" id="questManageModal"
-            data-reveal aria-hidden="true" role="dialog" />
+          <div className="reveal" id="questManageModal" data-reveal />
 
           <a className="radius button small right" href="#"
             onClick={this.handleAddClick.bind(this, null)}>
@@ -640,8 +641,7 @@ var QuestContrib = React.createClass({
             selected={QuestListEntry.selected_quests} />
         </div>
         <div className="row">
-          <div className="reveal-modal" id="questModal"
-            data-reveal aria-hidden="true" role="dialog" />
+          <div className="reveal" id="questModal" data-reveal />
 
           <div className="large-12 columns">
             <a className="radius button" href="#"
