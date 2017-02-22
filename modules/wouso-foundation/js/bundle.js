@@ -26144,7 +26144,7 @@
 	  render: function () {
 	    return React.createElement(
 	      'div',
-	      { id: 'progress-bar', 'data-time': countdownTimer },
+	      { id: 'progress-bar', 'data-time': this.props.timer },
 	      React.createElement('div', { className: 'pbar' })
 	    );
 	  }
@@ -26216,7 +26216,8 @@
 	      question: "",
 	      options: [],
 	      answer: "",
-	      submit: false
+	      submit: false,
+	      duration: null
 	    };
 	  },
 
@@ -26228,7 +26229,8 @@
 	          question: res.question ? res.question : null,
 	          options: res.options ? res.options : [],
 	          submit: !res.answer && res.question ? true : false,
-	          answer: res.answer
+	          answer: res.answer,
+	          duration: res.diff ? res.diff : null
 	        });
 	      }
 	    }.bind(this));
@@ -26238,6 +26240,8 @@
 	    var qotdQuestion = null;
 	    var qotdGameIntro = null;
 	    var qotdNoQuestionWarn = null;
+	    // Compute time left to answer question
+	    var remainingTime = countdownTimer - Math.ceil(this.state.duration / 1000);
 
 	    if (this.state.question) {
 	      qotdQuestion = React.createElement(QotdQuestion, { id: this.state.id, text: this.state.question });
@@ -26253,6 +26257,7 @@
 	        this.props.intl.formatMessage({ id: 'qotd_alert_noquestion' })
 	      );
 	    }
+
 	    return React.createElement(
 	      'div',
 	      { className: 'row' },
@@ -26262,7 +26267,7 @@
 	        React.createElement(
 	          'form',
 	          { className: 'qotd-form', id: 'qotd', method: 'post', action: '/api/wouso-qotd/play' },
-	          countdownTimer > 0 ? React.createElement(QotdCountdown, { timer: countdownTimer }) : null,
+	          countdownTimer > 0 ? React.createElement(QotdCountdown, { timer: remainingTime }) : null,
 	          qotdNoQuestionWarn,
 	          qotdGameIntro,
 	          qotdQuestion,
@@ -26501,7 +26506,7 @@
 	              null,
 	              'Date:'
 	            ),
-	            React.createElement('input', { name: 'date', type: 'text', id: 'qotd-date', value: this.state.date }),
+	            React.createElement('input', { name: 'date', type: 'text', id: 'qotd-date', defaultValue: this.state.date }),
 	            React.createElement('div', { id: 'datepicker' })
 	          )
 	        ),

@@ -5,7 +5,7 @@ var ReactIntl = require('react-intl');
 var QotdCountdown = React.createClass({
   render: function () {
     return (
-      <div id="progress-bar" data-time={countdownTimer}>
+      <div id="progress-bar" data-time={this.props.timer}>
         <div className="pbar" />
       </div>
     )
@@ -63,6 +63,7 @@ var QotdGame = React.createClass({
       options  : [],
       answer   : "",
       submit   : false,
+      duration : null,
     }
   },
 
@@ -74,7 +75,8 @@ var QotdGame = React.createClass({
           question : (res.question ? res.question : null),
           options  : (res.options  ? res.options  : []),
           submit   : ((!res.answer && res.question)  ? true : false),
-          answer   : res.answer
+          answer   : res.answer,
+          duration : (res.diff     ? res.diff : null)
         });
       }
     }.bind(this))
@@ -84,6 +86,8 @@ var QotdGame = React.createClass({
     var qotdQuestion  = null;
     var qotdGameIntro = null;
     var qotdNoQuestionWarn = null;
+    // Compute time left to answer question
+    var remainingTime = countdownTimer - Math.ceil(this.state.duration/1000);
 
     if (this.state.question) {
       qotdQuestion = <QotdQuestion id={this.state.id} text={this.state.question} />
@@ -91,11 +95,12 @@ var QotdGame = React.createClass({
     } else {
       qotdNoQuestionWarn = <p className='grey-title'>{this.props.intl.formatMessage({id: 'qotd_alert_noquestion'})}</p>
     }
+
     return (
       <div className="row">
         <div className="large-12 columns">
           <form className="qotd-form" id="qotd" method="post" action="/api/wouso-qotd/play">
-            { countdownTimer > 0 ? <QotdCountdown timer={countdownTimer} /> : null }
+            { countdownTimer > 0 ? <QotdCountdown timer={remainingTime} /> : null }
 
             {qotdNoQuestionWarn}
             {qotdGameIntro}

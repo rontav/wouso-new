@@ -236,6 +236,7 @@ router.get('/api/wouso-qotd/play', login.isUser, function (req, res, next) {
           // Compute remaining time
           var diff = Math.abs(Date.now() - ans.date);
           var mins = Math.ceil(diff / (1000 * 60));
+          question['diff'] = diff;
 
           if (ans.res != null) {
             // Provide answer contains response
