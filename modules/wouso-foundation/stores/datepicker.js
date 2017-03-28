@@ -1,6 +1,6 @@
-var AppDispatcher = require('../dispatchers/app');
-var EventEmitter  = require('events').EventEmitter;
-var assign        = require('object-assign');
+import  AppDispatcher from '../dispatchers/app';
+import  {EventEmitter} from 'events';
+import  assign   from 'object-assign';
 
 var CHANGE_EVENT = 'change';
 
@@ -9,11 +9,11 @@ var _date = null;
 
 var DateStore = assign({}, EventEmitter.prototype, {
 
-  getDate: function() {
+  getDate: () => {
     return _date;
   },
 
-  emitChange: function() {
+  emitChange: () => {
     this.emit(CHANGE_EVENT);
   },
 
@@ -25,7 +25,7 @@ var DateStore = assign({}, EventEmitter.prototype, {
     this.removeListener(CHANGE_EVENT, callback);
   },
 
-  dispatcherIndex: AppDispatcher.register(function(payload) {
+  dispatcherIndex: AppDispatcher.register((payload) => {
     switch(payload.action.type) {
       case 'refreshDate':
         _date = payload.action.date;

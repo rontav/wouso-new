@@ -2,7 +2,7 @@
 var req = require.context('./', true, /\.json.*$/);
 var exports = {};
 
-req.keys().forEach(function (file) {
+req.keys().forEach( (file) => {
   var locale = file.replace('./', '').replace('.json', '');
   exports[locale] = req(file);
 });

@@ -13,7 +13,7 @@ class QotdCountdown extends React.Component {
       </div>
     )
   }
-};
+}
 
 class QotdSubmit extends React.Component {
   render() {
@@ -24,7 +24,7 @@ class QotdSubmit extends React.Component {
       <input className="button small" id="qotd-form-submit" type="submit" value="Send" />
     )
   }
-};
+}
 
 class QotdQuestion extends React.Component {
   // static propTypes = {
@@ -37,16 +37,16 @@ class QotdQuestion extends React.Component {
       <input name='question_id' type='hidden' value={this.props.id} />
     </div>);
   }
-};
+}
 
-class  QotdOption extends React.Component{
+class QotdOption extends React.Component {
   // static propTypes = {
   //  ans: React.propTypes
   //  text: React.propTypes
   // }
-  render () {
+  render() {
     var checkboxDisable = false;
-    var spanClass = "";
+    var spanClass = '';
 
     // Disable checkboes if questions answered
     if (this.props.ans) {
@@ -64,17 +64,17 @@ class  QotdOption extends React.Component{
       </div>
     )
   }
-};
+}
 
-class  QotdGame extends  React.Component{
-  constructor(){
+class QotdGame extends React.Component {
+  constructor() {
     super();
 
     this.state = {
-      id: "",
-      question: "",
+      id: '',
+      question: '',
       options: [],
-      answer: "",
+      answer: '',
       submit: false,
       duration: null
     }
@@ -85,10 +85,10 @@ class  QotdGame extends  React.Component{
 
 
   componentDidMount() {
-    $.get('/api/wouso-qotd/play',  function (res) {
+    $.get('/api/wouso-qotd/play', function (res) {
       if (this.isMounted()) {
         this.setState({
-          id: (res._id ? res._id : ""),
+          id: (res._id ? res._id : ''),
           question: (res.question ? res.question : null),
           options: (res.options ? res.options : []),
           submit: ((!res.answer && res.question) ? true : false),
@@ -99,7 +99,7 @@ class  QotdGame extends  React.Component{
     }.bind(this))
   }
 
-  render () {
+  render() {
     var qotdQuestion = null;
     var qotdGameIntro = null;
     var qotdNoQuestionWarn = null;
@@ -145,6 +145,6 @@ class  QotdGame extends  React.Component{
       </div>
     )
   }
-};
+}
 
 module.exports = ReactIntl.injectIntl(QotdGame);

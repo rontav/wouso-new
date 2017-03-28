@@ -3,6 +3,7 @@ var EventEmitter  = require('events').EventEmitter;
 var assign        = require('object-assign');
 
 var CHANGE_EVENT = 'change';
+var _date = null;
 
 var QuestStore = assign({}, EventEmitter.prototype, {
 

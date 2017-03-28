@@ -1,8 +1,10 @@
-var React = require('react');
+import React from 'react';
 
-
-var QotdTeachListEntry = React.createClass({
-  render: function() {
+class QotdTeachListEntry extends React.Component {
+  // static propTypes = {
+  //   qotd: React.propTypes
+  // }
+  render() {
     // Compute no of correct Answers
     var correct_ans = 0;
     for (var a in this.props.qotd.answers) {
@@ -13,46 +15,47 @@ var QotdTeachListEntry = React.createClass({
       }
     }
 
-    return(
+    return (
       <div>
-        <p> { this.props.qotd.question}</p>
+        <p> {this.props.qotd.question}</p>
         <p>
-          { "Responses: " + this.props.qotd.answers.length + " (" + correct_ans + " correct)"}
+          {'Responses: ' + this.props.qotd.answers.length + '(' + correct_ans + ' correct)'}
         </p>
       </div>
     );
   }
-});
+}
 
 
-var QotdTeach = React.createClass({
-  getInitialState: function() {
-    return {
+class QotdTeach extends React.Component {
+  constructor() {
+    super();
+
+    this.state = {
       today: []
     }
-  },
+  }
 
-  componentDidMount: function() {
+
+  componentDidMount() {
     var date = new Date();
     // Get previous day's date
-    var start = [date.getMonth()+1, date.getDate()-1, date.getFullYear()].join('.');
+    var start = [date.getMonth() + 1, date.getDate() - 1, date.getFullYear()].join('.');
 
-    $.get('/api/wouso-qotd/list/100/1?start=' + start, function(res) {
-      if (this.isMounted()) {
-        this.setState({
-          today: res.questions
-        });
-      }
+    $.get('/api/wouso-qotd/list/100/1?start=' + start, function (res) {
+      this.setState({
+        today: res.questions
+      });
     }.bind(this));
-  },
+  }
 
-  render: function() {
-    return(
+  render () {
+    return (
       <div>
         <div className="row">
           <div className="large-12 columns">
             <h2>Questions for today:</h2>
-            { this.state.today.map(function (q, i) {
+            {this.state.today.map( (q, i) => {
               return <QotdTeachListEntry key={i} qotd={q} />
             }, this)}
           </div>
@@ -60,7 +63,7 @@ var QotdTeach = React.createClass({
       </div>
     );
   }
-});
+}
 
 
 module.exports = QotdTeach;

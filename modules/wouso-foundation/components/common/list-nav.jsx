@@ -52,6 +52,6 @@ class ListNav extends React.Component {
       </div>
     );
   }
-};
+}
 
 module.exports = ListNav;

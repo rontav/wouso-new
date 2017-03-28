@@ -7,15 +7,15 @@ var style = {
     width: 400
 };
 
-class Container extends React.Component{
-    constructor(){
+class Container extends React.Component {
+    constructor() {
         super();
         this.getInitialState = this.getInitialState.bind(this);
         this.compareCards = this.compareCards.bind(this);
         this.swapCards = this.swapCards.bind(this);   
     }
 
-    getInitialState(){
+    getInitialState() {
         return {
             cards: [{
                 id: 1,
@@ -49,7 +49,7 @@ class Container extends React.Component{
         };
     }
 
-    compareCards(card1, card2){
+    compareCards(card1, card2) {
         return card1.order - card2.order;
     }
 
@@ -84,6 +84,6 @@ class Container extends React.Component{
             </div>
         );
     }
-};
+}
 
 module.exports = ReactDnD.DragDropContext(HTML5Backend)(Container);
