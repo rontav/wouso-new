@@ -1,18 +1,6 @@
 'use strict'
-var fs = require('fs');
 
-var app  = {};
-app.data = null;
-
-try {
-  // Check if config.json exists
-  fs.lstatSync('./config.json');
-  app.data = (JSON.parse(fs.readFileSync('./config.json', 'utf8')));
-}
-catch (e) {
-  // Read config from env var
-  app.data = (JSON.parse(process.env.config));
-}
+var config = require('./config.js');
 
 /**
  * New Relic agent configuration.
@@ -28,7 +16,7 @@ exports.config = {
   /**
    * Your New Relic license key.
    */
-  license_key: app.data.newrelic_license_key,
+  license_key: config.newrelicLicenseKey,
   logging: {
     /**
      * Level at which to log. 'trace' is most useful to New Relic when diagnosing

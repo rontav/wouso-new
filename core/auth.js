@@ -8,6 +8,7 @@ var User = require('../config/models/user')
 // load up the settings
 var Settings = require('../config/models/settings')
 
+var config = require('../config.js');
 
 module.exports = function(app, passport) {
 
@@ -103,6 +104,6 @@ module.exports = function(app, passport) {
   }))
 
   // Add social login if available and needed
-  if ('wouso-social-login' in app.data.modules)
+  if ('wouso-social-login' in config.modules)
     require('wouso-social-login').social(app, passport)
 }
