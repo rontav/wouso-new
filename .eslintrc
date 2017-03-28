@@ -5,32 +5,42 @@
         "node": true,
         "jquery": true
     },
-
     "globals": {
-        "React": true,
         "describe": true,
         "before": true,
         "it": true
     },
-
     "parserOptions": {
         "ecmaFeatures": {
-            "jsx": true,
-            "arrowFunctions": true,
-            "blockBindings": true,
-            "generators": true,
-            "require-jsdoc": false
-        }
+            "jsx": true
+        },
+        "ecmaVersion": 2017
     },
-
     "plugins": [
-        "node",
         "react"
     ],
-
     "extends": [
-        "standard-jsx",
         "eslint:recommended",
-        "plugin:node/recommended"
-    ]
+        "plugin:react/recommended"
+    ],
+    "rules": {
+        "indent": [
+            0,
+            2
+        ],
+        "quotes": [
+            2,
+            "single",
+            {
+                "avoidEscape": true,
+                "allowTemplateLiterals": true
+            }
+        ],
+        "space-before-function-paren": 0,
+        "space-before-blocks": 2,
+        "arrow-spacing": 2,
+        "no-unused-vars": 1,
+        "node/shebang": 0,
+        "no-console": 0
+    }
 }
