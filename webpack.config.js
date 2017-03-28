@@ -3,10 +3,15 @@ var autoprefixer = require('autoprefixer');
 var precss = require('precss');
 var path = require('path');
 
+process.browser = true;
+
 var exp = {
   devServer: {
     host: '0.0.0.0',
-    port: 8090
+    port: 8090,
+    headers: {
+      'Access-Control-Allow-Origin': '*'
+    }
   },
   devtool: 'eval',
   entry: [
@@ -39,6 +44,15 @@ var exp = {
                 'react'
               ]
             }
+          }
+        ]
+      },
+      {
+        test: /config\.js$/,
+        exclude: /node_modules/,
+        use: [
+          {
+            loader: 'val-loader'
           }
         ]
       },
@@ -118,6 +132,9 @@ var exp = {
     })
   ],
   resolve: {
+    alias: {
+      config: path.resolve(__dirname, `config.js`)
+    },
     modules: [
       path.resolve(__dirname, '/modules'),
       'node_modules'
