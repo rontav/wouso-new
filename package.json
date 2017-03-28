@@ -2,10 +2,10 @@
   "name": "wouso-new",
   "version": "0.0.1",
   "scripts": {
-    "start": "./node_modules/nodemon/bin/nodemon.js app.js",
-    "login": "./node_modules/nodemon/bin/nodemon.js app.js login",
+    "start": "nodemon app.js",
+    "login": "nodemon app.js login",
     "webpackDevServer": "webpack-dev-server --colors --progress --inline",
-    "test": "./node_modules/mocha/bin/mocha tests/"
+    "test": "mocha tests/"
   },
   "dependencies": {
     "bcrypt-nodejs": "0.0.3",
