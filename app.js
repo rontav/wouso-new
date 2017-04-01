@@ -1,4 +1,4 @@
-require('newrelic');
+// require('newrelic');
 
 var fs            = require('fs');
 var express       = require('express');
@@ -73,7 +73,7 @@ if (process.env.NODE_ENV != 'development' || process.env.NODE_ENV != 'testing') 
 require('./core/auth')(app, passport)
 
 // Init badges
-query = {'name': 'qotd-streak'}
+var query = {'name': 'qotd-streak'}
 update = {$set: {'levels': [{
   'name'   : 'I',
   'limit'  : 5
@@ -127,7 +127,7 @@ i18n.expressBind(app, {
 // Store available views
 // Views in the themes directory have the highest priority and can overwrite
 // core or module views
-views = ['views', './node_modules/' + used_theme + '/views']
+var views = ['views', './node_modules/' + used_theme + '/views']
 
 
 // Auto login with dummy user in development if 'login'
@@ -161,6 +161,7 @@ app.use(function (req, res, next) {
 })
 
 app.use(function (req, res, next) {
+  console.log(req.config)
   log.debug(req.method + ' ' + req.url)
 
   // Save selected role to session
@@ -173,13 +174,14 @@ app.use(function (req, res, next) {
   res.locals.URL = req.url.split('?')[0]
 
   // Set preferred locale
+
   req.i18n.setLocale(req.config.language)
 
   next()
 })
 
 // Load enabled games
-for (game in config.games) {
+for (var game in config.games) {
   if (config.games[game]) {
     // Build list of enabled modules
     available_games.push(game)
@@ -187,18 +189,20 @@ for (game in config.games) {
     // Load module shema, if exists
     // Modules such as wouso-social-login do not provide any shema
     try {
-      require(game + '/model.js')
-    } catch (err) {}
+      require('./modules/'+game + '/model.js')
+    } catch (err) {
+      console.log(err, 'Error loading module from config.');
+    }
 
     // Load module routes
-    app.use(require(game + '/routes.js'))
+    app.use(require('./modules/'+game + '/routes.js'))
     // Load module views
     views.push('node_modules/' + game)
   }
 }
 
 // Load enabled modules
-for (module in config.modules) {
+for (var module in config.modules) {
   if (config.modules[module]) {
     // Build list of enabled modules
     available_modules.push(module)
@@ -206,11 +210,14 @@ for (module in config.modules) {
     // Load module shema, if exists
     // Modules such as wouso-social-login do not provide any shema
     try {
-      require(module + '/model.js')
-    } catch (err) {}
+      require('./modules/'+ module + '/model.js')
+    } catch (err) {
+      console.log(err, 'Error loading module from config.');
+    }
 
     // Load module routes
-    app.use(require(module + '/routes.js'))
+
+    app.use(require('./modules/' + module + '/routes.js'))
     // Load module views
     views.push('node_modules/' + module)
   }
