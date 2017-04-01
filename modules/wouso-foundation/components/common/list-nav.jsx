@@ -1,28 +1,38 @@
-var React         = require('react');
-var AppDispatcher = require('../../dispatchers/app');
+import React from 'react';
+import AppDispatcher from '../../dispatchers/app';
 
+class ListNav extends React.Component {
+  constructor() {
+    super();
+    this.refreshList = this.refreshList.bind(this);
+  }
+  // static propTypes = {
+  //   total: React.propTypes,
+  //   no: React.propTypes,
+  //   refreshList: React.propTypes,
+  //   page: React.propTypes,
+  // }
 
-var ListNav = React.createClass({
-  refreshList: function (page) {
+  refreshList(page) {
     AppDispatcher.handleViewAction({
-      type : this.props.refreshType,
-      no   : String(this.props.no),
-      page : String(page)
+      type: this.props.refreshType,
+      no: String(this.props.no),
+      page: String(page)
     });
-  },
+  }
 
-  render: function() {
+  render() {
     this.pages = [];
     if (this.props.total) {
-      this.pages = Math.ceil(this.props.total/this.props.no);
-      this.pages = Array.apply(0, Array(this.pages)).map(function(j, i) {
-        return i+1;
+      this.pages = Math.ceil(this.props.total / this.props.no);
+      this.pages = Array.apply(0, Array(this.pages)).map(function (j, i) {
+        return i + 1;
       });
     }
 
     return (
       <div className="questions-pages text-center">
-        { this.pages.map(function (opt, i) {
+        {this.pages.map( (opt, i) => {
           if (opt == this.props.page) {
             return (
               <b key={i}>
@@ -38,10 +48,10 @@ var ListNav = React.createClass({
               </a>
             );
           }
-        }, this) }
+        }, this)}
       </div>
     );
   }
-});
+}
 
 module.exports = ListNav;

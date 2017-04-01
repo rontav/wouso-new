@@ -1,9 +1,11 @@
-var React     = require('react');
-var ReactIntl = require('react-intl');
+import React from 'react';
+import ReactIntl from 'react-intl';
 
-
-var QotdAdmin = React.createClass({
-  render: function () {
+class QotdAdmin extends React.Component{
+  // static propTypes = {
+  //   intl: React.propTypes
+  // }
+  render () {
     return (
       <div className="row">
         <div className="large-12 columns">
@@ -27,6 +29,6 @@ var QotdAdmin = React.createClass({
       </div>
     )
   }
-})
+};
 
 module.exports = ReactIntl.injectIntl(QotdAdmin);

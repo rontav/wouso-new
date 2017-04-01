@@ -1,17 +1,19 @@
-var React = require('react'),
-    ReactDnD = require('react-dnd')
+import React from 'react';
+import ReactDnD from 'react-dnd';
+
+
 var ItemTypes = {
-      CARD: 'card'
-    };
+    CARD: 'card'
+};
 
 var cardSource = {
-    beginDrag: function(props) {
+    beginDrag: (props) => {
         return { id: props.id };
     }
 };
 
 var cardTarget = {
-    hover: function(props, monitor) {
+    hover: (props, monitor) => {
         var draggedId = monitor.getItem().id;
 
         if (draggedId !== props.id) {
@@ -20,17 +22,17 @@ var cardTarget = {
     }
 };
 
-var Card = React.createClass({
-    propTypes: {
+
+class Card extends React.Component {
+    static propTypes = {
         connectDragSource: React.PropTypes.func.isRequired,
         connectDropTarget: React.PropTypes.func.isRequired,
         isDragging: React.PropTypes.bool.isRequired,
         id: React.PropTypes.any.isRequired,
         text: React.PropTypes.string.isRequired,
         swapCards: React.PropTypes.func.isRequired
-    },
-
-    render: function() {
+    }
+    render() {
         var style = {
             border: '1px dashed gray',
             padding: '0.5rem 1rem',
@@ -45,21 +47,21 @@ var Card = React.createClass({
             </div>
         ));
     }
-});
+};
 
 var DragSourceDecorator = ReactDnD.DragSource(ItemTypes.CARD, cardSource,
-    function(connect, monitor) {
+    (connect, monitor) => {
         return {
             connectDragSource: connect.dragSource(),
             isDragging: monitor.isDragging()
         };
-});
+    });
 
 var DropTargetDecorator = ReactDnD.DropTarget(ItemTypes.CARD, cardTarget,
-    function(connect) {
+    (connect) => {
         return {
             connectDropTarget: connect.dropTarget()
         };
-});
+    });
 
 module.exports = DropTargetDecorator(DragSourceDecorator(Card));

@@ -1,14 +1,21 @@
-var React = require('react'),
-    HTML5Backend = require('react-dnd-html5-backend'),
-    Card = require("./Card"),
-    ReactDnD = require('react-dnd');
+import React from 'react';
+import HTML5Backend from 'react-dnd-html5-backend';
+import Card from './Card';
+import ReactDnD from 'react-dnd';
 
 var style = {
     width: 400
 };
 
-var Container = React.createClass({
-    getInitialState: function(){
+class Container extends React.Component {
+    constructor() {
+        super();
+        this.getInitialState = this.getInitialState.bind(this);
+        this.compareCards = this.compareCards.bind(this);
+        this.swapCards = this.swapCards.bind(this);   
+    }
+
+    getInitialState() {
         return {
             cards: [{
                 id: 1,
@@ -40,32 +47,33 @@ var Container = React.createClass({
                 text: 'PROFIT'
             }]
         };
-    },
+    }
 
-    compareCards: function(card1, card2){
+    compareCards(card1, card2) {
         return card1.order - card2.order;
-    },
+    }
 
-    swapCards: function(id1, id2) {
+    swapCards(id1, id2) {
         var cards = this.state.cards;
 
-        var card1 = cards.filter(function(c){return c.id === id1})[0];
-        var card2 = cards.filter(function(c){return c.id === id2})[0];
-        var card1Order = card1.order;
+        var card1 = cards.filter((c) => {return c.id === id1})[0];
+        var card2 = cards.filter((c) => {return c.id === id2})[0];
+
+        var temp = card1.order;
         card1.order = card2.order;
-        card2.order = card1Order;
+        card2.order = temp;
 
         cards.sort(this.compareCards);
 
         this.setState({
             cards: cards
         });
-    },
+    }
 
-    render: function() {
+    render() {
         return (
             <div style={style}>
-                {this.state.cards.map(function(card) {
+                {this.state.cards.map((card) =>  {
                     return (
                         <Card key={card.id}
                                     id={card.id}
@@ -76,6 +84,6 @@ var Container = React.createClass({
             </div>
         );
     }
-});
+}
 
 module.exports = ReactDnD.DragDropContext(HTML5Backend)(Container);

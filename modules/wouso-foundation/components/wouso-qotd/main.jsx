@@ -1,14 +1,14 @@
-var React        = require('react');
-var ReactDOM     = require('react-dom');
-var IntlProvider = require('react-intl').IntlProvider;
+import  React from 'react';
+import  ReactDOM from 'react-dom';
+import  {IntlProvider} from 'react-intl';
 
-var QotdGame  = require('./game');
-var QotdList  = require('./contribute');
-var QotdTeach = require('./teacher');
-var QotdAdmin = require('./admin');
+import  QotdGame from './game';
+import QotdList   from'./contribute';
+import QotdTeach  from './teacher';
+import QotdAdmin from './admin';
 
-var locales = require('../../locales/locales.js');
-var config  = require('../../../../config.json');
+import locales from '../../locales/locales.js';
+import  config  from '../../../../config.json';
 
 
 var intlData = {

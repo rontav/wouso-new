@@ -1,24 +1,30 @@
-var React            = require('react');
-var ReactDOM         = require('react-dom');
-var ReactIntl        = require('react-intl');
+import React from 'react';
+import ReactDom from 'react-dom';
+import ReactIntl from 'react-intl';
 
-var QStore        = require('../../stores/questions');
-var DateStore     = require('../../stores/datepicker');
-var AppDispatcher = require('../../dispatchers/app');
+import QStore from '../../stores/questions';
+import DateStore from '../../stores/datepicker';
+import AppDispatcher from '../../dispatchers/app';
 
 // Common components
-var ListNav    = require('../common/list-nav.jsx');
-var ListSearch = require('../common/list-search.jsx');
+
+import ListNav from '../common/list-nav.jsx';
+import ListSearch from '../common/list-search.jsx';
 
 
-var QotdQuestionOption = React.createClass({
-  getInitialState: function() {
-    return {
-      val  : null
+class QotdQuestionOption extends React.Component {
+  constructor() {
+    super();
+
+    this.changeOptionValueTo = this.changeOptionValueTo.bind(this);
+
+    this.state = {
+      val: null
     }
-  },
+  }
 
-  render: function() {
+
+  render() {
     if (this.state.val != null) {
       optionState = this.state.val;
     } else {
@@ -26,9 +32,9 @@ var QotdQuestionOption = React.createClass({
     }
 
     var default_class = "button postfix qotd-check";
-    var optionClass   = optionState ? default_class + " success" : default_class;
-    var value         = optionState ? "true" : "false";
-    var valueText     = optionState ? "True" : "False";
+    var optionClass = optionState ? default_class + " success" : default_class;
+    var value = optionState ? "true" : "false";
+    var valueText = optionState ? "True" : "False";
 
     return (
       <div className="row collapse qotd-answer">
@@ -43,70 +49,103 @@ var QotdQuestionOption = React.createClass({
         </div>
       </div>
     );
-  },
+  }
 
-  changeOptionValueTo: function(value) {
+  changeOptionValueTo(value) {
     this.setState({
-      val : value
+      val: value
     });
   }
-});
+};
 
+class QotdQuestionForm extends React.Component {
+  constructor(props) {
+    super();
 
-var QotdQuestionForm = React.createClass({
-  getInitialState: function() {
-    // Render datepicker
-    $.get("/api/wouso-qotd/list/dates", function(res) {
+    this._onChange = this._onChange.bind(this);
+    this.addOption = this.addOption.bind(this);
+    this.editQuestion = this.editQuestion.bind(this);
+    this.editTags = this.editTags.bind(this);
+
+    this.state = {
+      question: "",
+      tags: "",
+      date: DateStore.getDate(),
+      options: Array.apply(0, Array(noOfOptions)).map((j, i) => { return i + 1; })
+    }
+  }
+  
+  // static propTypes = {
+  //   id: React.propTypes.
+  // }
+
+  _onChange () {
+    this.setState({
+      date: DateStore.getDate()
+    });
+  }
+
+  addOption() {
+    this.setState({
+      options: Array.apply(0, Array(this.state.options.length + 1)).map(function (j, i) { return i + 1; })
+    });
+  }
+
+  editQuestion(event) {
+    this.setState({
+      question: event.target.value
+    });
+  }
+
+  editTags(event) {
+    this.setState({
+      tags: event.target.value
+    });
+  }
+
+  componentDidMount() {
+    DateStore.addChangeListener(this._onChange);
+
+    $.get("/api/wouso-qotd/list/dates", function (res) {
       $('#datepicker').datepicker({
         inline: true,
-        beforeShowDay: function(date) {
+        beforeShowDay: function (date) {
           formated_date = new Date(Date.parse(date)).toISOString();
           if (res.indexOf(formated_date) > -1)
             return { classes: 'activeClass' };
         }
-      }).on('changeDate', function(e) {
+      }).on('changeDate', function (e) {
         AppDispatcher.handleViewAction({
-          type : "refreshDate",
-          date :  e.format("dd/mm/yyyy"),
+          type: "refreshDate",
+          date: e.format("dd/mm/yyyy"),
         });
       });
     }.bind(this));
 
-    return {
-      question : "",
-      tags     : "",
-      date     : DateStore.getDate(),
-      options  : Array.apply(0, Array(noOfOptions)).map(function(j, i) { return i+1; })
-    }
-  },
-
-  componentDidMount: function() {
-    DateStore.addChangeListener(this._onChange);
-
     if (this.props.id) {
-      $.get('/api/wouso-qotd/list?id=' + this.props.id, function(res) {
+      $.get('/api/wouso-qotd/list?id=' + this.props.id, function (res) {
         if (this.isMounted()) {
           this.setState({
-            question : res.question,
-            tags     : res.tags.join(" "),
-            date     : QotdListEntry.shortenDate(res.date),
-            options  : res.choices
+            question: res.question,
+            tags: res.tags.join(" "),
+            date: QotdListEntry.shortenDate(res.date),
+            options: res.choices
           });
         }
       }.bind(this));
     }
-  },
+  }
 
-  componentWillUnmount: function() {
+  componentWillUnmount () {
     DateStore.removeChangeListener(this._onChange);
 
     this.setState({
       question: ""
     });
-  },
+  }
 
-  render: function() {
-    var modalTitle  = this.props.id ? "Edit question" : "Add question";
+  render() {
+    var modalTitle = this.props.id ? "Edit question" : "Add question";
     var modalSubmit = this.props.id ? "Update" : "Add";
     return (
       <form id="add-qotd-form" method="post" action="/api/wouso-qotd/add">
@@ -114,9 +153,9 @@ var QotdQuestionForm = React.createClass({
           <div className="row">
             <div className="large-12 columns">
               <h2>{modalTitle}</h2>
-                <label>Question:</label>
-                <input name="question" type="text" value={this.state.question} onChange={this.editQuestion}></input>
-                <input name="id" type="hidden" value={this.props.id}></input>
+              <label>Question:</label>
+              <input name="question" type="text" value={this.state.question} onChange={this.editQuestion}></input>
+              <input name="id" type="hidden" value={this.props.id}></input>
             </div>
           </div>
           <div className="row">
@@ -129,11 +168,11 @@ var QotdQuestionForm = React.createClass({
             <div className="large-6 columns">
               <label>Answers:</label>
               <div id="qotd-answer-list">
-                { this.state.options.map(function(opt, i) {
+                {this.state.options.map(function (opt, i) {
                   return (
-                    <QotdQuestionOption key={i} text={this.state.options[i].text} val={this.state.options[i].val}/>
+                    <QotdQuestionOption key={i} text={this.state.options[i].text} val={this.state.options[i].val} />
                   );
-                }, this) }
+                }, this)}
               </div>
             </div>
             <div className="large-6 columns">
@@ -154,49 +193,25 @@ var QotdQuestionForm = React.createClass({
         </div>
       </form>
     );
-  },
-
-  _onChange: function() {
-    this.setState({
-      date : DateStore.getDate()
-    });
-  },
-
-  addOption: function() {
-    this.setState({
-      options  : Array.apply(0, Array(this.state.options.length+1)).map(function(j, i) { return i+1; })
-    });
-  },
-
-  editQuestion: function(event) {
-    this.setState({
-      question: event.target.value
-    });
-  },
-
-  editTags: function(event) {
-    this.setState({
-      tags: event.target.value
-    });
   }
-});
+};
 
 
 var QotdListEntry = React.createClass({
   statics: {
-    selected_qotd : [],
+    selected_qotd: [],
 
-    shortenDate: function(date) {
+    shortenDate: function (date) {
       if (!date) return null;
 
       var qdate = new Date(date);
       var shortDate = ("0" + qdate.getDate()).slice(-2) + "/";
-      shortDate += ("0" + (qdate.getMonth()+1)).slice(-2) + "/";
+      shortDate += ("0" + (qdate.getMonth() + 1)).slice(-2) + "/";
       shortDate += qdate.getFullYear();
       return shortDate;
     },
 
-    handleEditClick: function(id) {
+    handleEditClick: function (id) {
       // Mount component and reveal modal
       ReactDOM.render(<QotdQuestionForm id={id} />, document.getElementById("qotdModal"));
       var popup = new Foundation.Reveal($('#qotdModal'));
@@ -209,7 +224,7 @@ var QotdListEntry = React.createClass({
     },
   },
 
-  handleChange: function(event) {
+  handleChange: function (event) {
     if (QotdListEntry.selected_qotd.indexOf(event.target.value) < 0) {
       QotdListEntry.selected_qotd.push(event.target.value);
     } else {
@@ -217,7 +232,7 @@ var QotdListEntry = React.createClass({
     }
   },
 
-  render: function() {
+  render: function () {
     var entryDate = "--/--/--";
 
     if (this.props.date)
@@ -240,48 +255,48 @@ var QotdListEntry = React.createClass({
 
 
 var QotdList = React.createClass({
-  getInitialState: function() {
+  getInitialState: function () {
     return {
-      questions : [],
-      total     : null,
-      no        : null,
-      page      : null,
-      term      : ''
+      questions: [],
+      total: null,
+      no: null,
+      page: null,
+      term: ''
     }
   },
 
-  componentDidMount: function() {
+  componentDidMount: function () {
     QStore.addChangeListener(this._onChange);
     AppDispatcher.handleViewAction({
       type: "refreshQotd"
     });
   },
 
-  componentWillUnmount: function() {
+  componentWillUnmount: function () {
     QStore.removeChangeListener(this._onChange);
   },
 
-  render: function() {
+  render: function () {
     return (
       <div>
         <div className="row">
           <ListSearch searchType='searchQotd' refreshType='refreshQotd'
-                      selected={QotdListEntry.selected_qotd} />
+            selected={QotdListEntry.selected_qotd} />
         </div>
         <div className="row">
           <div className="reveal" id="qotdModal" data-reveal></div>
           <div className="large-12 columns">
             <a className="radius button" href="#" onClick={QotdListEntry.handleEditClick.bind(this, null)}>Add qotd</a>
             <h2>
-              { this.props.intl.formatMessage({id: 'qotd_list_title'}) + " (" + this.state.total + " results" + (this.state.term != '' ? " for \"" + this.state.term + "\"": '') + ")" }
+              {this.props.intl.formatMessage({ id: 'qotd_list_title' }) + " (" + this.state.total + " results" + (this.state.term != '' ? " for \"" + this.state.term + "\"" : '') + ")"}
             </h2>
-            { this.state.total == 0 ? (this.state.term != '' ? "No match for \"" + this.state.term + "\"" : "No questions") : null}
-            { this.state.questions.map(function (opt) {
+            {this.state.total == 0 ? (this.state.term != '' ? "No match for \"" + this.state.term + "\"" : "No questions") : null}
+            {this.state.questions.map(function (opt) {
               return <QotdListEntry key={opt._id} id={opt._id} text={opt.question} date={opt.date} />
             }, this)}
             <div className="spacer"></div>
             <ListNav total={this.state.total} no={this.state.no}
-                     page={this.state.page} refreshType='refreshQotd' />
+              page={this.state.page} refreshType='refreshQotd' />
           </div>
         </div>
         <div className="spacer"></div>
@@ -289,13 +304,13 @@ var QotdList = React.createClass({
     );
   },
 
-  _onChange: function() {
+  _onChange: function () {
     this.setState({
-      questions : QStore.getCurrent(),
-      total     : QStore.getCount(),
-      no        : QStore.getNumber(),
-      page      : QStore.getPage(),
-      term      : QStore.getTerm()
+      questions: QStore.getCurrent(),
+      total: QStore.getCount(),
+      no: QStore.getNumber(),
+      page: QStore.getPage(),
+      term: QStore.getTerm()
     });
   }
 });
