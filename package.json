@@ -4,6 +4,7 @@
   "scripts": {
     "start": "./node_modules/nodemon/bin/nodemon.js app.js",
     "login": "./node_modules/nodemon/bin/nodemon.js app.js login",
+    "webpackDevServer": "webpack-dev-server --colors --progress --inline",
     "test": "./node_modules/mocha/bin/mocha tests/"
   },
   "dependencies": {
@@ -45,14 +46,16 @@
     "babel-loader": "^6.2.5",
     "babel-plugin-syntax-async-functions": "^6.13.0",
     "babel-plugin-transform-class-properties": "^6.23.0",
-    "babel-preset-es2015": "^6.14.0",
+    "babel-preset-es2017": "^6.22.0",
     "babel-preset-react": "^6.11.1",
     "chai": "^3.5.0",
     "eslint": "^3.5.0",
     "eslint-config-standard-jsx": "^3.0.0",
     "eslint-plugin-node": "^2.0.0",
     "eslint-plugin-react": "^6.2.2",
+    "jsx-loader": "^0.13.2",
     "mocha": "^3.0.2",
+    "node-sass": "^4.5.0",
     "precss": "^1.4.0",
     "react": "^15.3.1",
     "react-datetime": "^2.5.0",
@@ -64,7 +67,9 @@
     "react-widgets": "^3.4.4",
     "sass-loader": "^6.0.3",
     "should": "^11.1.0",
+    "style-loader": "^0.13.1",
     "supertest": "^2.0.0",
-    "webpack": "^2.3.2"
+    "webpack": "^2.3.2",
+    "webpack-dev-server": "^2.3.0"
   }
 }
