@@ -20,9 +20,7 @@ var defaults = {
   superuser: {
     'root@root.com': 'marius'
   },
-  debug: {
-
-  },
+  debug: {},
   mongo_url: {
     dev: 'mongodb://localhost/wouso-new-dev',
     test: 'mongodb://localhost/wouso-new-test',
@@ -30,46 +28,49 @@ var defaults = {
   },
   credentials: {
     facebook: {
-      clientID: '',
-      clientSecret: ''
+      clientID: 'x',
+      clientSecret: 'x'
     },
     twitter: {
-      clientID: '',
-      clientSecret: ''
+      clientID: 'x',
+      clientSecret: 'x'
     },
     google: {
-      clientID: '',
-      clientSecret: ''
+      clientID: 'x',
+      clientSecret: 'x'
     },
     github: {
-      clientID: '',
-      clientSecret: ''
+      clientID: 'x',
+      clientSecret: 'x'
     }
   },
   newrelicLicenseKey: ''
-}
+};
+var secretKeys = ['credentials', 'mongo_url', 'newrelicLicenseKey', 'superuser', 'secret'];
 
 var config = {};
 var secrets = {};
 
 try {
   config = require('./config.json');
-  secrets = require('./secret.json');
 }
 catch (e) {
-  console.error('Config or secret file is invalid');
+  console.error('config.json is missing or is invalid.');
 }
-config = _.merge(defaults, config);
+try {
+  secrets = require('./secret.json');
+  secretKeys = secretKeys.concat(Object.keys(secrets));
+}
+catch (e) {
+  console.error('secret.json is missing or is invalid.');
+}
+config = _.defaultsDeep(secrets, config, defaults);
 
 config.hostname = config.host + config.port;
 
-for (var i = 0; i < Object.keys(secrets).length; i++) {
-  var keys = Object.keys(secrets);
+for (var i = 0; i < secretKeys.length; i++) {
   if (process.browser) {
-    delete config[keys[i]];
-  }
-  else {
-    config[keys[i]] = secrets[keys[i]];
+    delete config[secretKeys[i]];
   }
 }
 
