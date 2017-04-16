@@ -16,7 +16,7 @@ var QOption = mongoose.model('QOption');
 var Qotd    = mongoose.model('Qotd');
 
 // Read config file
-var data = (JSON.parse(fs.readFileSync('./config.json', 'utf8')));
+var data = require('../../../config.js');
 
 
 describe('QOTD settings endpoint:', function() {
