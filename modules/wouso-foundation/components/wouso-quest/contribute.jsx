@@ -10,7 +10,7 @@ var momentLocalizer = require('react-widgets/lib/localizers/moment');
 momentLocalizer(Moment);
 
 var locales = require('../../locales/locales.js');
-var config  = require('../../../../config.json');
+var config  = require('config');
 
 var QStore        = require('../../stores/questions');
 var QuestStore    = require('../../stores/quest');

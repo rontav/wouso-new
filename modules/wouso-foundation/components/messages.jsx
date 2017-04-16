@@ -4,7 +4,7 @@ var ReactIntl    = require('react-intl');
 var IntlProvider = require('react-intl').IntlProvider;
 
 var locales = require('../locales/locales.js');
-var config  = require('../../../config.json');
+var config  = require('config');
 
 var intlData = {
   locale   : 'en-US',

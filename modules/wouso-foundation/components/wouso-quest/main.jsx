@@ -7,7 +7,7 @@ var QuestContrib = require('./contribute');
 var QuestGame    = require('./game');
 
 var locales = require('../../locales/locales.js');
-var config  = require('../../../../config.json');
+var config  = require('config');
 
 var intlData = {
   locale   : 'en-US',
