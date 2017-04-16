@@ -7,9 +7,9 @@ var DEFAULT_ROUTE = 'http://%s/wouso-social-login/auth/%s/callback'
 var User = require('../config/models/user')
 // load up the settings
 var Settings = require('../config/models/settings')
+var config = require('../config.js');
 
-
-module.exports = function(app, passport) {
+module.exports = function(passport) {
 
   // used to serialize the user for the session
   passport.serializeUser(function(user, done) {
@@ -103,6 +103,6 @@ module.exports = function(app, passport) {
   }))
 
   // Add social login if available and needed
-  if ('wouso-social-login' in app.data.modules)
-    require('wouso-social-login').social(app, passport)
+  if ('wouso-social-login' in config.modules)
+    require('wouso-social-login').social(passport)
 }

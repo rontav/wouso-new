@@ -10,13 +10,13 @@ var DEFAULT_ROUTE = 'http://%s/wouso-social-login/auth/%s/callback'
 // Load up core db models
 var User = require('../../config/models/user')
 var Settings = require('../../config/models/settings')
+var config = require('../../config.js');
 
-
-module.exports = function(app, passport) {
+module.exports = function(passport) {
   passport.use(new FacebookStrategy({
-    clientID          : app.data.credentials.facebook.clientID,
-    clientSecret      : app.data.credentials.facebook.clientSecret,
-    callbackURL       : util.format(DEFAULT_ROUTE, app.data.hostname, 'facebook'),
+    clientID          : config.credentials.facebook.clientID,
+    clientSecret      : config.credentials.facebook.clientSecret,
+    callbackURL       : util.format(DEFAULT_ROUTE, config.hostname, 'facebook'),
     passReqToCallback : true
 
   }, function(req, token, refreshToken, profile, done) {
@@ -87,9 +87,9 @@ module.exports = function(app, passport) {
 
   // TWITTER
   passport.use(new TwitterStrategy({
-    consumerKey       : app.data.credentials.twitter.clientID,
-    consumerSecret    : app.data.credentials.twitter.clientSecret,
-    callbackURL       : util.format(DEFAULT_ROUTE, app.data.hostname, 'twitter'),
+    consumerKey       : config.credentials.twitter.clientID,
+    consumerSecret    : config.credentials.twitter.clientSecret,
+    callbackURL       : util.format(DEFAULT_ROUTE, config.hostname, 'twitter'),
     passReqToCallback : true
 
   }, function(req, token, tokenSecret, profile, done) {
@@ -160,9 +160,9 @@ module.exports = function(app, passport) {
 
   // GOOGLE
   passport.use(new GoogleStrategy({
-    clientID          : app.data.credentials.google.clientID,
-    clientSecret      : app.data.credentials.google.clientSecret,
-    callbackURL       : util.format(DEFAULT_ROUTE, app.data.hostname, 'google'),
+    clientID          : config.credentials.google.clientID,
+    clientSecret      : config.credentials.google.clientSecret,
+    callbackURL       : util.format(DEFAULT_ROUTE, config.hostname, 'google'),
     passReqToCallback : true
 
   }, function(req, access_token, refresh_token, profile, done) {
@@ -237,9 +237,9 @@ module.exports = function(app, passport) {
 
   // GITHUB
   passport.use(new GitHubStrategy({
-    clientID          : app.data.credentials.github.clientID,
-    clientSecret      : app.data.credentials.github.clientSecret,
-    callbackURL       : util.format(DEFAULT_ROUTE, app.data.hostname, 'github'),
+    clientID          : config.credentials.github.clientID,
+    clientSecret      : config.credentials.github.clientSecret,
+    callbackURL       : util.format(DEFAULT_ROUTE, config.hostname, 'github'),
     passReqToCallback : true
 
   }, function(req, token, refreshToken, profile, done) {

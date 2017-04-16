@@ -13,19 +13,7 @@ var log           = require('./core/logging')('core');
 
 var app = module.exports = express();
 
-
-app.data = null;
-try {
-  // Check if config.json exists
-  fs.lstatSync('./config.json');
-  app.data = (JSON.parse(fs.readFileSync('./config.json', 'utf8')));
-}
-catch (e) {
-  // Read config from env var
-  app.data = (JSON.parse(process.env.config));
-  log.warning('Using config from env var.')
-}
-
+var config = require('./config.js');
 
 // List of enabled and available modules and games
 var available_games = [];
@@ -33,8 +21,8 @@ var available_modules = [];
 
 // Used theme
 var used_theme = null;
-for (var theme in app.data.themes) {
-  if (app.data.themes[theme]) {
+for (var theme in config.themes) {
+  if (config.themes[theme]) {
     used_theme = theme;
   }
 }
@@ -48,11 +36,11 @@ mongoose.Promise = global.Promise;
 mongoose.connection.on('error', configDB.check);
 // Connect to proper db
 if (process.env.NODE_ENV == 'production') {
-  mongoose.connect(app.data.mongo_url.prod)
+  mongoose.connect(config.mongo_url.prod)
 } else if (process.env.NODE_ENV == 'testing'){
-  mongoose.connect(app.data.mongo_url.test)
+  mongoose.connect(config.mongo_url.test)
 } else {
-  mongoose.connect(app.data.mongo_url.dev)
+  mongoose.connect(config.mongo_url.dev)
 }
 
 
@@ -64,8 +52,8 @@ var Badges   = require('./config/models/badges');
 // Ensure superuser exists
 var User = require('./config/models/user');
 // Get first superuser from config dict
-var root = Object.keys(app.data.superuser)[0];
-var pass = app.data.superuser[root];
+var root = Object.keys(config.superuser)[0];
+var pass = config.superuser[root];
 // Add to users collection only if does not already exist
 var update = { $set: {
   'role'           : 0,
@@ -88,7 +76,7 @@ if (process.env.NODE_ENV != 'development' || process.env.NODE_ENV != 'testing') 
 }
 
 // Configuring Passport
-require('./core/auth')(app, passport)
+require('./core/auth')(passport)
 
 // Init badges
 query = {'name': 'qotd-streak'}
@@ -191,14 +179,14 @@ app.use(function (req, res, next) {
   res.locals.URL = req.url.split('?')[0]
 
   // Set preferred locale
-  req.i18n.setLocale(req.app.data.language)
+  req.i18n.setLocale(config.language)
 
   next()
 })
 
 // Load enabled games
-for (game in app.data.games) {
-  if (app.data.games[game]) {
+for (game in config.games) {
+  if (config.games[game]) {
     // Build list of enabled modules
     available_games.push(game)
 
@@ -216,8 +204,8 @@ for (game in app.data.games) {
 }
 
 // Load enabled modules
-for (module in app.data.modules) {
-  if (app.data.modules[module]) {
+for (module in config.modules) {
+  if (config.modules[module]) {
     // Build list of enabled modules
     available_modules.push(module)
 
