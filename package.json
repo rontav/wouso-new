@@ -5,7 +5,8 @@
     "start": "./node_modules/nodemon/bin/nodemon.js app.js",
     "login": "./node_modules/nodemon/bin/nodemon.js app.js login",
     "webpackDevServer": "webpack-dev-server --colors --progress --inline",
-    "test": "./node_modules/mocha/bin/mocha tests/"
+    "test": "./node_modules/mocha/bin/mocha tests/",
+    "prepare": "mkdir -p node_modules && cd node_modules && ln -s ../modules/* ./"
   },
   "dependencies": {
     "bcrypt-nodejs": "0.0.3",
@@ -28,11 +29,7 @@
     "pretty-logger": "^0.1.2",
     "pug": "^2.0.0-beta6",
     "serve-favicon": "^2.3.0",
-    "winston": "^2.0.0",
-    "wouso-foundation": "file:./modules/wouso-foundation",
-    "wouso-qotd": "file:./modules/wouso-qotd",
-    "wouso-quest": "file:./modules/wouso-quest",
-    "wouso-social-login": "file:./modules/wouso-social-login"
+    "winston": "^2.0.0"
   },
   "engines": {
     "node": "4.0.x",
